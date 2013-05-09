@@ -59,6 +59,10 @@ Rectangle {
 			anchors.rightMargin: 8
 			anchors.topMargin: 8
 		}
+		MouseArea {
+			anchors.fill: parent
+			cursorShape: "IBeamCursor"
+		}
 	}
 
 	Rectangle {
