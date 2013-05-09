@@ -22,4 +22,5 @@ include(qtquick2applicationviewer/qtquick2applicationviewer.pri)
 qtcAddDeployment()
 
 OTHER_FILES += \
-    qml/showdevant/TopToolbar.qml
+    qml/showdevant/TopToolbar.qml \
+    README.md
