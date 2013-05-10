@@ -12,7 +12,11 @@ QML_IMPORT_PATH =
 # MOBILITY +=
 
 # The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    requestmanager.cpp \
+    downloadmanager.cpp \
+    commandmanager.cpp \
+    showsearchmodel.cpp
 
 # Installation path
 # target.path =
@@ -23,4 +27,11 @@ qtcAddDeployment()
 
 OTHER_FILES += \
     qml/showdevant/TopToolbar.qml \
-    README.md
+    README.md \
+    qml/showdevant/SearchResultList.qml
+
+HEADERS += \
+    requestmanager.h \
+    downloadmanager.h \
+    commandmanager.h \
+    showsearchmodel.h
