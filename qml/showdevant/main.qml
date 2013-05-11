@@ -8,16 +8,42 @@ Item {
 	width: 800
 	height: 600
 
-	TopToolbar {
-		id: topToolbar
-		Component.onCompleted: {
-			dropDownAnimation.start();
+	Rectangle {
+		id: leftRectangle
+		anchors {
+			top: topToolbar.bottom
+			bottom: parent.bottom
 		}
-
+		width: 200
+		color: "#DDDDDD"
+		Component.onCompleted: {
+			leftAnimation.start();
+		}
 	}
 
 	PathAnimation {
-		id: dropDownAnimation
+		id: leftAnimation
+		easing.type: Easing.InQuad
+		path: Path {
+			startX: -200
+			PathCubic {
+				x: 0
+				y: 0
+			}
+		}
+		target: leftRectangle
+		duration: 750
+	}
+
+	TopToolbar {
+		id: topToolbar
+		Component.onCompleted: {
+			topToolbarAnimation.start();
+		}
+	}
+
+	PathAnimation {
+		id: topToolbarAnimation
 		easing.type: Easing.InQuad
 		path: Path {
 			startY: -50
@@ -29,7 +55,6 @@ Item {
 		target: topToolbar
 		duration: 750
 	}
-
 
 //	Rectangle {
 //		id: leftPanel

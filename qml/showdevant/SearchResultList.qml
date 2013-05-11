@@ -39,16 +39,17 @@ ShadowRectangle {
 				anchors.right: parent.right;
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.rightMargin: 4
-				width: 40
+				width: followText.contentWidth + 10
 				height: 18
 				radius: 4
 				border.color: "#BBBBBB"
-				color: followMouseArea.containsMouse ? "#00FF00" : "#AAFFAA"
+				color: followMouseArea.containsMouse ? "#00AA00" : "#AAFFAA"
 				Text {
+					id: followText
 					anchors.verticalCenter: parent.verticalCenter
 					anchors.horizontalCenter: parent.horizontalCenter
 					font.pointSize: 8
-					color: "#444444"
+					color: followMouseArea.containsMouse ? "#DDDDDD" : "#444444"
 					text: "follow"
 				}
 				MouseArea {
@@ -72,7 +73,7 @@ ShadowRectangle {
 		anchors.top: parent.top
 		anchors.left: parent.left
 		anchors.right: parent.right
-		color: "#BBBBBB"
+		color: "#DDDDDD"
 		Text {
 			anchors.verticalCenter: parent.verticalCenter
 			color: "#222222"
