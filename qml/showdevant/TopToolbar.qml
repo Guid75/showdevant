@@ -54,7 +54,6 @@ ShadowRectangle {
 	anchors {
 		left: parent.left
 		right: parent.right
-//		top: parent.top
 	}
 	height: 50
 	gradient: Gradient {
@@ -134,7 +133,8 @@ ShadowRectangle {
 			anchors.fill: parent
 			cursorShape: "IBeamCursor"
 			onPressed: {
-				searchInput.focus = true
+				searchInput.focus = true;
+				mouse.accepted = false;
 			}
 			hoverEnabled: true
 		}
