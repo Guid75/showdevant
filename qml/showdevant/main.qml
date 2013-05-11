@@ -9,7 +9,27 @@ Item {
 	height: 600
 
 	TopToolbar {
+		id: topToolbar
+		Component.onCompleted: {
+			dropDownAnimation.start();
+		}
+
 	}
+
+	PathAnimation {
+		id: dropDownAnimation
+		easing.type: Easing.InQuad
+		path: Path {
+			startY: -50
+			PathCubic {
+				x: 0
+				y: 0
+			}
+		}
+		target: topToolbar
+		duration: 750
+	}
+
 
 //	Rectangle {
 //		id: leftPanel
