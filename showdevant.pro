@@ -11,6 +11,8 @@ QML_IMPORT_PATH =
 # CONFIG += mobility
 # MOBILITY +=
 
+QT += sql
+
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
     requestmanager.cpp \
@@ -18,7 +20,8 @@ SOURCES += main.cpp \
     commandmanager.cpp \
     showsearchmodel.cpp \
     jsonparser.cpp \
-    shortcut.cpp
+    shortcut.cpp \
+    databasemanager.cpp
 
 # Installation path
 # target.path =
@@ -30,7 +33,8 @@ qtcAddDeployment()
 OTHER_FILES += \
     qml/showdevant/TopToolbar.qml \
     README.md \
-    qml/showdevant/SearchResultList.qml
+    qml/showdevant/SearchResultList.qml \
+    qml/showdevant/ShowList.qml
 
 HEADERS += \
     requestmanager.h \
@@ -38,4 +42,5 @@ HEADERS += \
     commandmanager.h \
     showsearchmodel.h \
     jsonparser.h \
-    shortcut.h
+    shortcut.h \
+    databasemanager.h

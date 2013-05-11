@@ -19,6 +19,11 @@ Item {
 		Component.onCompleted: {
 			leftAnimation.start();
 		}
+		ShowList {
+			anchors.fill: parent
+			anchors.topMargin: 10
+			anchors.bottomMargin: 40
+		}
 	}
 
 	PathAnimation {
