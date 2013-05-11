@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import com.guid75 1.0
 
 Item {
 	id: root
@@ -8,9 +9,7 @@ Item {
 	height: 600
 
 	TopToolbar {
-
 	}
-
 
 //	Rectangle {
 //		id: leftPanel

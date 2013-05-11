@@ -16,7 +16,9 @@ SOURCES += main.cpp \
     requestmanager.cpp \
     downloadmanager.cpp \
     commandmanager.cpp \
-    showsearchmodel.cpp
+    showsearchmodel.cpp \
+    jsonparser.cpp \
+    shortcut.cpp
 
 # Installation path
 # target.path =
@@ -34,4 +36,6 @@ HEADERS += \
     requestmanager.h \
     downloadmanager.h \
     commandmanager.h \
-    showsearchmodel.h
+    showsearchmodel.h \
+    jsonparser.h \
+    shortcut.h

@@ -14,6 +14,19 @@ ShadowRectangle {
 		id: showSearchModel
 	}
 
+	function hideSearchResults() {
+		if (searchList)
+			searchList.destroy();
+		searchList = null;
+	}
+
+	Shortcut {
+		key: "Escape"
+		onActivated: {
+			hideSearchResults();
+		}
+	}
+
 	property int searchTicket: -1
 	property Item searchList: null
 
@@ -26,14 +39,15 @@ ShadowRectangle {
 
 			var compo = Qt.createComponent("SearchResultList.qml");
 			// TODO error management
-			if (searchList)
-				searchList.destroy();
-			searchList = compo.createObject(root, {
-											  x: searchRectangle.x +1,
-											  y: searchRectangle.y + searchRectangle.height,
-											  width: searchRectangle.width - 2,
-												model: showSearchModel
-										  });
+			showSearchModel.parseJson(response);
+			if (!searchList)
+				searchList = compo.createObject(root, {
+													searchText: searchInput.text,
+													x: searchRectangle.x +1,
+													y: searchRectangle.y + searchRectangle.height,
+													width: searchRectangle.width - 2,
+													model: showSearchModel
+												});
 		}
 	}
 
@@ -96,12 +110,12 @@ ShadowRectangle {
 				if (searchTimer.running)
 					searchTimer.stop();
 
-				if (text != "")
-					searchTimer.start();
-				else {
+				if (text != "") {
 					if (searchList)
-						searchList.destroy();
-					searchList = null;
+						searchList.searchText = text;
+					searchTimer.start();
+				} else {
+					hideSearchResults();
 				}
 			}
 			onFocusChanged:
