@@ -13,15 +13,15 @@ ShadowRectangle {
 			id: itemRectangle
 			state: "normal"
 			width: parent.width
-			color: mouseAreaItem.containsMouse ? "#EEEEEE" : "#00000000"
+			color: mouseAreaItem.containsMouse || followMouseArea.containsMouse ? "#EEEEEE" : "#00000000"
 			height: 20
+			clip: true
 			MouseArea {
 				id: mouseAreaItem
 				anchors.fill: parent
-				onClicked: {
-					listView.currentIndex = index
-				}
 				hoverEnabled: true
+				onClicked: {
+				}
 			}
 			Text {
 				id: itemText
@@ -32,6 +32,35 @@ ShadowRectangle {
 				text: display
 				font.bold: true
 				elide: Text.ElideRight
+			}
+			Rectangle {
+				id: followRectangle
+				antialiasing: true
+				anchors.right: parent.right;
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.rightMargin: 4
+				width: 40
+				height: 18
+				radius: 4
+				border.color: "#BBBBBB"
+				color: followMouseArea.containsMouse ? "#00FF00" : "#AAFFAA"
+				Text {
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.horizontalCenter: parent.horizontalCenter
+					font.pointSize: 8
+					color: "#444444"
+					text: "follow"
+				}
+				MouseArea {
+					id: followMouseArea
+					propagateComposedEvents: true
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: "PointingHandCursor"
+					onClicked: {
+						mouse.accepted = false;
+					}
+				}
 			}
 		}
 	}
