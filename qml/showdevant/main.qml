@@ -8,6 +8,12 @@ Item {
 	width: 800
 	height: 600
 
+	Component.onCompleted: {
+		if (databaseManager.openDB() === 2) {
+			console.log("database opened");
+		}
+	}
+
 	Rectangle {
 		id: leftRectangle
 		anchors {

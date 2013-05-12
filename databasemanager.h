@@ -33,7 +33,7 @@ public:
 	/// \return 0 if none of those methods worked
 	/// \return 1 if the fallback memory database has been successfully opened
 	/// \return 2 if the persistent database has been successfully opened
-	int openDB();
+	Q_INVOKABLE int openDB();
 
 	QSqlError lastError();
 
