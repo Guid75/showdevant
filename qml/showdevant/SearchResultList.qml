@@ -5,7 +5,7 @@ ShadowRectangle {
 	property string searchText : ""
 	width: 100
 	antialiasing: true
-	color: "#FFFFFF"
+    color: "#FFFFFF"
 
 	Component {
 		id: searchDelegate

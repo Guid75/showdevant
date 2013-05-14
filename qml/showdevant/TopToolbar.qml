@@ -57,8 +57,8 @@ ShadowRectangle {
 	}
 	height: 50
 	gradient: Gradient {
-		GradientStop { position: 0.0; color: "lightsteelblue" }
-		GradientStop { position: 1.0; color: "#7777FF" }
+        GradientStop { position: 0.0; color: "white" }
+        GradientStop { position: 1.0; color: "#AAAAAA" }
 	}
 
 	Image {

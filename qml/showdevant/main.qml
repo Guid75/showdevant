@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import com.guid75 1.0
+import "notifications.js" as Notifications
 
 Item {
 	id: root
@@ -9,9 +10,19 @@ Item {
 	height: 600
 
 	Component.onCompleted: {
-		if (databaseManager.openDB() === 2) {
-			console.log("database opened");
-		}
+        switch (databaseManager.openDB()) {
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            Notifications.notify("database successfully opened");
+            Notifications.error("This is a very long sentence to see if it fits");
+            Notifications.warning("This is a very long sentence to see if it fits and if a warning is enough to see the color");
+            break;
+        default:
+            break;
+        }
 	}
 
 	Rectangle {

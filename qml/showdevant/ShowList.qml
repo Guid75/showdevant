@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
 Rectangle {
-	color: "#EEEEEE"
+    color: "#00000000"
 	property alias model : listView.model
 
 	ListView {

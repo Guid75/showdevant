@@ -34,7 +34,9 @@ OTHER_FILES += \
     qml/showdevant/TopToolbar.qml \
     README.md \
     qml/showdevant/SearchResultList.qml \
-    qml/showdevant/ShowList.qml
+    qml/showdevant/ShowList.qml \
+    qml/showdevant/notifications.js \
+    qml/showdevant/NotificationBox.qml
 
 HEADERS += \
     requestmanager.h \
