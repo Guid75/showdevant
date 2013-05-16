@@ -2,9 +2,10 @@ import QtQuick 2.0
 
 Rectangle {
     property alias message: mainText.text
+	property alias duration: mainTimer.interval
 
-    x: 0
-    y: 0
+	id: myself
+	anchors.horizontalCenter: parent.horizontalCenter
     // get a good z
     width: Math.max(mainText.contentWidth + 20, 100)
     height: 32
@@ -20,4 +21,14 @@ Rectangle {
         color: "#444444"
         anchors.centerIn: parent
     }
+
+	Timer {
+		id: mainTimer
+		interval: duration
+		running: true
+		repeat: false
+		onTriggered: {
+			myself.destroy();
+		}
+	}
 }
