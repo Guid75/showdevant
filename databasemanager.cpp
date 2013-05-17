@@ -80,6 +80,8 @@ int DatabaseManager::openDB()
                "FOREIGN KEY (subtitle_id) REFERENCES subtitle(id) ON DELETE CASCADE, "
                "UNIQUE (subtitle_id, file) ON CONFLICT REPLACE)");
 
+	emit opened();
+
 	return ret;
 }
 

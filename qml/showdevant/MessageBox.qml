@@ -1,44 +1,30 @@
 import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
 
 Item {
-	signal quit(string buttonLabel)
+	id: myself
+	anchors.fill: parent
 
 	property alias message: mainText.text
 	property alias buttons: buttonsRepeater.model
 	property int padding : 10;
-	id: myself
-	anchors.fill: parent
 
-/*	Component.onCompleted: {
-		if (!buttons) {
-			buttons = [{
-						   text: 'OK',
-						   action: 'ok'
-					   }, {
-						   text: 'Cancel',
-						   action: 'cancel'
-					   }];
-
-		}
-
-		// fill buttons
-		buttons.forEach(function(button) {
-			buttonsModel.append(button);
-		});
-	}*/
+	signal quit(string buttonLabel)
 
 	Rectangle {
-		id: back;
-		anchors.fill: parent;
-		opacity: 0.50;
-		color: "black";
+		id: back
+		anchors.fill: parent
+		opacity: 0.50
+		color: "black"
 
 		MouseArea {
+			hoverEnabled: true;
 			anchors.fill: parent;
-			onClicked: { }
-			onWheel: { }
+			onEntered:  { }
+			onExited:   { }
+			onReleased: { }
+			onPressed:  { }
+			onClicked:  { }
+			onWheel:    { }
 		}
 	}
 
@@ -65,7 +51,6 @@ Item {
 		Component {
 			id: buttonComponent
 			Rectangle {
-				Layout.minimumWidth: myText.contentWidth
 				height: buttonRow.height
 				width: buttonRow.width / buttonsRepeater.count
 				color:  mouseAreaOk.containsMouse ? "#44000000" : "#00000000"
@@ -82,7 +67,7 @@ Item {
 					cursorShape: "PointingHandCursor"
 					onClicked: {
 						quit(model.action);
-						myself.destroy();
+						//myself.destroy();
 					}
 				}
 			}

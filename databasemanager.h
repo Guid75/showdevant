@@ -25,6 +25,7 @@
 class DatabaseManager : public QObject
 {
 	Q_OBJECT
+
 public:
 	static DatabaseManager &instance();
 
@@ -36,6 +37,9 @@ public:
 	Q_INVOKABLE int openDB();
 
 	QSqlError lastError();
+
+signals:
+	void opened();
 
 private:
 	static DatabaseManager *_instance;

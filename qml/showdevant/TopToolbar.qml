@@ -57,8 +57,8 @@ ShadowRectangle {
 	}
 	height: 50
 	gradient: Gradient {
-        GradientStop { position: 0.0; color: "white" }
-        GradientStop { position: 1.0; color: "#AAAAAA" }
+		GradientStop { position: 0.0; color: "white" }
+		GradientStop { position: 1.0; color: "#AAAAAA" }
 	}
 
 	Image {
@@ -71,13 +71,13 @@ ShadowRectangle {
 		}
 		fillMode: Image.PreserveAspectFit
 		MouseArea {
+			hoverEnabled: true
 			anchors.fill: betaSeriesImage
-			cursorShape: "PointingHandCursor"
+			cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+			onClicked: {
+				console.log("clicked on image")
+			}
 		}
-	}
-
-	MouseArea {
-		anchors.fill: betaSeriesImage
 	}
 
 	Rectangle {
@@ -131,7 +131,7 @@ ShadowRectangle {
 		MouseArea {
 			id: searchMouseArea
 			anchors.fill: parent
-			cursorShape: "IBeamCursor"
+			cursorShape: containsMouse ? Qt.IBeamCursor : Qt.ArrowCursor
 			onPressed: {
 				searchInput.focus = true;
 				mouse.accepted = false;
@@ -167,7 +167,7 @@ ShadowRectangle {
 			height: 16
 		}
 
-/*		Text {
+		/*		Text {
 			id: searchButtonText
 			color: "white"
 			horizontalAlignment: Text.AlignHCenter

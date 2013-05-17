@@ -2,6 +2,7 @@ import QtQuick 2.0
 
 Item {
 	property alias color : rectangle.color
+	property alias border: rectangle.border
 	property alias gradient : rectangle.gradient
 
 	BorderImage {

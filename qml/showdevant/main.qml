@@ -1,23 +1,20 @@
 import QtQuick 2.0
 import com.guid75 1.0
 import "notifications.js" as Notifications
-import QtQuick.Controls 1.0;
 
-Item {
+Rectangle {
 	id: root
-
-	// default size, but scalable by user
 	width: 800
 	height: 600
 
 	Component.onCompleted: {
 		var compo, messageBox;
-		switch (0) {
 		//switch (databaseManager.openDB()) {
+		switch (2) {
 		case 0:
 			epicFailMessage.active = true;
+			epicFailMessage.focus = true;
 			break;
-			// return;
 		case 1:
 			Notifications.warning("It seems than the local file database is impossible to open, so we fallback on the memory database", 4000);
 			break;
@@ -32,11 +29,11 @@ Item {
 
 	Rectangle {
 		id: leftRectangle
+		width: 200
 		anchors {
 			top: topToolbar.bottom
 			bottom: parent.bottom
 		}
-		width: 200
 		x: -200
 		color: "#DDDDDD"
 		ShowList {
@@ -53,7 +50,7 @@ Item {
 			startX: -200
 			PathCubic {
 				x: 0
-				y: 0
+				y: 50
 			}
 		}
 		target: leftRectangle
@@ -62,7 +59,7 @@ Item {
 
 	TopToolbar {
 		id: topToolbar
-		y: -50
+		y: -60
 	}
 
 	PathAnimation {
@@ -89,7 +86,7 @@ Item {
 					text: "Quit"
 				}
 			}
-			onQuit: { Qt.quit(); }
+			onQuit: { epicFailMessage.active = false; Qt.quit(); }
 		}
 		active: false
 		asynchronous: true
