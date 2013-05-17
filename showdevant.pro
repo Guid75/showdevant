@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     jsonparser.cpp \
     shortcut.cpp \
     databasemanager.cpp \
-    sqltablemodel.cpp
+    sqltablemodel.cpp \
+    showmodel.cpp
 
 # Installation path
 # target.path =
@@ -48,4 +49,5 @@ HEADERS += \
     jsonparser.h \
     shortcut.h \
     databasemanager.h \
-    sqltablemodel.h
+    sqltablemodel.h \
+    showmodel.h

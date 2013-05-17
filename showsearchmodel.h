@@ -15,6 +15,7 @@ public:
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
+	QHash<int, QByteArray> roleNames() const{ return roles; }
 	int getCount() { this->count = this->rowCount(); return count; }
 
 	Q_INVOKABLE QVariant get(int row);
@@ -28,7 +29,8 @@ public slots:
 private:
 	QList<QPair<QString,QString> > items;
 	int count;
-	
+	QHash<int, QByteArray> roles;
+
 };
 
 #endif // SHOWSEARCHMODEL_H

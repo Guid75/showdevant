@@ -4,6 +4,8 @@
 ShowSearchModel::ShowSearchModel(QObject *parent) :
     QAbstractListModel(parent)
 {
+	roles.insert(Qt::UserRole + 1, "showId");
+	roles.insert(Qt::UserRole + 2, "title");
 }
 
 int ShowSearchModel::rowCount(const QModelIndex &parent) const
@@ -18,8 +20,13 @@ QVariant ShowSearchModel::data(const QModelIndex &index, int role) const
 	if (!index.isValid())
 		return QVariant();
 
+	if (role <= Qt::UserRole)
+		return QVariant();
+
 	const QPair<QString,QString> &pair = items[index.row()];
-	if (role == Qt::DisplayRole)
+	if (role == Qt::UserRole + 1)
+		return pair.first;
+	if (role == Qt::UserRole + 2)
 		return pair.second;
 	return QVariant();
 }
@@ -75,3 +82,4 @@ void ShowSearchModel::parseJson(const QByteArray &data)
 	}
 	endResetModel();
 }
+

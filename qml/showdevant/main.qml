@@ -1,11 +1,18 @@
 import QtQuick 2.0
 import com.guid75 1.0
+import QtQuick.Controls 1.0
+import QtQuick.Layouts 1.0
 import "notifications.js" as Notifications
 
 Rectangle {
 	id: root
-	width: 800
-	height: 600
+	width: 1024
+	height: 768
+
+	ShowModel {
+		id: showModel
+		table: "show"
+	}
 
 	Component.onCompleted: {
 		var compo, messageBox;
@@ -23,38 +30,37 @@ Rectangle {
 		default:
 			break;
 		}
-		leftAnimation.start();
 		topToolbarAnimation.start();
 	}
 
-	Rectangle {
-		id: leftRectangle
-		width: 200
+	SplitView {
 		anchors {
-			top: topToolbar.bottom
+			top: parent.top
 			bottom: parent.bottom
+			left: parent.left
+			right: parent.right
+			topMargin: 50
 		}
-		x: -200
-		color: "#DDDDDD"
-		ShowList {
-			anchors.fill: parent
-			anchors.topMargin: 10
-			anchors.bottomMargin: 40
-		}
-	}
+		orientation: Qt.Horizontal
 
-	PathAnimation {
-		id: leftAnimation
-		easing.type: Easing.InQuad
-		path: Path {
-			startX: -200
-			PathCubic {
-				x: 0
-				y: 50
+		Rectangle {
+			id: leftRectangle
+			width: 200
+			Layout.minimumWidth: 100
+			Layout.maximumWidth: 300
+			color: "#DDDDDD"
+			ShowList {
+				id: showList
+				anchors.fill: parent
+				anchors.topMargin: 10
+				anchors.bottomMargin: 40
 			}
 		}
-		target: leftRectangle
-		duration: 750
+		Rectangle {
+			color: "#FFEECC"
+			Layout.minimumWidth: 0
+			Layout.fillWidth: true
+		}
 	}
 
 	TopToolbar {

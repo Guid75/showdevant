@@ -5,33 +5,66 @@ Rectangle {
 	color: "#00000000"
 	property alias model : listView.model
 
-	SqlTableModel {
-		id: showModel
-		table: "show"
+	Component {
+		id: showDelegate
+		Rectangle {
+			width: parent.width
+			height: 20
+			color: itemMouseArea.containsMouse ? "white" : "#DDDDDD"
+			clip: true
+			Text {
+				x: 8
+				anchors.verticalCenter: parent.verticalCenter
+				width: parent.width
+				text: model.title
+				elide: Text.ElideRight
+			}
+			MouseArea {
+				cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+				id: itemMouseArea
+				anchors.fill: parent
+				hoverEnabled: true
+			}
+		}
 	}
 
 	Component {
-		id: showDelegate
-		Item {
+		id: showSectionDelegate
+		Rectangle {
+			gradient: Gradient {
+				GradientStop { position: 0.0; color: "#AAAAAA" }
+				GradientStop { position: 1.0; color: "#CCCCCC" }
+			}
+			border.color: "#888888"
 			width: parent.width
 			height: 20
 			clip: true
 			Text {
+				x: 2
+				anchors.verticalCenter: parent.verticalCenter
+				horizontalAlignment: Text.AlignLeft
 				width: parent.width
-				//horizontalAlignment: Text.AlignHCenter
-				text: model.title
-				elide: Text.ElideRight
+				font.capitalization: Font.Capitalize
+				font.bold: true
+				text: section
 			}
 		}
 	}
 
 	ListView {
 		id: listView
+
+		add: Transition {
+			NumberAnimation { properties: "x,y"; duration: 200 }
+		}
 		anchors {
 			fill: parent
 			leftMargin: 4
 			rightMargin: 4
 		}
+		section.property: "show_id"
+		section.criteria: ViewSection.FirstCharacter
+		section.delegate: showSectionDelegate
 		model: showModel
 		delegate: showDelegate
 	}

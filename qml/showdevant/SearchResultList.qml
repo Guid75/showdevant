@@ -5,7 +5,7 @@ ShadowRectangle {
 	property string searchText : ""
 	width: 100
 	antialiasing: true
-    color: "#FFFFFF"
+	color: "#FFFFFF"
 
 	Component {
 		id: searchDelegate
@@ -29,7 +29,7 @@ ShadowRectangle {
 				x: 8
 				width: listView.width
 				height: 10
-				text: display
+				text: title
 				font.bold: true
 				elide: Text.ElideRight
 			}
@@ -59,6 +59,7 @@ ShadowRectangle {
 					hoverEnabled: true
 					cursorShape: "PointingHandCursor"
 					onClicked: {
+						showModel.addShow(model.showId, model.title);
 						mouse.accepted = false;
 					}
 				}
