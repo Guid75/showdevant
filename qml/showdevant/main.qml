@@ -121,8 +121,8 @@ Rectangle {
 								height: 50
 								width: 200
 								gradient: Gradient {
-									GradientStop { position: 0.0; color: "#BBBBBB" }
-									GradientStop { position: 1.0; color: "#DDDDDD" }
+									GradientStop { position: 0.0; color: mouseAreaEpisode.containsMouse ? "white" : "#BBBBBB"}
+									GradientStop { position: 1.0; color: mouseAreaEpisode.containsMouse ? "white" : "#DDDDDD" }
 								}
 								color: mouseAreaEpisode.containsMouse ? "#EEEEEE" : "#CCCCCC"
 								Column {
