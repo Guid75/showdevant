@@ -40,14 +40,16 @@ ShadowRectangle {
 			var compo = Qt.createComponent("SearchResultList.qml");
 			// TODO error management
 			showSearchModel.parseJson(response);
-			if (!searchList)
+			if (!searchList) {
+				var obj = searchRectangle.mapToItem(null, 0, 0);
 				searchList = compo.createObject(root, {
 													searchText: searchInput.text,
-													x: searchRectangle.x +1,
-													y: searchRectangle.y + searchRectangle.height,
-													width: searchRectangle.width - 2,
+													listX: obj.x + 1,
+													listY: obj.y + searchRectangle.height,
+													listWidth: searchRectangle.width - 2,
 													model: showSearchModel
 												});
+			}
 		}
 	}
 

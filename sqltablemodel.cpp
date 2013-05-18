@@ -3,7 +3,8 @@
 #include "sqltablemodel.h"
 
 SqlTableModel::SqlTableModel(QObject *parent) :
-	QSqlTableModel(parent)
+	QSqlTableModel(parent),
+	_sortOrder(Qt::AscendingOrder)
 {
 }
 
@@ -32,5 +33,36 @@ void SqlTableModel::setTable(const QString &tableName)
 	QSqlTableModel::setTable(tableName);
 	generateRoleNames();
 
+	int col = fieldIndex(_sortField);
+	if (col >= 0) {
+		setSort(col, _sortOrder);
+	}
+
 	select();
+}
+
+Qt::SortOrder SqlTableModel::getSortOrder() const
+{
+	return _sortOrder;
+}
+
+void SqlTableModel::setSortOrder(Qt::SortOrder order)
+{
+	if (_sortOrder == order)
+		return;
+
+	_sortOrder = order;
+}
+
+const QString &SqlTableModel::getSortField() const
+{
+	return _sortField;
+}
+
+void SqlTableModel::setSortField(const QString &field)
+{
+	if (_sortField == field)
+		return;
+
+	_sortField = field;
 }

@@ -10,7 +10,7 @@ Rectangle {
 		Rectangle {
 			width: parent.width
 			height: 20
-			color: itemMouseArea.containsMouse ? "white" : "#DDDDDD"
+			color: itemMouseArea.containsMouse ? "white" : (listView.currentIndex == index ? "#FFEECC" : "#DDDDDD")
 			clip: true
 			Text {
 				x: 8
@@ -24,6 +24,10 @@ Rectangle {
 				id: itemMouseArea
 				anchors.fill: parent
 				hoverEnabled: true
+				onClicked: {
+					listView.currentIndex = index;
+					seasonModel.currentFilter = 'show_id="' + model.show_id + '"';
+				}
 			}
 		}
 	}
@@ -53,7 +57,7 @@ Rectangle {
 
 	ListView {
 		id: listView
-
+		currentIndex: -1
 		add: Transition {
 			NumberAnimation { properties: "x,y"; duration: 200 }
 		}
@@ -62,7 +66,7 @@ Rectangle {
 			leftMargin: 4
 			rightMargin: 4
 		}
-		section.property: "show_id"
+		section.property: "title"
 		section.criteria: ViewSection.FirstCharacter
 		section.delegate: showSectionDelegate
 		model: showModel
