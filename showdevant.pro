@@ -39,7 +39,8 @@ OTHER_FILES += \
     qml/showdevant/ShowList.qml \
     qml/showdevant/notifications.js \
     qml/showdevant/NotificationBox.qml \
-    qml/showdevant/MessageBox.qml
+    qml/showdevant/MessageBox.qml \
+    TODO.txt
 
 HEADERS += \
     requestmanager.h \

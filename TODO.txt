@@ -1,0 +1,2 @@
+- On doit pouvoir consulter une série et ses sous-titres meme sans la suivre et pouvoir la mettre quand meme dans le cache avec date de peremption des données
+  Il faut donc un nouveau parametre boolean "follow" dans la table "show" qui permet de dire si cette série doit ou non apparaitre dans la liste des séries suivies
