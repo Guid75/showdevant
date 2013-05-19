@@ -26,7 +26,10 @@ Rectangle {
 				hoverEnabled: true
 				onClicked: {
 					listView.currentIndex = index;
-					seasonModel.show = model.show_id;
+					if (showManager.load(model.show_id) == 0)
+						seasonModel.show = model.show_id;
+					else
+						loadingWidget.active = true;
 				}
 			}
 		}

@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     sqltablemodel.cpp \
     showmodel.cpp \
     sqlquerymodel.cpp \
-    seasonmodel.cpp
+    seasonmodel.cpp \
+    showmanager.cpp
 
 # Installation path
 # target.path =
@@ -42,7 +43,9 @@ OTHER_FILES += \
     qml/showdevant/notifications.js \
     qml/showdevant/NotificationBox.qml \
     qml/showdevant/MessageBox.qml \
-    TODO.txt
+    TODO.txt \
+    qml/showdevant/SeasonItem.qml \
+    qml/showdevant/LoadingWidget.qml
 
 HEADERS += \
     requestmanager.h \
@@ -55,4 +58,5 @@ HEADERS += \
     sqltablemodel.h \
     showmodel.h \
     sqlquerymodel.h \
-    seasonmodel.h
+    seasonmodel.h \
+    showmanager.h

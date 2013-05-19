@@ -16,6 +16,14 @@ Rectangle {
 		sortField: "title"
 	}
 
+	Connections {
+		target: showManager
+		onRefreshDone: {
+			loadingWidget.active = false;
+			seasonModel.show = showId;
+		}
+	}
+
 	/*SqlTableModel {
 		id: seasonModel
 		table: "season"
@@ -151,40 +159,28 @@ Rectangle {
 						Repeater {
 							id: repeaterEpisode
 							model: seasonModel
-							ShadowRectangle {
-								height: 50
-								width: 200
-								gradient: Gradient {
-									GradientStop { position: 0.0; color: mouseAreaEpisode.containsMouse ? "white" : "#BBBBBB"}
-									GradientStop { position: 1.0; color: mouseAreaEpisode.containsMouse ? "white" : "#DDDDDD" }
-								}
-								color: mouseAreaEpisode.containsMouse ? "#EEEEEE" : "#CCCCCC"
-								Column {
-									anchors {
-										top: parent.top
-										left: parent.left
-										topMargin: 4
-										leftMargin: 4
-									}
-									Text {
-										text: "Season <b>" + number + "</b>"
-										font.pointSize: 12
-									}
-									Text {
-										//text: Math.floor(Math.random() * 24) + " episodes"
-										text: episode_count + " episodes"
-										font.pointSize: 8
-									}
-								}
+							SeasonItem {
 								MouseArea {
-									id: mouseAreaEpisode
 									anchors.fill: parent
-									hoverEnabled: true
-									cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+									propagateComposedEvents: true
+									onClicked: {
+										// TODO animation to bring the season above
+										mouse.accepted = false;
+									}
 								}
 							}
 						}
 					}
+				}
+				Loader {
+					id: loadingWidget
+					anchors.centerIn: parent
+					sourceComponent: LoadingWidget {
+						anchors.centerIn: parent
+						width: 200
+					}
+					active: false
+					asynchronous: true
 				}
 			}
 		}
