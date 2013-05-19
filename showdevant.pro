@@ -23,7 +23,9 @@ SOURCES += main.cpp \
     shortcut.cpp \
     databasemanager.cpp \
     sqltablemodel.cpp \
-    showmodel.cpp
+    showmodel.cpp \
+    sqlquerymodel.cpp \
+    seasonmodel.cpp
 
 # Installation path
 # target.path =
@@ -51,4 +53,6 @@ HEADERS += \
     shortcut.h \
     databasemanager.h \
     sqltablemodel.h \
-    showmodel.h
+    showmodel.h \
+    sqlquerymodel.h \
+    seasonmodel.h

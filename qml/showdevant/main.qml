@@ -16,11 +16,16 @@ Rectangle {
 		sortField: "title"
 	}
 
-	SqlTableModel {
+	/*SqlTableModel {
 		id: seasonModel
 		table: "season"
 		sortOrder: Qt.DescendingOrder
 		sortField: "number"
+	}*/
+
+	SeasonModel {
+		id: seasonModel
+		show: "dexter"
 	}
 
 	Component.onCompleted: {
@@ -72,7 +77,36 @@ Rectangle {
 			Rectangle {
 				id: resumeRectangle
 				height: 100
-				color: "#DDDDDD"
+				color: "#EEEEEE"
+				Image {
+					anchors.fill: parent
+					fillMode: Image.PreserveAspectCrop
+					source: "show-banner.jpg"
+				}
+				Rectangle {
+					id: backgroundItem
+					anchors {
+						left: parent.left
+						right: parent.right
+						bottom: parent.bottom
+					}
+					color: "black"
+					opacity: 0.7
+					height: 30
+				}
+				Item {
+					anchors.fill: backgroundItem
+					Text {
+						anchors.fill: parent
+						anchors.leftMargin: 6
+						verticalAlignment: Text.AlignVCenter
+						//font.bold: true
+						font.pointSize: 12
+						color: "white"
+						text: "Dexter"
+					}
+				}
+
 				anchors {
 					top: parent.top
 					left: parent.left
@@ -92,7 +126,7 @@ Rectangle {
 				}
 				Flickable {
 					anchors.fill: parent
-					contentWidth: Math.max(parent.width, 208)
+					contentWidth: Math.max(width, 208)
 					contentHeight: flowEpisode.childrenRect.height + 8
 					clip: true
 					Flow {
@@ -137,7 +171,8 @@ Rectangle {
 										font.pointSize: 12
 									}
 									Text {
-										text: Math.floor(Math.random() * 24) + " episodes"
+										//text: Math.floor(Math.random() * 24) + " episodes"
+										text: episode_count + " episodes"
 										font.pointSize: 8
 									}
 								}

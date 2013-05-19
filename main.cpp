@@ -8,7 +8,9 @@
 #include "showsearchmodel.h"
 #include "shortcut.h"
 #include "sqltablemodel.h"
+#include "sqlquerymodel.h"
 #include "showmodel.h"
+#include "seasonmodel.h"
 
 #include "qtquick2applicationviewer.h"
 
@@ -20,7 +22,9 @@ int main(int argc, char *argv[])
 	qmlRegisterType<ShowSearchModel>("com.guid75", 1, 0, "ShowSearchModel");
 	qmlRegisterType<Shortcut>("com.guid75", 1, 0, "Shortcut");
 	qmlRegisterType<SqlTableModel>("com.guid75", 1, 0, "SqlTableModel");
+	qmlRegisterType<SqlQueryModel>("com.guid75", 1, 0, "SqlQueryModel");
 	qmlRegisterType<ShowModel>("com.guid75", 1, 0, "ShowModel");
+	qmlRegisterType<SeasonModel>("com.guid75", 1, 0, "SeasonModel");
 
 	DatabaseManager::instance().openDB();
 

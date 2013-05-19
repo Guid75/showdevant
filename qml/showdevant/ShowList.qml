@@ -26,7 +26,7 @@ Rectangle {
 				hoverEnabled: true
 				onClicked: {
 					listView.currentIndex = index;
-					seasonModel.currentFilter = 'show_id="' + model.show_id + '"';
+					seasonModel.show = model.show_id;
 				}
 			}
 		}
