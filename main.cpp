@@ -1,12 +1,13 @@
 #include <QtGui/QGuiApplication>
 #include <QQmlContext>
+#include <QtQml>
+#include <QDebug>
 
 #include "requestmanager.h"
 #include "downloadmanager.h"
 #include "commandmanager.h"
 #include "databasemanager.h"
 #include "showmanager.h"
-#include "showsearchmodel.h"
 #include "shortcut.h"
 #include "sqltablemodel.h"
 #include "sqlquerymodel.h"
@@ -20,7 +21,6 @@ int main(int argc, char *argv[])
 	QGuiApplication app(argc, argv);
 
 	QtQuick2ApplicationViewer viewer;
-	qmlRegisterType<ShowSearchModel>("com.guid75", 1, 0, "ShowSearchModel");
 	qmlRegisterType<Shortcut>("com.guid75", 1, 0, "Shortcut");
 	qmlRegisterType<SqlTableModel>("com.guid75", 1, 0, "SqlTableModel");
 	qmlRegisterType<SqlQueryModel>("com.guid75", 1, 0, "SqlQueryModel");

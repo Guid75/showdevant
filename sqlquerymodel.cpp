@@ -24,9 +24,8 @@ void SqlQueryModel::setQuery(const QSqlQuery &query)
 
 void SqlQueryModel::generateRoleNames()
 {
-	for( int i = 0; i < record().count(); i++) {
+	for( int i = 0; i < record().count(); i++)
 		roles.insert(Qt::UserRole + i + 1, record().fieldName(i).toLocal8Bit());
-	}
 }
 
 QVariant SqlQueryModel::data(const QModelIndex &index, int role) const
@@ -43,4 +42,13 @@ QVariant SqlQueryModel::data(const QModelIndex &index, int role) const
 		value = QSqlQueryModel::data(modelIndex, Qt::DisplayRole);
 	}
 	return value;
+}
+
+QVariant SqlQueryModel::get(int row)
+{
+	QMap<QString, QVariant> itemData;
+	foreach (int role, roles.keys())
+		itemData.insert(roles[role], data(createIndex(row, 0), role));
+
+	return QVariant(itemData);
 }

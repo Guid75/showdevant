@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import com.guid75 1.0
+import "showmanager.js" as ShowManager
 
 Rectangle {
 	color: "#00000000"
@@ -26,7 +27,13 @@ Rectangle {
 				hoverEnabled: true
 				onClicked: {
 					listView.currentIndex = index;
-					if (showManager.load(model.show_id) == 0)
+					ShowManager.load(model.show_id, function(showId, expired) {
+						if (expired)
+							console.log("Expired for %1!".arg(showId));
+					});
+					bannerImage.source = "http://api.betaseries.com/pictures/show/" + model.show_id + ".jpg?key=9adb4ab628c6";
+					bannerText.text = model.title;
+					if (showManager.load(model.show_id) === 0)
 						seasonModel.show = model.show_id;
 					else
 						loadingWidget.active = true;

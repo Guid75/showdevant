@@ -34,7 +34,12 @@ public:
 	/// \return 0 if none of those methods worked
 	/// \return 1 if the fallback memory database has been successfully opened
 	/// \return 2 if the persistent database has been successfully opened
-	Q_INVOKABLE int openDB();
+	int openDB();
+
+	/// \return 0 if none of those methods worked
+	/// \return 1 if the fallback memory database has been successfully opened
+	/// \return 2 if the persistent database has been successfully opened
+	Q_INVOKABLE int openDBLastError() const { return _openDBLastError; }
 
 	QSqlError lastError();
 
@@ -42,6 +47,7 @@ signals:
 	void opened();
 
 private:
+	int _openDBLastError;
 	static DatabaseManager *_instance;
 	QSqlDatabase db;
 

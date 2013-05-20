@@ -9,6 +9,7 @@ Item {
 
 	Rectangle {
 		id: myself
+		radius: 4
 		height: 10
 		anchors.left: parent.left
 		anchors.right: parent.right
@@ -51,14 +52,10 @@ Item {
 				PathQuad {
 					x: myself.width - 11
 					y: 0
-/*					controlX: (myself.width - 11) / 2
-					controlY: 200*/
 				}
 				PathQuad {
 					x: 1
 					y: 0
-					/*controlX: (myself.width - 11) / 2
-					controlY: 200*/
 				}
 			}
 			duration: 2000

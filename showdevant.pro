@@ -18,7 +18,6 @@ SOURCES += main.cpp \
     requestmanager.cpp \
     downloadmanager.cpp \
     commandmanager.cpp \
-    showsearchmodel.cpp \
     jsonparser.cpp \
     shortcut.cpp \
     databasemanager.cpp \
@@ -45,13 +44,14 @@ OTHER_FILES += \
     qml/showdevant/MessageBox.qml \
     TODO.txt \
     qml/showdevant/SeasonItem.qml \
-    qml/showdevant/LoadingWidget.qml
+    qml/showdevant/LoadingWidget.qml \
+    qml/showdevant/commands.js \
+    qml/showdevant/database.js
 
 HEADERS += \
     requestmanager.h \
     downloadmanager.h \
     commandmanager.h \
-    showsearchmodel.h \
     jsonparser.h \
     shortcut.h \
     databasemanager.h \

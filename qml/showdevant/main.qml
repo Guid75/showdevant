@@ -1,8 +1,10 @@
 import QtQuick 2.0
+import QtQuick.LocalStorage 2.0
 import com.guid75 1.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
 import "notifications.js" as Notifications
+import "database.js" as Database
 
 Rectangle {
 	id: root
@@ -33,13 +35,12 @@ Rectangle {
 
 	SeasonModel {
 		id: seasonModel
-		show: "dexter"
 	}
 
 	Component.onCompleted: {
-		var compo, messageBox;
-		//switch (databaseManager.openDB()) {
-		switch (2) {
+		Database.init();
+
+		switch (databaseManager.openDBLastError()) {
 		case 0:
 			epicFailMessage.active = true;
 			epicFailMessage.focus = true;
@@ -87,9 +88,9 @@ Rectangle {
 				height: 100
 				color: "#EEEEEE"
 				Image {
+					id: bannerImage
 					anchors.fill: parent
 					fillMode: Image.PreserveAspectCrop
-					source: "show-banner.jpg"
 				}
 				Rectangle {
 					id: backgroundItem
@@ -99,19 +100,19 @@ Rectangle {
 						bottom: parent.bottom
 					}
 					color: "black"
-					opacity: 0.7
+					opacity: bannerText.text == "" ? 0.0 : 0.7
 					height: 30
 				}
 				Item {
 					anchors.fill: backgroundItem
 					Text {
+						id: bannerText
 						anchors.fill: parent
 						anchors.leftMargin: 6
 						verticalAlignment: Text.AlignVCenter
 						//font.bold: true
 						font.pointSize: 12
 						color: "white"
-						text: "Dexter"
 					}
 				}
 
@@ -130,7 +131,7 @@ Rectangle {
 					left: parent.left
 					right: parent.right
 					bottom: parent.bottom
-					margins: 8
+					margins: 4
 				}
 				Flickable {
 					anchors.fill: parent

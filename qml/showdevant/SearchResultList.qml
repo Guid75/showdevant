@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import "showmanager.js" as ShowManager
 
 Item {
 	anchors.fill: parent
@@ -20,6 +21,7 @@ Item {
 	ShadowRectangle {
 		id: mainRectangle
 		width: 100
+		height: listView.contentHeight + resumeRectangle.height
 		antialiasing: true
 		color: "#FFFFFF"
 
@@ -75,7 +77,7 @@ Item {
 						hoverEnabled: true
 						cursorShape: "PointingHandCursor"
 						onClicked: {
-							showModel.addShow(model.showId, model.title);
+							ShowManager.addShow(model.showId, model.title);
 							mouse.accepted = false;
 						}
 					}
@@ -83,7 +85,6 @@ Item {
 			}
 		}
 
-		height: listView.contentHeight + resumeRectangle.height
 		Rectangle {
 			id: resumeRectangle
 			height: 20

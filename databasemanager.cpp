@@ -28,57 +28,60 @@ DatabaseManager::DatabaseManager(QObject *parent) :
 
 int DatabaseManager::openDB()
 {
-    // Find QSLite driver
+	// Find QSLite driver
 	db = QSqlDatabase::addDatabase("QSQLITE");
 
-    QDir dir = QDir::home();
+	QDir dir = QDir::home();
 	if (dir.mkpath(".showdevant") && dir.cd(".showdevant")) {
-        db.setDatabaseName(QDir::toNativeSeparators(dir.filePath("shows.sqlite")));
-    }
+		db.setDatabaseName(QDir::toNativeSeparators(dir.filePath("shows.sqlite")));
+	}
 
 	int ret = 2;
-    // let try to open the persistent database
-    if (!db.open()) {
+	// let try to open the persistent database
+	if (!db.open()) {
 		ret = 1;
+		_openDBLastError = 1;
 		// now let try with a memory database
 		db.setDatabaseName(":memory:");
 		if (!db.open()) {
 			// even the memory fallback failed? Ouch!
+			_openDBLastError = 0;
 			return 0;
 		}
 	}
+	_openDBLastError = 2;
 
 	// create tables?
 	// TODO: do not create if they exist and if they embed the needed fields
-    // TODO: use ids for all tables
+	// TODO: use ids for all tables
 	QSqlQuery query;
 
-    query.exec("PRAGMA foreign_keys = ON;");
+	query.exec("PRAGMA foreign_keys = ON;");
 
-    // shows
-    query.exec("CREATE TABLE show (show_id text primary key, title text, episodes_last_check_date integer)");
+	// shows
+	query.exec("CREATE TABLE show (show_id text primary key, title text, episodes_last_check_date integer)");
 
-    // seasons
-    query.exec("CREATE TABLE season (show_id text, number integer, PRIMARY KEY (show_id, number))");
+	// seasons
+	query.exec("CREATE TABLE season (show_id text, number integer, PRIMARY KEY (show_id, number))");
 
-    // episodes
-    query.exec("CREATE TABLE episode "
-               "(show_id text, season integer, episode integer, title text, "
-               "number text, global integer, date integer, "
-               "comments integer, subtitles_last_check_date integer, PRIMARY KEY (show_id, season, episode))");
+	// episodes
+	query.exec("CREATE TABLE episode "
+			   "(show_id text, season integer, episode integer, title text, "
+			   "number text, global integer, date integer, "
+			   "comments integer, subtitles_last_check_date integer, PRIMARY KEY (show_id, season, episode))");
 
-    // subtitles
-    query.exec("CREATE TABLE subtitle "
-               "(id integer primary key, show_id text, season integer, episode integer, "
-               "language text, source text, file text, "
-               "url text, quality integer, "
-               "UNIQUE (show_id, season, episode, url) ON CONFLICT REPLACE)");
+	// subtitles
+	query.exec("CREATE TABLE subtitle "
+			   "(id integer primary key, show_id text, season integer, episode integer, "
+			   "language text, source text, file text, "
+			   "url text, quality integer, "
+			   "UNIQUE (show_id, season, episode, url) ON CONFLICT REPLACE)");
 
-    // subtitles content
-    query.exec("CREATE TABLE subtitle_content "
-               "(subtitle_id integer, file text, "
-               "FOREIGN KEY (subtitle_id) REFERENCES subtitle(id) ON DELETE CASCADE, "
-               "UNIQUE (subtitle_id, file) ON CONFLICT REPLACE)");
+	// subtitles content
+	query.exec("CREATE TABLE subtitle_content "
+			   "(subtitle_id integer, file text, "
+			   "FOREIGN KEY (subtitle_id) REFERENCES subtitle(id) ON DELETE CASCADE, "
+			   "UNIQUE (subtitle_id, file) ON CONFLICT REPLACE)");
 
 	emit opened();
 

@@ -7,6 +7,7 @@ class SqlQueryModel : public QSqlQueryModel
 {
 	Q_OBJECT
 	Q_PROPERTY(QString query READ getQuery WRITE setQuery)
+	Q_PROPERTY(int count READ getCount() NOTIFY countChanged())
 
 public:
 	explicit SqlQueryModel(QObject *parent = 0);
@@ -16,12 +17,16 @@ public:
 	void setQuery(const QSqlQuery &query);
 	QVariant data(const QModelIndex &index, int role) const;
 	virtual QHash<int, QByteArray> roleNames() const{return roles;}
+	int getCount() { this->count = this->rowCount(); return count; }
+	Q_INVOKABLE QVariant get(int row);
 
 signals:
+	void countChanged();
 
 public slots:
 
 private:
+	int count;
 	QString _query;
 	QHash<int, QByteArray> roles;
 

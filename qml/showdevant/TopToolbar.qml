@@ -1,17 +1,50 @@
 import QtQuick 2.0
 import com.guid75 1.0
+import "commands.js" as Commands
 
 ShadowRectangle {
 	id: topToolbar
+	ListModel {
+		id: searchModel
+	}
+
 	Timer {
 		id: searchTimer
 		interval: 500;
 		running: false;
 		repeat: false
-		onTriggered: topToolbar.searchTicket = commandManager.showsSearch(searchInput.text)
-	}
-	ShowSearchModel {
-		id: showSearchModel
+		onTriggered: {
+			Commands.showsSearch({ expression: searchInput.text },
+								 function(error, json) {
+									 if (error)
+										 return;
+									 var compo = Qt.createComponent("SearchResultList.qml");
+
+									 // fill the model
+									 for (var showName in json.shows) {
+										 if (!json.shows.hasOwnProperty(showName)) {
+											 continue;
+										 }
+										 var show = json.shows[showName];
+										 searchModel.append({
+															  showId: show["url"],
+															  title: show["title"]
+														  })
+									 }
+
+									 if (!searchList) {
+										 var obj = searchRectangle.mapToItem(null, 0, 0);
+										 searchList = compo.createObject(root, {
+																			 searchText: searchInput.text,
+																			 listX: obj.x + 1,
+																			 listY: obj.y + searchRectangle.height,
+																			 listWidth: searchRectangle.width - 2,
+																			 //model: showSearchModel
+																			 model: searchModel
+																		 });
+									 }
+								 });
+		}
 	}
 
 	function hideSearchResults() {
@@ -27,31 +60,7 @@ ShadowRectangle {
 		}
 	}
 
-	property int searchTicket: -1
 	property Item searchList: null
-
-	Connections {
-		target: commandManager
-		onCommandFinished: {
-			if (ticketId !== searchTicket) {
-				return;
-			}
-
-			var compo = Qt.createComponent("SearchResultList.qml");
-			// TODO error management
-			showSearchModel.parseJson(response);
-			if (!searchList) {
-				var obj = searchRectangle.mapToItem(null, 0, 0);
-				searchList = compo.createObject(root, {
-													searchText: searchInput.text,
-													listX: obj.x + 1,
-													listY: obj.y + searchRectangle.height,
-													listWidth: searchRectangle.width - 2,
-													model: showSearchModel
-												});
-			}
-		}
-	}
 
 	anchors {
 		left: parent.left

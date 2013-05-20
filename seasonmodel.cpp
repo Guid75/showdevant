@@ -5,7 +5,7 @@
 SeasonModel::SeasonModel(QObject *parent) :
     SqlQueryModel(parent)
 {
-	setShow("");
+	setShow("a");
 }
 
 void SeasonModel::setShow(const QString &show)
