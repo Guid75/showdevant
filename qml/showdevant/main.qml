@@ -13,9 +13,14 @@ Rectangle {
 
 	ShowModel {
 		id: showModel
-		table: "show"
-		sortOrder: Qt.AscendingOrder
+	}
+
+	SortFilterProxyModel {
+		id: showProxyModel
+		sourceModel: showModel
 		sortField: "title"
+		sortOrder: Qt.AscendingOrder
+		sortCaseSensitivity: Qt.CaseInsensitive
 	}
 
 	Connections {
@@ -38,8 +43,6 @@ Rectangle {
 	}
 
 	Component.onCompleted: {
-		Database.init();
-
 		switch (databaseManager.openDBLastError()) {
 		case 0:
 			epicFailMessage.active = true;
@@ -73,6 +76,7 @@ Rectangle {
 			color: "#DDDDDD"
 			ShowList {
 				id: showList
+				model: showProxyModel
 				anchors.fill: parent
 				anchors.topMargin: 10
 				anchors.bottomMargin: 40

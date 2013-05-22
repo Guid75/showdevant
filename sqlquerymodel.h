@@ -13,8 +13,8 @@ public:
 	explicit SqlQueryModel(QObject *parent = 0);
 
 	const QString &getQuery() const { return _query; }
-	void setQuery(const QString &query);
-	void setQuery(const QSqlQuery &query);
+	Q_INVOKABLE void setQuery(const QString &query);
+	Q_INVOKABLE void setQuery(const QSqlQuery &query);
 	QVariant data(const QModelIndex &index, int role) const;
 	virtual QHash<int, QByteArray> roleNames() const{return roles;}
 	int getCount() { this->count = this->rowCount(); return count; }

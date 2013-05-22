@@ -31,10 +31,9 @@ public:
 	 * \retval 1 if the show is expired and a request ticket has been emitted
 	 * \retval -1 if the request ticket could not be given by the request manager
 	 */
-	Q_INVOKABLE int load(const QString &showId);
+	Q_INVOKABLE int refreshOnExpired(const QString &showid);
 
 signals:
-	// TODO manage errors
 	void refreshDone(const QString &showId);
 
 private:

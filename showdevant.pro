@@ -25,6 +25,7 @@ SOURCES += main.cpp \
     showmodel.cpp \
     sqlquerymodel.cpp \
     seasonmodel.cpp \
+    sortfilterproxymodel.cpp \
     showmanager.cpp
 
 # Installation path
@@ -45,8 +46,7 @@ OTHER_FILES += \
     TODO.txt \
     qml/showdevant/SeasonItem.qml \
     qml/showdevant/LoadingWidget.qml \
-    qml/showdevant/commands.js \
-    qml/showdevant/database.js
+    qml/showdevant/commands.js
 
 HEADERS += \
     requestmanager.h \
@@ -59,4 +59,5 @@ HEADERS += \
     showmodel.h \
     sqlquerymodel.h \
     seasonmodel.h \
+    sortfilterproxymodel.h \
     showmanager.h

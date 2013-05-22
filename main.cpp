@@ -7,12 +7,13 @@
 #include "downloadmanager.h"
 #include "commandmanager.h"
 #include "databasemanager.h"
-#include "showmanager.h"
 #include "shortcut.h"
 #include "sqltablemodel.h"
 #include "sqlquerymodel.h"
 #include "showmodel.h"
 #include "seasonmodel.h"
+#include "sortfilterproxymodel.h"
+#include "showmanager.h"
 
 #include "qtquick2applicationviewer.h"
 
@@ -24,10 +25,18 @@ int main(int argc, char *argv[])
 	qmlRegisterType<Shortcut>("com.guid75", 1, 0, "Shortcut");
 	qmlRegisterType<SqlTableModel>("com.guid75", 1, 0, "SqlTableModel");
 	qmlRegisterType<SqlQueryModel>("com.guid75", 1, 0, "SqlQueryModel");
-	qmlRegisterType<ShowModel>("com.guid75", 1, 0, "ShowModel");
 	qmlRegisterType<SeasonModel>("com.guid75", 1, 0, "SeasonModel");
+	qmlRegisterType<ShowModel>("com.guid75", 1, 0, "ShowModel");
+	qmlRegisterType<SortFilterProxyModel>("com.guid75", 1, 0, "SortFilterProxyModel");
 
 	DatabaseManager::instance().openDB();
+
+/*	ShowModel showModel;
+
+	SortFilterProxyModel showProxyModel;
+	showProxyModel.setSourceModel(&showModel);
+	showProxyModel.sort(0, Qt::AscendingOrder);
+	viewer.rootContext()->setContextProperty("showModel", &showProxyModel);*/
 
 	viewer.rootContext()->setContextProperty("commandManager", &CommandManager::instance());
 	viewer.rootContext()->setContextProperty("downloadManager", &DownloadManager::instance());

@@ -77,7 +77,8 @@ Item {
 						hoverEnabled: true
 						cursorShape: "PointingHandCursor"
 						onClicked: {
-							ShowManager.addShow(model.showId, model.title);
+							showModel.addShow(model.showId, model.title);
+							//ShowManager.addShow(model.showId, model.title);
 							mouse.accepted = false;
 						}
 					}

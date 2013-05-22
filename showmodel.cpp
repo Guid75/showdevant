@@ -7,6 +7,7 @@
 ShowModel::ShowModel(QObject *parent) :
 	SqlTableModel(parent)
 {
+	setTable("show");
 }
 
 bool ShowModel::addShow(const QString &showId, const QString &title)
@@ -15,6 +16,5 @@ bool ShowModel::addShow(const QString &showId, const QString &title)
 	record.setValue("show_id", showId);
 	record.setValue("title", title);
 	bool v = insertRecord(-1, record);
-	select();
 	return v;
 }
