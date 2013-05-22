@@ -21,13 +21,15 @@ Rectangle {
 		sortField: "title"
 		sortOrder: Qt.AscendingOrder
 		sortCaseSensitivity: Qt.CaseInsensitive
+		filterField: "title"
+		filterCaseSensitivity: Qt.CaseInsensitive
 	}
 
 	Connections {
 		target: showManager
 		onRefreshDone: {
 			loadingWidget.active = false;
-			seasonModel.show = showId;
+			__showReady(showId);
 		}
 	}
 
@@ -40,6 +42,16 @@ Rectangle {
 
 	SeasonModel {
 		id: seasonModel
+	}
+
+	EpisodeModel {
+		id: episodeModel
+	}
+
+	function __showReady(showId) {
+		seasonModel.show = showId;
+		seasonsFlickable.visible = true;
+		episodesFlickable.visible = false;
 	}
 
 	Component.onCompleted: {
@@ -74,12 +86,39 @@ Rectangle {
 			width: 200
 			Layout.minimumWidth: 100
 			color: "#DDDDDD"
+			TextField {
+				placeholderText: "Filter wildcard"
+				id: showFilterField
+				anchors.top: parent.top
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.topMargin: 10
+				anchors.leftMargin: 2
+				anchors.rightMargin: 2
+				onTextChanged: {
+					showProxyModel.filter = text;
+				}
+			}
+
 			ShowList {
 				id: showList
 				model: showProxyModel
-				anchors.fill: parent
-				anchors.topMargin: 10
+				clip: true
+				anchors.top: showFilterField.bottom
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.topMargin: 6
 				anchors.bottomMargin: 40
+				onShowSelected: {
+					bannerImage.source = "http://api.betaseries.com/pictures/show/" + showId + ".jpg?key=9adb4ab628c6";
+					bannerText.text = title;
+
+					if (showManager.refreshOnExpired(showId) === 0)
+						__showReady(showId);
+					else
+						loadingWidget.active = true;
+				}
 			}
 		}
 		Rectangle {
@@ -137,45 +176,14 @@ Rectangle {
 					bottom: parent.bottom
 					margins: 4
 				}
-				Flickable {
+				SeasonsFlickable {
+					id: seasonsFlickable
 					anchors.fill: parent
-					contentWidth: Math.max(width, 208)
-					contentHeight: flowEpisode.childrenRect.height + 8
-					clip: true
-					Flow {
-						id: flowEpisode
-						anchors.fill: parent
-						anchors.margins: 4
-						spacing: 10
-						add: Transition {
-							NumberAnimation {
-								easing.type: Easing.OutCirc
-								properties: "x,y"
-								duration: 500
-							}
-						}
-						move: Transition {
-							NumberAnimation {
-								easing.type: Easing.OutCirc
-								properties: "x,y"
-								duration: 500
-							}
-						}
-						Repeater {
-							id: repeaterEpisode
-							model: seasonModel
-							SeasonItem {
-								MouseArea {
-									anchors.fill: parent
-									propagateComposedEvents: true
-									onClicked: {
-										// TODO animation to bring the season above
-										mouse.accepted = false;
-									}
-								}
-							}
-						}
-					}
+				}
+				EpisodesFlickable {
+					id: episodesFlickable
+					anchors.fill: parent
+					visible: false
 				}
 				Loader {
 					id: loadingWidget

@@ -78,7 +78,6 @@ Item {
 						cursorShape: "PointingHandCursor"
 						onClicked: {
 							showModel.addShow(model.showId, model.title);
-							//ShowManager.addShow(model.showId, model.title);
 							mouse.accepted = false;
 						}
 					}

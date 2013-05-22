@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     sqlquerymodel.cpp \
     seasonmodel.cpp \
     sortfilterproxymodel.cpp \
-    showmanager.cpp
+    showmanager.cpp \
+    episodemodel.cpp
 
 # Installation path
 # target.path =
@@ -46,7 +47,10 @@ OTHER_FILES += \
     TODO.txt \
     qml/showdevant/SeasonItem.qml \
     qml/showdevant/LoadingWidget.qml \
-    qml/showdevant/commands.js
+    qml/showdevant/commands.js \
+    qml/showdevant/SeasonsFlickable.qml \
+    qml/showdevant/EpisodesFlickable.qml \
+    qml/showdevant/EpisodeItem.qml
 
 HEADERS += \
     requestmanager.h \
@@ -60,4 +64,5 @@ HEADERS += \
     sqlquerymodel.h \
     seasonmodel.h \
     sortfilterproxymodel.h \
-    showmanager.h
+    showmanager.h \
+    episodemodel.h

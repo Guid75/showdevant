@@ -14,11 +14,17 @@ SqlTableModel *SortFilterProxyModel::sourceModel() const
 void SortFilterProxyModel::setSourceModel(SqlTableModel *sourceModel)
 {
 	QSortFilterProxyModel::setSourceModel(sourceModel);
+	SqlTableModel *model = this->sourceModel();
 
 	if (!_sortField.isEmpty()) {
-		SqlTableModel *model = this->sourceModel();
 		if (model)
 			sort(model->fieldIndex(_sortField), _sortOrder);
+	}
+	if (!_filterField.isEmpty()) {
+		if (model)
+			setFilterKeyColumn(model->fieldIndex(_filterField));
+		if (!_filter.isEmpty())
+			setFilterFixedString(_filter);
 	}
 }
 
@@ -42,4 +48,27 @@ void SortFilterProxyModel::setSortOrder(Qt::SortOrder order)
 	SqlTableModel *model = sourceModel();
 	if (model && !_sortField.isEmpty())
 		sort(model->fieldIndex(_sortField), _sortOrder);
+}
+
+void SortFilterProxyModel::setFilterField(const QString &field)
+{
+	if (_filterField == field)
+		return;
+
+	_filterField = field;
+	SqlTableModel *model = sourceModel();
+	if (model)
+		setFilterKeyColumn(model->fieldIndex(field));
+}
+
+void SortFilterProxyModel::setFilter(const QString &filter)
+{
+	if (_filter == filter)
+		return;
+
+	_filter = filter;
+/*	SqlTableModel *model = sourceModel();
+	if (model) {*/
+		this->setFilterFixedString(filter);
+	/*}*/
 }

@@ -12,6 +12,7 @@
 #include "sqlquerymodel.h"
 #include "showmodel.h"
 #include "seasonmodel.h"
+#include "episodemodel.h"
 #include "sortfilterproxymodel.h"
 #include "showmanager.h"
 
@@ -26,6 +27,7 @@ int main(int argc, char *argv[])
 	qmlRegisterType<SqlTableModel>("com.guid75", 1, 0, "SqlTableModel");
 	qmlRegisterType<SqlQueryModel>("com.guid75", 1, 0, "SqlQueryModel");
 	qmlRegisterType<SeasonModel>("com.guid75", 1, 0, "SeasonModel");
+	qmlRegisterType<EpisodeModel>("com.guid75", 1, 0, "EpisodeModel");
 	qmlRegisterType<ShowModel>("com.guid75", 1, 0, "ShowModel");
 	qmlRegisterType<SortFilterProxyModel>("com.guid75", 1, 0, "SortFilterProxyModel");
 

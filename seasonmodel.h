@@ -13,14 +13,9 @@ public:
 
 	const QString &getShow() const { return _show; }
 	void setShow(const QString &show);
-	
-signals:
-	
-public slots:
 
 private:
 	QString _show;
-	
 };
 
 #endif // SEASONMODEL_H
