@@ -30,5 +30,8 @@ ShadowRectangle {
 		anchors.fill: parent
 		hoverEnabled: true
 		cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+		onClicked: {
+			itemClicked();
+		}
 	}
 }

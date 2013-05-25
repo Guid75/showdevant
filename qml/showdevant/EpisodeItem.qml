@@ -41,6 +41,7 @@ ShadowRectangle {
 
 	Row {
 		visible: mouseArea.containsMouse
+		spacing: 2
 		anchors {
 			right: parent.right
 			top: parent.top

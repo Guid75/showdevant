@@ -3,6 +3,7 @@ import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
 
 ToolBar {
+	id: toolBar
 	signal currentIndexChanged(int current)
 	signal closeMe()
 	property int min: 0
@@ -16,9 +17,12 @@ ToolBar {
 		if (current === val)
 			return;
 
-		myAlternativeText.current = val;
 		current = val;
 		currentIndexChanged(val);
+	}
+
+	Component.onCompleted: {
+		textBehavior.enabled = true;
 	}
 
 	RowLayout {
@@ -51,6 +55,8 @@ ToolBar {
 				id: myText
 				clip: true
 				Behavior on text {
+					id: textBehavior
+					enabled: toolBar.visible
 					ParallelAnimation {
 						SequentialAnimation {
 							NumberAnimation { target: myText; property: "opacity"; to: 0; duration: 500 }
@@ -80,6 +86,12 @@ ToolBar {
 				text: currentTemplate.arg(current).arg(max)
 				font.pointSize: 14
 				opacity: 0
+			}
+
+			Binding {
+				target: myAlternativeText
+				property: "current"
+				value: current
 			}
 		}
 

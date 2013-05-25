@@ -162,9 +162,9 @@ Rectangle {
 			RangeSelector {
 				id: seasonSelector
 				currentTemplate: "Season %1/%2"
-				Behavior on height {
-					NumberAnimation { duration: 500 }
-				}
+//				Behavior on height {
+//					NumberAnimation { from: 20; to: 40; duration: 500 }
+//				}
 				anchors {
 					left: parent.left
 					right: parent.right
@@ -186,9 +186,9 @@ Rectangle {
 			RangeSelector {
 				id: episodeSelector
 				currentTemplate: "Episode %1/%2"
-				Behavior on height {
-					NumberAnimation { duration: 500 }
-				}
+//				Behavior on height {
+//					NumberAnimation { from: 20; to: 40; duration: 500 }
+//				}
 				anchors {
 					left: parent.left
 					right: parent.right
@@ -215,6 +215,7 @@ Rectangle {
 					margins: 4
 				}
 			}
+
 			Loader {
 				id: loadingWidget
 				anchors.centerIn: playgroundLoader
