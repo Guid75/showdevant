@@ -36,6 +36,11 @@ Flickable {
 						episodesFlickable.visible = true;
 						episodeModel.show = show_id;
 						episodeModel.season = number;
+						seasonSelector.currentSeason = number;
+						seasonSelector.minSeason = 1;
+						seasonSelector.maxSeason = seasonModel.count;
+						seasonSelector.visible = true;
+						seasonSelector.height = 40;
 						mouse.accepted = false;
 					}
 				}

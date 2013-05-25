@@ -2,3 +2,4 @@
   Il faut donc un nouveau parametre boolean "follow" dans la table "show" qui permet de dire si cette série doit ou non apparaitre dans la liste des séries suivies
 
 - supprimer régulièrement et automatiquement les données obsolètes de la base pour ne pas la faire trop grossir au fil du temps
+- Pas d'animation quand on affiche les barres de sélection

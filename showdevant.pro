@@ -50,7 +50,8 @@ OTHER_FILES += \
     qml/showdevant/commands.js \
     qml/showdevant/SeasonsFlickable.qml \
     qml/showdevant/EpisodesFlickable.qml \
-    qml/showdevant/EpisodeItem.qml
+    qml/showdevant/EpisodeItem.qml \
+    qml/showdevant/SeasonSelector.qml
 
 HEADERS += \
     requestmanager.h \

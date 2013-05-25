@@ -4,7 +4,7 @@ import com.guid75 1.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
 import "notifications.js" as Notifications
-import "database.js" as Database
+//import "database.js" as Database
 
 Rectangle {
 	id: root
@@ -33,13 +33,6 @@ Rectangle {
 		}
 	}
 
-	/*SqlTableModel {
-		id: seasonModel
-		table: "season"
-		sortOrder: Qt.DescendingOrder
-		sortField: "number"
-	}*/
-
 	SeasonModel {
 		id: seasonModel
 	}
@@ -52,6 +45,8 @@ Rectangle {
 		seasonModel.show = showId;
 		seasonsFlickable.visible = true;
 		episodesFlickable.visible = false;
+		seasonSelector.visible = false;
+		seasonSelector.height = 0;
 	}
 
 	Component.onCompleted: {
@@ -121,13 +116,18 @@ Rectangle {
 				}
 			}
 		}
-		Rectangle {
-			color: "#EEEEEE"
+		Item {
 			Layout.minimumWidth: 0
 			Layout.fillWidth: true
 
 			Rectangle {
 				id: resumeRectangle
+				anchors {
+					left: parent.left
+					right: parent.right
+					top: parent.top
+					margins: 4
+				}
 				height: 100
 				color: "#EEEEEE"
 				Image {
@@ -158,19 +158,36 @@ Rectangle {
 						color: "white"
 					}
 				}
+			}
 
+			SeasonSelector {
+				id: seasonSelector
+				height: 0
+				Behavior on height {
+					NumberAnimation { duration: 500 }
+				}
 				anchors {
-					top: parent.top
 					left: parent.left
 					right: parent.right
-					margins: 8
+					top: resumeRectangle.bottom
+					margins: 4
+				}
+				visible: false
+				onSeasonChanged: {
+					episodeModel.season = season;
+				}
+				onCloseMe: {
+					seasonsFlickable.visible = true;
+					episodesFlickable.visible = false;
+					seasonSelector.visible = false;
 				}
 			}
 
 			Rectangle {
+				id: playgroundRectangle
 				color: "#EEEEEE"
 				anchors {
-					top: resumeRectangle.bottom
+					top: seasonSelector.visible ? seasonSelector.bottom : resumeRectangle.bottom
 					left: parent.left
 					right: parent.right
 					bottom: parent.bottom

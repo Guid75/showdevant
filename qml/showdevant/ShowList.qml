@@ -7,31 +7,6 @@ Rectangle {
 	property alias model : listView.model
 	signal showSelected(string showId, string title)
 
-	/*function __refreshEpisodes(showData) {
-		var lastCheckEpoch = 0;
-		var expiration = 24 * 64 * 64 * 1000; // TODO make this value customizable
-		var now;
-
-		bannerImage.source = "http://api.betaseries.com/pictures/show/" + showData.show_id + ".jpg?key=9adb4ab628c6";
-		bannerText.text = showData.title;
-
-		lastCheckEpoch = showData.episodes_last_check_date * 1000;
-
-		now = new Date();
-		if (now.getTime() - lastCheckEpoch > expiration) {
-			loadingWidget.active = true;
-			// expired data, we need to launch the request
-			ShowManager.fetchAllEpisodes(showData.show_id, queryModel, function(success) {
-				loadingWidget.active = false;
-				if (success) {
-					seasonModel.show = showData.show_id;
-				}
-			});
-		} else {
-			seasonModel.show = showData.show_id;
-		}
-	}*/
-
 	Component {
 		id: showDelegate
 		Rectangle {
