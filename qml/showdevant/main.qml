@@ -43,10 +43,9 @@ Rectangle {
 
 	function __showReady(showId) {
 		seasonModel.show = showId;
-		seasonsFlickable.visible = true;
-		episodesFlickable.visible = false;
+		playgroundLoader.source = "SeasonsFlickable.qml";
 		seasonSelector.visible = false;
-		seasonSelector.height = 0;
+		episodeSelector.visible = false;
 	}
 
 	Component.onCompleted: {
@@ -160,9 +159,9 @@ Rectangle {
 				}
 			}
 
-			SeasonSelector {
+			RangeSelector {
 				id: seasonSelector
-				height: 0
+				currentTemplate: "Season %1/%2"
 				Behavior on height {
 					NumberAnimation { duration: 500 }
 				}
@@ -173,45 +172,58 @@ Rectangle {
 					margins: 4
 				}
 				visible: false
-				onSeasonChanged: {
-					episodeModel.season = season;
+				onCurrentIndexChanged: {
+					episodeModel.season = current;
+					episodeSelector.current = 1;
 				}
 				onCloseMe: {
-					seasonsFlickable.visible = true;
-					episodesFlickable.visible = false;
+					playgroundLoader.source = "SeasonsFlickable.qml";
 					seasonSelector.visible = false;
+					episodeSelector.visible = false;
 				}
 			}
 
-			Rectangle {
-				id: playgroundRectangle
-				color: "#EEEEEE"
+			RangeSelector {
+				id: episodeSelector
+				currentTemplate: "Episode %1/%2"
+				Behavior on height {
+					NumberAnimation { duration: 500 }
+				}
 				anchors {
-					top: seasonSelector.visible ? seasonSelector.bottom : resumeRectangle.bottom
+					left: parent.left
+					right: parent.right
+					top: seasonSelector.bottom
+					margins: 4
+				}
+				visible: false
+				onCurrentIndexChanged: {
+					// TODO refresh current episode details
+				}
+				onCloseMe: {
+					playgroundLoader.source = "EpisodesFlickable.qml";
+					episodeSelector.visible = false;
+				}
+			}
+
+			Loader {
+				id: playgroundLoader
+				anchors {
+					top: episodeSelector.visible ? episodeSelector.bottom : (seasonSelector.visible ? seasonSelector.bottom : resumeRectangle.bottom)
 					left: parent.left
 					right: parent.right
 					bottom: parent.bottom
 					margins: 4
 				}
-				SeasonsFlickable {
-					id: seasonsFlickable
-					anchors.fill: parent
-				}
-				EpisodesFlickable {
-					id: episodesFlickable
-					anchors.fill: parent
-					visible: false
-				}
-				Loader {
-					id: loadingWidget
+			}
+			Loader {
+				id: loadingWidget
+				anchors.centerIn: playgroundLoader
+				sourceComponent: LoadingWidget {
 					anchors.centerIn: parent
-					sourceComponent: LoadingWidget {
-						anchors.centerIn: parent
-						width: 200
-					}
-					active: false
-					asynchronous: true
+					width: 200
 				}
+				active: false
+				asynchronous: true
 			}
 		}
 	}

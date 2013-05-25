@@ -3,3 +3,4 @@
 
 - supprimer régulièrement et automatiquement les données obsolètes de la base pour ne pas la faire trop grossir au fil du temps
 - Pas d'animation quand on affiche les barres de sélection
+- Problème avec chargement rapide des bannières, au bout d'un moment, ça ne charge plus rien, mais pas de message d'erreur

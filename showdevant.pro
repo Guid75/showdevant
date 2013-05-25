@@ -51,7 +51,7 @@ OTHER_FILES += \
     qml/showdevant/SeasonsFlickable.qml \
     qml/showdevant/EpisodesFlickable.qml \
     qml/showdevant/EpisodeItem.qml \
-    qml/showdevant/SeasonSelector.qml
+    qml/showdevant/RangeSelector.qml
 
 HEADERS += \
     requestmanager.h \

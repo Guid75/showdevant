@@ -46,13 +46,13 @@ Flickable {
 			id: repeaterEpisode
 			model: episodeModel
 			EpisodeItem {
-				MouseArea {
-					anchors.fill: parent
-					propagateComposedEvents: true
-					onClicked: {
-						// TODO animation to bring the season above
-						mouse.accepted = false;
-					}
+				onItemClicked: {
+					episodeSelector.current = episode;
+					episodeSelector.min = 1;
+					episodeSelector.max = episodeModel.count;
+					episodeSelector.visible = true;
+					episodeSelector.height = 40;
+					mouse.accepted = false;
 				}
 			}
 		}

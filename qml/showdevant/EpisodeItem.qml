@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Controls 1.0
 
 ShadowRectangle {
 	id: fatherRectangle
@@ -28,10 +29,48 @@ ShadowRectangle {
 			elide: Text.ElideMiddle
 		}
 	}
+
+	// this MouseArea is used to detect all clicks on the item except the clickable sub-controls (like the seen checkbox)
+	MouseArea {
+		id: clickableArea
+		anchors.fill: parent
+		onClicked: {
+			itemClicked();
+		}
+	}
+
+	Row {
+		visible: mouseArea.containsMouse
+		anchors {
+			right: parent.right
+			top: parent.top
+			topMargin: 4
+		}
+
+		Text {
+			text: "seen"
+		}
+
+		CheckBox {
+		}
+	}
+
+	// this MouseArea is used to change the cursor
 	MouseArea {
 		id: mouseArea
 		anchors.fill: parent
 		hoverEnabled: true
+		propagateComposedEvents: true
+
 		cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+		onClicked: {
+			mouse.accepted = false;
+		}
+		onPressed: {
+			mouse.accepted = false;
+		}
+		onReleased: {
+			mouse.accepted = false;
+		}
 	}
 }

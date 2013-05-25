@@ -3,20 +3,22 @@ import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
 
 ToolBar {
-	signal seasonChanged(int season)
+	signal currentIndexChanged(int current)
 	signal closeMe()
-	clip: true
-	property int minSeason: 0
-	property int maxSeason: 0
-	property int currentSeason: 0
+	property int min: 0
+	property int max: 0
+	property int current: 0
+	property string currentTemplate: "Foobar %1/%2"
 
-	function __changeSeason(season) {
-		if (currentSeason === season)
+	clip: true
+
+	function __changeCurrent(val) {
+		if (current === val)
 			return;
 
-		myAlternativeText.nextSeason = season;
-		currentSeason = season;
-		seasonChanged(currentSeason);
+		myAlternativeText.current = val;
+		current = val;
+		currentIndexChanged(val);
 	}
 
 	RowLayout {
@@ -25,17 +27,17 @@ ToolBar {
 		ToolButton {
 			iconSource: "first.png"
 			onClicked: {
-				if (currentSeason === minSeason)
+				if (current === min)
 					return;
-				__changeSeason(minSeason);
+				__changeCurrent(min);
 			}
 		}
 
 		ToolButton {
 			iconSource: "previous.png"
 			onClicked: {
-				if (currentSeason > minSeason) {
-					__changeSeason(currentSeason - 1);
+				if (current > min) {
+					__changeCurrent(current - 1);
 				}
 			}
 		}
@@ -64,7 +66,7 @@ ToolBar {
 				anchors.fill: parent
 				horizontalAlignment: Text.AlignHCenter
 				verticalAlignment: Text.AlignVCenter
-				text: "Season %1/%2".arg(currentSeason).arg(maxSeason)
+				text: currentTemplate.arg(current).arg(max)
 				font.pointSize: 14
 			}
 
@@ -73,9 +75,9 @@ ToolBar {
 				anchors.fill: parent
 				horizontalAlignment: Text.AlignHCenter
 				verticalAlignment: Text.AlignVCenter
-				property int nextSeason: 0
+				property int current: 0
 				clip: true
-				text: "Season %1/%2".arg(nextSeason).arg(maxSeason)
+				text: currentTemplate.arg(current).arg(max)
 				font.pointSize: 14
 				opacity: 0
 			}
@@ -84,8 +86,8 @@ ToolBar {
 		ToolButton {
 			iconSource: "next.png"
 			onClicked: {
-				if (currentSeason < maxSeason) {
-					__changeSeason(currentSeason + 1);
+				if (current < max) {
+					__changeCurrent(current + 1);
 				}
 			}
 		}
@@ -93,9 +95,9 @@ ToolBar {
 		ToolButton {
 			iconSource: "last.png"
 			onClicked: {
-				if (currentSeason === maxSeason)
+				if (current === max)
 					return;
-				__changeSeason(maxSeason);
+				__changeCurrent(max);
 			}
 		}
 
