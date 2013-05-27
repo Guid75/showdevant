@@ -4,10 +4,12 @@ import com.guid75 1.0
 Item {
 	clip: true
 	property int currentSeason
+	property string currentShow
 	property int futureSeason
 	readonly property string widgetType : "episodes"
 
 	Component.onCompleted: {
+		currentModel.season = currentSeason;
 		constructionAnimation.start();
 	}
 
@@ -34,18 +36,27 @@ Item {
 
 	EpisodeModel {
 		id: previousModel
-		show: "dexter"
-		season: 1
+	}
+	Binding {
+		target: previousModel
+		property: "show"
+		value: currentShow
 	}
 	EpisodeModel {
 		id: currentModel
-		show: "dexter"
-		season: 2
+	}
+	Binding {
+		target: currentModel
+		property: "show"
+		value: currentShow
 	}
 	EpisodeModel {
 		id: nextModel
-		show: "dexter"
-		season: 3
+	}
+	Binding {
+		target: nextModel
+		property: "show"
+		value: currentShow
 	}
 
 	Flickable {
@@ -63,7 +74,6 @@ Item {
 			spacing: 10
 			Repeater {
 				model: previousModel
-//				model: episodeModel
 				EpisodeItem {
 					onItemClicked: {
 	/*					episodeSelector.current = episode;
@@ -134,7 +144,6 @@ Item {
 			anchors.margins: 4
 			spacing: 10
 			Repeater {
-//				model: episodeModel
 				model: nextModel
 				EpisodeItem {
 					onItemClicked: {
@@ -160,50 +169,41 @@ Item {
 		property: 'y'
 		from: parent ? parent.height : 0
 		to: 4
-		duration: 600
+		duration: 300
 	}
 
-	SequentialAnimation {
+	PropertyAnimation {
 		id: toLeftAnimation
-		PropertyAnimation {
-			target: previousFlickable
-			property: 'x'
-			from: - parent.width
-			to: 0
-			duration: 400
-		}
+		target: previousFlickable
+		property: 'x'
+		from: parent ? - parent.width : 0
+		to: 0
+		duration: 400
 		onStarted: {
 			previousModel.season = currentSeason;
 		}
 		onStopped: {
 			currentModel.season = currentSeason;
-			previousFlickable.x = - parent.width
 			if (futureSeason !== currentSeason) {
-				futureSeason = currentSeason;
 				__launchAnimation(futureSeason);
 			}
 		}
 	}
 
-	SequentialAnimation {
+	PropertyAnimation {
 		id: toRightAnimation
-		PropertyAnimation {
-			target: previousFlickable
-			property: 'x'
-			from: - parent.width
-			to: - 2 * parent.width
-			duration: 400
-		}
+		target: previousFlickable
+		property: 'x'
+		from: parent ? - parent.width : 0
+		to: parent ? - 2 * parent.width : 0
+		duration: 400
 		onStarted: {
-			previousModel.season = currentSeason;
+			nextModel.season = currentSeason;
 		}
 		onStopped: {
 			currentModel.season = currentSeason;
-			previousFlickable.x = - parent.width
-			if (futureSeason !== currentSeason) {
-				futureSeason = currentSeason;
+			if (futureSeason !== currentSeason)
 				__launchAnimation(futureSeason);
-			}
 		}
 	}
 }

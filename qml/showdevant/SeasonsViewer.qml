@@ -39,7 +39,8 @@ Flickable {
 					seasonSelector.visible = true;
 					seasonSelector.height = 40;
 					playgroundLoader.setSource("EpisodesViewer.qml", {
-												   currentSeason: number
+												   currentSeason: number,
+												   currentShow: show_id
 											   });
 				}
 			}

@@ -205,6 +205,7 @@ Rectangle {
 					playgroundLoader.item.episode = current;
 				}
 				onCloseMe: {
+					console.log("pouet");
 					playgroundLoader.source = "EpisodesViewer.qml";
 					episodeSelector.visible = false;
 				}
