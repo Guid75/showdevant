@@ -43,7 +43,7 @@ Rectangle {
 
 	function __showReady(showId) {
 		seasonModel.show = showId;
-		playgroundLoader.source = "SeasonsFlickable.qml";
+		playgroundLoader.source = "SeasonsViewer.qml";
 		seasonSelector.visible = false;
 		episodeSelector.visible = false;
 	}
@@ -128,7 +128,7 @@ Rectangle {
 					margins: 4
 				}
 				height: 100
-				color: "#EEEEEE"
+				color: "white"
 				Image {
 					id: bannerImage
 					anchors.fill: parent
@@ -175,9 +175,12 @@ Rectangle {
 				onCurrentIndexChanged: {
 					episodeModel.season = current;
 					episodeSelector.current = 1;
+					if (playgroundLoader.item.widgetType === "episodes") {
+						playgroundLoader.item.setCurrentSeason(current);
+					}
 				}
 				onCloseMe: {
-					playgroundLoader.source = "SeasonsFlickable.qml";
+					playgroundLoader.source = "SeasonsViewer.qml";
 					seasonSelector.visible = false;
 					episodeSelector.visible = false;
 				}
@@ -198,9 +201,11 @@ Rectangle {
 				visible: false
 				onCurrentIndexChanged: {
 					// TODO refresh current episode details
+					playgroundLoader.item.season = episodeModel.season
+					playgroundLoader.item.episode = current;
 				}
 				onCloseMe: {
-					playgroundLoader.source = "EpisodesFlickable.qml";
+					playgroundLoader.source = "EpisodesViewer.qml";
 					episodeSelector.visible = false;
 				}
 			}

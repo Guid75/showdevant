@@ -48,11 +48,11 @@ OTHER_FILES += \
     qml/showdevant/SeasonItem.qml \
     qml/showdevant/LoadingWidget.qml \
     qml/showdevant/commands.js \
-    qml/showdevant/SeasonsFlickable.qml \
-    qml/showdevant/EpisodesFlickable.qml \
     qml/showdevant/EpisodeItem.qml \
     qml/showdevant/RangeSelector.qml \
-    qml/showdevant/EpisodeDetail.qml
+    qml/showdevant/EpisodeDetail.qml \
+    qml/showdevant/EpisodesViewer.qml \
+    qml/showdevant/SeasonsViewer.qml
 
 HEADERS += \
     requestmanager.h \

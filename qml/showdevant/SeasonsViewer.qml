@@ -2,6 +2,8 @@ import QtQuick 2.0
 
 Flickable {
 	signal seasonSelected(int season)
+	readonly property string widgetType : "seasons"
+
 	contentWidth: Math.max(width, 208)
 	contentHeight: flowEpisode.childrenRect.height + 8
 	clip: true
@@ -36,7 +38,9 @@ Flickable {
 					seasonSelector.max = seasonModel.count;
 					seasonSelector.visible = true;
 					seasonSelector.height = 40;
-					playgroundLoader.source = "EpisodesFlickable.qml"
+					playgroundLoader.setSource("EpisodesViewer.qml", {
+												   currentSeason: number
+											   });
 				}
 			}
 		}
@@ -45,7 +49,7 @@ Flickable {
 		id: flowAnimation
 		target: flowEpisode
 		property: 'y'
-		from: parent.height
+		from: parent ? parent.height : 0
 		to: 4
 		duration: 300
 	}
