@@ -53,6 +53,7 @@ ToolBar {
 
 			Text {
 				id: myText
+				renderType: Text.NativeRendering
 				clip: true
 				Behavior on text {
 					id: textBehavior
@@ -73,18 +74,19 @@ ToolBar {
 				horizontalAlignment: Text.AlignHCenter
 				verticalAlignment: Text.AlignVCenter
 				text: currentTemplate.arg(current).arg(max)
-				font.pointSize: 14
+				font.pointSize: 13
 			}
 
 			Text {
 				id: myAlternativeText
+				renderType: Text.NativeRendering
 				anchors.fill: parent
 				horizontalAlignment: Text.AlignHCenter
 				verticalAlignment: Text.AlignVCenter
 				property int current: 0
 				clip: true
 				text: currentTemplate.arg(current).arg(max)
-				font.pointSize: 14
+				font.pointSize: 13
 				opacity: 0
 			}
 

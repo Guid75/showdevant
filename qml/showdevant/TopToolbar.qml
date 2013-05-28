@@ -107,6 +107,7 @@ ShadowRectangle {
 		}
 		TextInput {
 			id: searchInput
+			renderType: Text.NativeRendering
 			focus: true
 			clip: true
 			activeFocusOnPress: true
@@ -137,6 +138,7 @@ ShadowRectangle {
 				visible: searchInput.text == ""  && !searchInput.focus
 				color: "#AAAAAA"
 				anchors.fill: parent
+				renderType: Text.NativeRendering
 			}
 		}
 		MouseArea {

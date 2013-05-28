@@ -18,10 +18,12 @@ ShadowRectangle {
 		}
 		Text {
 			text: "Season <b>" + number + "</b>"
+			renderType: Text.NativeRendering
 			font.pointSize: 12
 		}
 		Text {
 			text: episode_count + " episodes"
+			renderType: Text.NativeRendering
 			font.pointSize: 8
 		}
 	}

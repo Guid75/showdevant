@@ -19,11 +19,13 @@ ShadowRectangle {
 			leftMargin: 4
 		}
 		Text {
-			text: "Episode <b>" + episode + "</b>"
+			text: "Episode S0%1E<b>%2</b>".arg(season).arg(episode)
+			renderType: Text.NativeRendering
 			font.pointSize: 12
 		}
 		Text {
 			text: '"%1"'.arg(title)
+			renderType: Text.NativeRendering
 			width: fatherRectangle.width
 			font.pointSize: 8
 			elide: Text.ElideMiddle
@@ -50,6 +52,7 @@ ShadowRectangle {
 
 		Text {
 			text: "seen"
+			renderType: Text.NativeRendering
 		}
 
 		CheckBox {

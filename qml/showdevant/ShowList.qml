@@ -20,6 +20,7 @@ Rectangle {
 				width: parent.width
 				text: model.title
 				elide: Text.ElideRight
+				renderType: Text.NativeRendering
 			}
 			MouseArea {
 				cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -53,6 +54,7 @@ Rectangle {
 				font.capitalization: Font.Capitalize
 				font.bold: true
 				text: section
+				renderType: Text.NativeRendering
 			}
 		}
 	}
