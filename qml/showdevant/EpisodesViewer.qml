@@ -22,6 +22,19 @@ Item {
 			toRightAnimation.start();
 	}
 
+	function __itemClicked(episode) {
+		episodeSelector.current = episode;
+		episodeSelector.min = 1;
+		episodeSelector.max = currentModel.count;
+		episodeSelector.visible = true;
+		episodeSelector.height = 40;
+		playgroundLoader.setSource("EpisodeDetail.qml", {
+									   showId: currentModel.show,
+									   season: currentModel.season,
+									   episode: episode
+								   });
+	}
+
 	function setCurrentSeason(season) {
 		if (currentSeason === season)
 			return;
@@ -75,18 +88,7 @@ Item {
 			Repeater {
 				model: previousModel
 				EpisodeItem {
-					onItemClicked: {
-	/*					episodeSelector.current = episode;
-						episodeSelector.min = 1;
-						episodeSelector.max = episodeModel.count;
-						episodeSelector.visible = true;
-						episodeSelector.height = 40;
-						playgroundLoader.setSource("EpisodeDetail.qml", {
-													   showId: episodeModel.show,
-													   season: episodeModel.season,
-													   episode: episode
-												   });*/
-					}
+					onItemClicked: __itemClicked(episode)
 				}
 			}
 		}
@@ -111,20 +113,8 @@ Item {
 			spacing: 10
 			Repeater {
 				model: currentModel
-//				model: episodeModel
 				EpisodeItem {
-					onItemClicked: {
-	/*					episodeSelector.current = episode;
-						episodeSelector.min = 1;
-						episodeSelector.max = episodeModel.count;
-						episodeSelector.visible = true;
-						episodeSelector.height = 40;
-						playgroundLoader.setSource("EpisodeDetail.qml", {
-													   showId: episodeModel.show,
-													   season: episodeModel.season,
-													   episode: episode
-												   });*/
-					}
+					onItemClicked: __itemClicked(episode)
 				}
 			}
 		}
@@ -146,18 +136,7 @@ Item {
 			Repeater {
 				model: nextModel
 				EpisodeItem {
-					onItemClicked: {
-	/*					episodeSelector.current = episode;
-						episodeSelector.min = 1;
-						episodeSelector.max = episodeModel.count;
-						episodeSelector.visible = true;
-						episodeSelector.height = 40;
-						playgroundLoader.setSource("EpisodeDetail.qml", {
-													   showId: episodeModel.show,
-													   season: episodeModel.season,
-													   episode: episode
-												   });*/
-					}
+					onItemClicked: __itemClicked(episode)
 				}
 			}
 		}

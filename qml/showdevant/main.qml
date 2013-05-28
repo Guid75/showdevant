@@ -162,9 +162,9 @@ Rectangle {
 			RangeSelector {
 				id: seasonSelector
 				currentTemplate: "Season %1/%2"
-//				Behavior on height {
-//					NumberAnimation { from: 20; to: 40; duration: 500 }
-//				}
+				Behavior on height {
+					NumberAnimation { from: 20; to: 40; duration: 500 }
+				}
 				anchors {
 					left: parent.left
 					right: parent.right
@@ -177,6 +177,9 @@ Rectangle {
 					episodeSelector.current = 1;
 					if (playgroundLoader.item.widgetType === "episodes") {
 						playgroundLoader.item.setCurrentSeason(current);
+					} else if (playgroundLoader.item.widgetType === "episodedetail") {
+						playgroundLoader.item.season = current;
+						playgroundLoader.item.episode = 1;
 					}
 				}
 				onCloseMe: {
@@ -189,9 +192,9 @@ Rectangle {
 			RangeSelector {
 				id: episodeSelector
 				currentTemplate: "Episode %1/%2"
-//				Behavior on height {
-//					NumberAnimation { from: 20; to: 40; duration: 500 }
-//				}
+				Behavior on height {
+					NumberAnimation { from: 20; to: 40; duration: 500 }
+				}
 				anchors {
 					left: parent.left
 					right: parent.right
@@ -205,8 +208,11 @@ Rectangle {
 					playgroundLoader.item.episode = current;
 				}
 				onCloseMe: {
-					console.log("pouet");
-					playgroundLoader.source = "EpisodesViewer.qml";
+					playgroundLoader.setSource("EpisodesViewer.qml", {
+												   currentSeason: seasonSelector.current,
+												   currentShow: seasonModel.show
+											   });
+
 					episodeSelector.visible = false;
 				}
 			}
