@@ -33,8 +33,8 @@ Rectangle {
 		}
 	}
 
-	SeasonModel {
-		id: seasonModel
+	SeasonListModel {
+		id: seasonListModel
 	}
 
 	EpisodeModel {
@@ -42,7 +42,7 @@ Rectangle {
 	}
 
 	function __showReady(showId) {
-		seasonModel.show = showId;
+		seasonListModel.show = showId;
 		playgroundLoader.source = "SeasonsViewer.qml";
 		seasonSelector.visible = false;
 		episodeSelector.visible = false;
@@ -210,7 +210,7 @@ Rectangle {
 				onCloseMe: {
 					playgroundLoader.setSource("EpisodesViewer.qml", {
 												   currentSeason: seasonSelector.current,
-												   currentShow: seasonModel.show
+												   currentShow: seasonListModel.show
 											   });
 
 					episodeSelector.visible = false;
@@ -233,6 +233,7 @@ Rectangle {
 				anchors.centerIn: playgroundLoader
 				sourceComponent: LoadingWidget {
 					anchors.centerIn: parent
+					color: "#888888"
 					width: 200
 				}
 				active: false

@@ -1,6 +1,53 @@
 import QtQuick 2.0
 
 Item {
+	id: base;
+	width: 50;
+	height: 50;
+
+	property int   count : 10;
+	property int   size  : 4;
+	property color color : "white";
+	property int   speed : 4000;
+
+	PropertyAnimation {
+		running: base.visible;
+		target: content;
+		property: "rotation";
+		loops: Animation.Infinite;
+		from: 0;
+		to: 360;
+		duration: base.speed;
+	}
+	Item {
+		id: content;
+		width: Math.min (parent.width, parent.height);
+		height: width;
+		transformOrigin: Item.Center;
+		anchors.centerIn: parent;
+
+		Repeater {
+			model: base.count;
+			delegate: Item {
+				width: parent.width;
+				height: 0;
+				rotation: (model.index * 360 / base.count);
+				anchors.centerIn: parent;
+
+				Rectangle {
+					color: base.color
+					height: base.size;
+					width: height;
+					radius: (height / 2);
+					antialiasing: true;
+				}
+			}
+		}
+	}
+}
+
+/*
+Item {
 	height: 10
 	Column {
 	Text {
@@ -64,3 +111,4 @@ Item {
 	}
 	}
 }
+*/

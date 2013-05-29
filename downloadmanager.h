@@ -3,33 +3,34 @@
 
 #include <QObject>
 #include <QMap>
+#include <QNetworkReply>
 
 class Download;
+class QNetworkAccessManager;
 
 class DownloadManager : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    static DownloadManager &instance();
-    
-    /*! \brief Schedule a file downloading
-     */
-    int download(const QString &fileName, const QString &url, const QString &dirPath);
+	static DownloadManager &instance();
 
-signals:
-    void downloadFinished(int ticketId, const QString &filePath);
+	void setNetworkAccessManager(QNetworkAccessManager *nam);
 
-public slots:
+	/*! \brief Schedule a file downloading
+	 */
+	Download *download(const QString &fileName, const QString &url, const QString &dirPath);
 
 private:
-    static DownloadManager *_instance;
-    QMap<int,Download*> downloads;
+	static DownloadManager *_instance;
+	QNetworkAccessManager *nam;
+	QMap<QNetworkReply*,Download*> downloads;
 
-    explicit DownloadManager(QObject *parent = 0);
+	explicit DownloadManager(QObject *parent = 0);
 
 private slots:
-    void requestReadyRead(int ticketId, const QByteArray &response);
-    void requestFinished(int ticketId);
+	void httpFinished();
+	void httpReadyRead();
+	void httpError(QNetworkReply::NetworkError);
 };
 
 #endif // DOWNLOADMANAGER_H

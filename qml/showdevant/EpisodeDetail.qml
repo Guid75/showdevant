@@ -18,68 +18,56 @@ Rectangle {
 	TabView {
 		id: frame
 		anchors.fill: parent
-//		anchors.margins: 4
-		Tab { title: "Episode resume" }
-		Tab { title: "Subtitles" }
+		//		anchors.margins: 4
+		Tab {
+			title: "Episode resume"
+			Item {
+				EpisodeResume {
+
+				}
+			}
+		}
+		Tab {
+			title: "Subtitles"
+		}
 
 		style: TabViewStyle {
 			frameOverlap: 1
 			tab: Rectangle {
-				color: tab.selected ? "#DDDDDD" :"#EEEEEE"
-				border.color:  tab.selected ? "#DDDDDD" : "#CCCCCC"
+				color: "#CCCCCC"
 				implicitWidth: Math.max(text.width + 4, 80)
 				implicitHeight: 25
-				Text {
-					id: text
-					renderType: Text.NativeRendering
-					anchors.centerIn: parent
-					text: tab.title
+				Rectangle {
+					anchors {
+						fill: parent
+						topMargin: 1
+						leftMargin: 1
+						rightMargin: 1
+						bottomMargin: tab.selected ? 0 : 1
+					}
+					color: tab.selected ? "#DDDDDD" :"#EEEEEE"
+					implicitWidth: Math.max(text.width + 4, 80)
+					implicitHeight: 25
+					Text {
+						id: shadowText
+						color: "white"
+						x: text.x + 1
+						y: text.y + 1
+						renderType: Text.NativeRendering
+						text: tab.title
+					}
+					Text {
+						id: text
+						renderType: Text.NativeRendering
+						anchors.centerIn: parent
+						text: tab.title
+					}
 				}
 			}
-
-			frame: Rectangle { color: "#DDDDDD" }
+			frame: Rectangle {
+				border.color: "#CCCCCC"
+				color: "#DDDDDD"
+			}
 		}
 	}
-
-	/*	Rectangle {
-		id: resumeRectangle
-		anchors {
-			left: parent.left
-			top: parent.top
-			margins: 4
-		}
-		width: episodeImage.paintedWidth
-		height: episodeImage.paintedHeight
-		color: "#DDDDDD"
-		Image {
-			id: episodeImage
-			width: 250
-			source: showId && season && episode ? "http://api.betaseries.com/pictures/episode/%1.jpg?season=%2&episode=%3&key=9adb4ab628c6".arg(showId).arg(season).arg(episode) : ""
-			fillMode: Image.PreserveAspectFit
-		}
-		Rectangle {
-			id: backgroundItem
-			anchors {
-				left: episodeImage.left
-				right: episodeImage.right
-				bottom: episodeImage.bottom
-			}
-			height: 30
-			color: "black"
-			opacity: bannerText.text == "" ? 0.0 : 0.7
-		}
-		Item {
-			anchors.fill: backgroundItem
-			Text {
-				id: bannerText
-				anchors.fill: parent
-				anchors.leftMargin: 6
-				verticalAlignment: Text.AlignVCenter
-				//font.bold: true
-				font.pointSize: 12
-				text: '"Dexter"'
-				color: "white"
-			}
-		}
-	}*/
 }

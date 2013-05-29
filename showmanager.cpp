@@ -22,6 +22,7 @@
 #include <QDebug>
 
 #include "commandmanager.h"
+#include "command.h"
 #include "jsonparser.h"
 #include "showmanager.h"
 
@@ -37,17 +38,16 @@ ShowManager &ShowManager::instance()
 ShowManager::ShowManager() :
 	QObject()
 {
-	connect(&CommandManager::instance(), &CommandManager::commandFinished,
-			this, &ShowManager::commandFinished);
 }
 
-void ShowManager::commandFinished(int ticketId, const QByteArray &response)
+void ShowManager::commandFinished(const QByteArray &response)
 {
-	TicketData ticketData = parsing[ticketId];
+	Command *command = qobject_cast<Command*>(sender());
+	TicketData ticketData = parsing[command];
 	if (ticketData.showId.isNull())
 		return;
 
-	parsing.remove(ticketId);
+	parsing.remove(command);
 
 	// call the parse function
 	QMetaObject::invokeMethod(this, ticketData.parseMethodName.toLocal8Bit(), Q_ARG(QString, ticketData.showId), Q_ARG(QByteArray, response));
@@ -135,12 +135,11 @@ void ShowManager::parseSeasons(const QString &showId, const QByteArray &response
 	QSqlDatabase::database().commit();
 }
 
-int ShowManager::refreshOnExpired(const QString &showid)
+int ShowManager::refreshOnExpired(const QString &showid, int season, int episode, bool description)
 {
 	QSqlQuery query;
 	qint64 last_check_epoch = 0;
 	qint64 expiration = 24 * 60 * 60 * 1000; // one day => TODO parametrable
-	int ticket;
 	// have we the season in database?
 	// take the expiration date in account
 	query.exec(QString("SELECT episodes_last_check_date FROM show WHERE show_id='%1'").arg(showid));
@@ -149,9 +148,10 @@ int ShowManager::refreshOnExpired(const QString &showid)
 	}
 	if (QDateTime::currentDateTime().toMSecsSinceEpoch() - last_check_epoch > expiration) {
 		// expired data, we need to launch the request
-		ticket = CommandManager::instance().showsEpisodes(showid);
+		Command *command = CommandManager::instance().showsEpisodes(showid);
 		// TODO ticket can be invalid, manage it
-		parsing.insert(ticket, TicketData(showid, "parseSeasons"));
+		parsing.insert(command, TicketData(showid, "parseSeasons"));
+		connect(command, &Command::finished, this, &ShowManager::commandFinished);
 		return 1;
 	} else
 		return 0;

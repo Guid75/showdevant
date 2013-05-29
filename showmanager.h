@@ -18,7 +18,9 @@
 #define SHOWMANAGER_H
 
 #include <QObject>
-#include <QHash>
+#include <QMap>
+
+class Command;
 
 class ShowManager : public QObject
 {
@@ -31,7 +33,7 @@ public:
 	 * \retval 1 if the show is expired and a request ticket has been emitted
 	 * \retval -1 if the request ticket could not be given by the request manager
 	 */
-	Q_INVOKABLE int refreshOnExpired(const QString &showid);
+	Q_INVOKABLE int refreshOnExpired(const QString &showid, int season = -1, int episode = -1, bool description = false);
 
 signals:
 	void refreshDone(const QString &showId);
@@ -46,12 +48,12 @@ private:
 	};
 
 	static ShowManager *_instance;
-	QHash<int,TicketData> parsing;
+	QMap<Command*,TicketData> parsing;
 
 	explicit ShowManager();
 
 private slots:
-	void commandFinished(int ticketId, const QByteArray &response);
+	void commandFinished(const QByteArray &response);
 
 	// parsing methods
 	void parseEpisode(const QString &showId, int season, const QJsonObject &root);

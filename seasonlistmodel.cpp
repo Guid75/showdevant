@@ -1,14 +1,14 @@
 #include <QSqlQuery>
 
-#include "seasonmodel.h"
+#include "seasonlistmodel.h"
 
-SeasonModel::SeasonModel(QObject *parent) :
-    SqlQueryModel(parent)
+SeasonListModel::SeasonListModel(QObject *parent) :
+	SqlQueryModel(parent)
 {
 	setShow("a");
 }
 
-void SeasonModel::setShow(const QString &show)
+void SeasonListModel::setShow(const QString &show)
 {
 	if (show == _show)
 		return;

@@ -3,36 +3,36 @@
 
 #include <QObject>
 #include <QMap>
+#include <QNetworkReply>
 
+class QNetworkAccessManager;
 class Command;
 
 class CommandManager : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    static CommandManager &instance();
+	static CommandManager &instance();
 
-	Q_INVOKABLE int showsSearch(const QString &expression);
-	Q_INVOKABLE int showsEpisodes(const QString &url, int season = -1, int episode = -1, bool summary = true, bool hide_notes = true);
-	Q_INVOKABLE int subtitlesShow(const QString &showId, int season = -1, int episode = -1, const QString &language = QString());
-	Q_INVOKABLE int subtitlesShowByFile(const QString &showId, const QString &fileName, const QString &language = QString());
+	void setNetworkAccessManager(QNetworkAccessManager *nam);
 
-signals:
-    // TODO returns a JSON document and parse error in the CommandManager
-    void commandFinished(int ticketId, const QByteArray &response);
-
-public slots:
+	Command *showsSearch(const QString &expression);
+	Command *showsEpisodes(const QString &showId, int season = -1, int episode = -1, bool summary = true, bool hide_notes = true);
+	Command *subtitlesShow(const QString &showId, int season = -1, int episode = -1, const QString &language = QString());
+	Command *subtitlesShowByFile(const QString &showId, const QString &fileName, const QString &language = QString());
 
 private:
-    static CommandManager *_instance;
-    QMap<int,Command*> commands;
+	static CommandManager *_instance;
+	QNetworkAccessManager *nam;
+	QMap<QNetworkReply*,Command*> commands;
 
-    explicit CommandManager(QObject *parent = 0);
-    int pushCommand(const QString &url);
+	explicit CommandManager(QObject *parent = 0);
+	Command *pushCommand(const QString &url);
 
 private slots:
-    void requestReadyRead(int ticketId, const QByteArray &response);
-    void requestFinished(int ticketId);
+	void httpFinished();
+	void httpReadyRead();
+	void httpError(QNetworkReply::NetworkError);
 };
 
 #endif // COMMANDMANAGER_H

@@ -9,6 +9,9 @@ class SqlQueryModel : public QSqlQueryModel
 	Q_PROPERTY(QString query READ getQuery WRITE setQuery)
 	Q_PROPERTY(int count READ getCount() NOTIFY countChanged())
 
+	Q_PROPERTY(bool synchronized READ getSynchronized() NOTIFY synchronizedChanged())
+	Q_PROPERTY(bool synchronizing READ getSynchronizing() NOTIFY synchronizingChanged())
+
 public:
 	explicit SqlQueryModel(QObject *parent = 0);
 
@@ -20,8 +23,13 @@ public:
 	int getCount() { this->count = this->rowCount(); return count; }
 	Q_INVOKABLE QVariant get(int row);
 
+	bool getSynchronized() const { return _synchronized; }
+	bool getSynchronizing() const { return _synchronizing; }
+
 signals:
 	void countChanged();
+	void synchronizedChanged();
+	void synchronizingChanged();
 
 public slots:
 
@@ -29,6 +37,8 @@ private:
 	int count;
 	QString _query;
 	QHash<int, QByteArray> roles;
+	bool _synchronized;
+	bool _synchronizing;
 
 	void generateRoleNames();
 };

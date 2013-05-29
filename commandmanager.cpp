@@ -1,105 +1,118 @@
-#include "requestmanager.h"
+#include <QNetworkAccessManager>
+
+#include "command.h"
 
 #include "commandmanager.h"
 
 static const QString apiKey = "9adb4ab628c6";
 static const QString websiteUrl = "http://api.betaseries.com";
 
-class Command
-{
-public:
-    QByteArray response;
-};
-
 CommandManager *CommandManager::_instance = 0;
 
 CommandManager &CommandManager::instance()
 {
-    if (!_instance)
-        _instance = new CommandManager;
+	if (!_instance)
+		_instance = new CommandManager;
 
-    return *_instance;
+	return *_instance;
+}
+
+void CommandManager::setNetworkAccessManager(QNetworkAccessManager *nam)
+{
+	if (this->nam == nam)
+		return;
+
+	this->nam = nam;
+
+	// TODO : remove all current QNetworkReply
 }
 
 CommandManager::CommandManager(QObject *parent) :
-    QObject(parent)
+	QObject(parent)
 {
-    connect(&RequestManager::instance(), &RequestManager::requestReadyRead,
-            this, &CommandManager::requestReadyRead);
-    connect(&RequestManager::instance(), &RequestManager::requestFinished,
-            this, &CommandManager::requestFinished);
 }
 
-int CommandManager::pushCommand(const QString &url)
+Command * CommandManager::pushCommand(const QString &url)
 {
-	int ticket = RequestManager::instance().pushRequest(url);
-    // TODO test if ticket is not -1
+	Q_ASSERT(nam != NULL);
 
-    Command *command = new Command;
-    commands.insert(ticket, command);
+	QNetworkReply *reply = nam->get(QNetworkRequest(url));
+	Command *command = new Command(this);
+	commands.insert(reply, command);
 
-    return ticket;
+	connect(reply, &QNetworkReply::finished, this, &CommandManager::httpFinished);
+	connect(reply, &QNetworkReply::readyRead, this, &CommandManager::httpReadyRead);
+	connect(reply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), this, &CommandManager::httpError);
+
+	return command;
 }
 
-int CommandManager::showsSearch(const QString &expression)
+Command *CommandManager::showsSearch(const QString &expression)
 {
-    return pushCommand(QString("%1/shows/search.json?title=%2&key=%3").arg(websiteUrl).arg(expression).arg(apiKey));
+	return pushCommand(QString("%1/shows/search.json?title=%2&key=%3").arg(websiteUrl).arg(expression).arg(apiKey));
 }
 
-int CommandManager::showsEpisodes(const QString &url, int season, int episode, bool summary, bool hide_notes)
+Command *CommandManager::showsEpisodes(const QString &showId, int season, int episode, bool summary, bool hide_notes)
 {
-    QString str = QString("%1/shows/episodes/%2.json?&key=%3").arg(websiteUrl).arg(url).arg(apiKey);
+	QString str = QString("%1/shows/episodes/%2.json?&key=%3").arg(websiteUrl).arg(showId).arg(apiKey);
 
-    if (season >= 0)
-        str.append(QString("&season=%1").arg(season));
-    if (episode >= 0)
-        str.append(QString("&episode=%1").arg(episode));
-    if (summary)
-        str.append("&summary=1");
-    if (hide_notes)
-        str.append("hide_notes=1");
+	if (season >= 0)
+		str.append(QString("&season=%1").arg(season));
+	if (episode >= 0)
+		str.append(QString("&episode=%1").arg(episode));
+	if (summary)
+		str.append("&summary=1");
+	if (hide_notes)
+		str.append("hide_notes=1");
 
-    return pushCommand(str);
+	return pushCommand(str);
 }
 
-int CommandManager::subtitlesShow(const QString &showId, int season, int episode, const QString &language)
+Command *CommandManager::subtitlesShow(const QString &showId, int season, int episode, const QString &language)
 {
-    QString str = QString("%1/subtitles/show/%2.json?&key=%3").arg(websiteUrl).arg(showId).arg(apiKey);
-    if (season >= 0)
-        str.append(QString("&season=%1").arg(season));
-    if (episode >= 0)
-        str.append(QString("&episode=%1").arg(episode));
-    if (!language.isEmpty())
-        str.append(QString("&language=%1").arg(language));
+	QString str = QString("%1/subtitles/show/%2.json?&key=%3").arg(websiteUrl).arg(showId).arg(apiKey);
+	if (season >= 0)
+		str.append(QString("&season=%1").arg(season));
+	if (episode >= 0)
+		str.append(QString("&episode=%1").arg(episode));
+	if (!language.isEmpty())
+		str.append(QString("&language=%1").arg(language));
 
-    return pushCommand(str);
+	return pushCommand(str);
 }
 
-int CommandManager::subtitlesShowByFile(const QString &showId, const QString &fileName, const QString &language)
+Command *CommandManager::subtitlesShowByFile(const QString &showId, const QString &fileName, const QString &language)
 {
-    QString str = QString("%1/subtitles/show/%2.json?&key=%3&file=%4").arg(websiteUrl).arg(showId).arg(apiKey).arg(fileName);
-    if (!language.isEmpty())
-        str.append(QString("&language=%1").arg(language));
+	QString str = QString("%1/subtitles/show/%2.json?&key=%3&file=%4").arg(websiteUrl).arg(showId).arg(apiKey).arg(fileName);
+	if (!language.isEmpty())
+		str.append(QString("&language=%1").arg(language));
 
-    return pushCommand(str);
+	return pushCommand(str);
 }
 
-void CommandManager::requestReadyRead(int ticketId, const QByteArray &response)
+void CommandManager::httpError(QNetworkReply::NetworkError)
 {
-    Command *command = commands[ticketId];
-    if (!command)
-        return; // not for me
-
-    command->response.append(response);
+	// TODO manage errors
 }
 
-void CommandManager::requestFinished(int ticketId)
+void CommandManager::httpReadyRead()
 {
-    Command *command = commands[ticketId];
-    if (!command)
-        return; // not for me
+	QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+	Command *command = commands[reply];
 
-    emit commandFinished(ticketId, command->response);
-    commands.remove(ticketId);
-    delete command;
+	Q_ASSERT(command != NULL);
+
+	command->_response.append(reply->readAll());
+}
+
+void CommandManager::httpFinished()
+{
+	QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+	Command *command = commands[reply];
+
+	Q_ASSERT(command != NULL);
+
+	command->emitFinished();
+	commands.remove(reply);
+	delete command;
 }

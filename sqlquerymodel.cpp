@@ -4,7 +4,9 @@
 #include "sqlquerymodel.h"
 
 SqlQueryModel::SqlQueryModel(QObject *parent) :
-	QSqlQueryModel(parent)
+	QSqlQueryModel(parent),
+	_synchronized(false),
+	_synchronizing(false)
 {
 
 }

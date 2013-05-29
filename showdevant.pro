@@ -15,7 +15,6 @@ QT += sql
 
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
-    requestmanager.cpp \
     downloadmanager.cpp \
     commandmanager.cpp \
     jsonparser.cpp \
@@ -24,10 +23,12 @@ SOURCES += main.cpp \
     sqltablemodel.cpp \
     showmodel.cpp \
     sqlquerymodel.cpp \
-    seasonmodel.cpp \
     sortfilterproxymodel.cpp \
     showmanager.cpp \
-    episodemodel.cpp
+    episodemodel.cpp \
+    seasonlistmodel.cpp \
+    command.cpp \
+    download.cpp
 
 # Installation path
 # target.path =
@@ -52,10 +53,10 @@ OTHER_FILES += \
     qml/showdevant/RangeSelector.qml \
     qml/showdevant/EpisodeDetail.qml \
     qml/showdevant/EpisodesViewer.qml \
-    qml/showdevant/SeasonsViewer.qml
+    qml/showdevant/SeasonsViewer.qml \
+    qml/showdevant/EpisodeResume.qml
 
 HEADERS += \
-    requestmanager.h \
     downloadmanager.h \
     commandmanager.h \
     jsonparser.h \
@@ -64,7 +65,9 @@ HEADERS += \
     sqltablemodel.h \
     showmodel.h \
     sqlquerymodel.h \
-    seasonmodel.h \
     sortfilterproxymodel.h \
     showmanager.h \
-    episodemodel.h
+    episodemodel.h \
+    seasonlistmodel.h \
+    command.h \
+    download.h

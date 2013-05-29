@@ -2,8 +2,8 @@
 #include <QQmlContext>
 #include <QtQml>
 #include <QDebug>
+#include <QNetworkAccessManager>
 
-#include "requestmanager.h"
 #include "downloadmanager.h"
 #include "commandmanager.h"
 #include "databasemanager.h"
@@ -11,7 +11,7 @@
 #include "sqltablemodel.h"
 #include "sqlquerymodel.h"
 #include "showmodel.h"
-#include "seasonmodel.h"
+#include "seasonlistmodel.h"
 #include "episodemodel.h"
 #include "sortfilterproxymodel.h"
 #include "showmanager.h"
@@ -22,11 +22,14 @@ int main(int argc, char *argv[])
 {
 	QGuiApplication app(argc, argv);
 
+	QNetworkAccessManager networkAccessManager;
+	CommandManager::instance().setNetworkAccessManager(&networkAccessManager);
+
 	QtQuick2ApplicationViewer viewer;
 	qmlRegisterType<Shortcut>("com.guid75", 1, 0, "Shortcut");
 	qmlRegisterType<SqlTableModel>("com.guid75", 1, 0, "SqlTableModel");
 	qmlRegisterType<SqlQueryModel>("com.guid75", 1, 0, "SqlQueryModel");
-	qmlRegisterType<SeasonModel>("com.guid75", 1, 0, "SeasonModel");
+	qmlRegisterType<SeasonListModel>("com.guid75", 1, 0, "SeasonListModel");
 	qmlRegisterType<EpisodeModel>("com.guid75", 1, 0, "EpisodeModel");
 	qmlRegisterType<ShowModel>("com.guid75", 1, 0, "ShowModel");
 	qmlRegisterType<SortFilterProxyModel>("com.guid75", 1, 0, "SortFilterProxyModel");

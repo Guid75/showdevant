@@ -13,7 +13,7 @@ Flickable {
 	}
 
 	Connections {
-		target: seasonModel
+		target: seasonListModel
 		onModelReset: flowAnimation.start()
 	}
 
@@ -28,14 +28,14 @@ Flickable {
 		spacing: 10
 		Repeater {
 			id: repeaterEpisode
-			model: seasonModel
+			model: seasonListModel
 			SeasonItem {
 				onItemClicked: {
 					episodeModel.show = show_id;
 					episodeModel.season = number;
 					seasonSelector.current = number;
 					seasonSelector.min = 1;
-					seasonSelector.max = seasonModel.count;
+					seasonSelector.max = seasonListModel.count;
 					seasonSelector.visible = true;
 					seasonSelector.height = 40;
 					playgroundLoader.setSource("EpisodesViewer.qml", {
