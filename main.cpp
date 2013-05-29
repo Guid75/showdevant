@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 
 	QNetworkAccessManager networkAccessManager;
 	CommandManager::instance().setNetworkAccessManager(&networkAccessManager);
+	DownloadManager::instance().setNetworkAccessManager(&networkAccessManager);
 
 	QtQuick2ApplicationViewer viewer;
 	qmlRegisterType<Shortcut>("com.guid75", 1, 0, "Shortcut");
