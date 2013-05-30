@@ -52,6 +52,8 @@ private:
 	QSqlDatabase db;
 
 	explicit DatabaseManager(QObject *parent = 0);
+
+	bool createTable(QSqlQuery &query, const QString &table, const QString &request);
 };
 
 #endif // DATABASEMANAGER_H

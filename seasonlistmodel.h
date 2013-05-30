@@ -2,6 +2,7 @@
 #define SEASONLISTMODEL_H
 
 #include "sqlquerymodel.h"
+#include "cache.h"
 
 class SeasonListModel : public SqlQueryModel
 {
@@ -20,8 +21,8 @@ private:
 	void select();
 
 private slots:
-	void showInfosSynchronizing(const QString &showId);
-	void showInfosSynchronized(const QString &showId);
+	void synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
+	void synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
 };
 
 #endif // SEASONLISTMODEL_H

@@ -40,7 +40,7 @@ Cache::Cache() :
 {
 }
 
-Cache::SynchronizeAction *Cache::getAction(Cache::SynchronizeAction::ActionType actionType, const QMap<QString, QVariant> &id)
+Cache::SynchronizeAction *Cache::getAction(Cache::SynchronizeAction::ActionType actionType, const ActionId &id) const
 {
 	foreach (SynchronizeAction *action, currentActions) {
 		if (action->actionType == actionType &&
@@ -51,19 +51,23 @@ Cache::SynchronizeAction *Cache::getAction(Cache::SynchronizeAction::ActionType 
 	return 0;
 }
 
+Cache::SynchronizeAction *Cache::getAction(Command *command) const
+{
+	foreach (SynchronizeAction *action, currentActions) {
+		if (action->commands.indexOf(command) >= 0)
+			return action;
+	}
+	return 0;
+}
+
 void Cache::commandFinished(const QByteArray &response)
 {
 	Command *command = qobject_cast<Command*>(sender());
-	TicketData ticketData = parsing[command];
-	if (ticketData.showId.isNull())
-		return;
+	SynchronizeAction *action = getAction(command);
 
-	parsing.remove(command);
+	Q_ASSERT(action != 0); // command MUST belong to an existing action
 
-	// call the parse function
-	QMetaObject::invokeMethod(this, ticketData.parseMethodName.toLocal8Bit(), Q_ARG(QString, ticketData.showId), Q_ARG(QByteArray, response));
-
-	emit refreshDone(ticketData.showId);
+	QMetaObject::invokeMethod(this, action->parseMethodName.toLocal8Bit(), Q_ARG(ActionId, action->id), Q_ARG(QByteArray, response));
 }
 
 void Cache::parseEpisode(const QString &showId, int season, const QJsonObject &root)
@@ -122,27 +126,22 @@ void Cache::parseSeasons(const QString &showId, const QByteArray &response)
 		if (seasonJson.isEmpty())
 			continue;
 
-		// numbers are under the form of strings from betaseries :/
 		bool ok;
 		int number = seasonJson.value("number").toString().toInt(&ok);
 		if (!ok)
 			continue;
 
+		parseEpisodes(showId, number, seasonJson);
+
 		QSqlQuery query;
-		query.prepare("INSERT INTO season (show_id, number) "
-					  "VALUES (:show_id, :number)");
-		query.bindValue(":show_id", showId);
+		query.prepare("UPDATE season SET last_sync_episode_list=:epoch WHERE show_id=:showid AND number=:number");
+		query.bindValue(":epoch", QDateTime::currentMSecsSinceEpoch() / 1000);
+		query.bindValue(":showid", showId);
 		query.bindValue(":number", number);
 		query.exec();
-		parseEpisodes(showId, number, seasonJson);
 	}
 
 	// update the episodes last check date of the show
-	QSqlQuery query;
-	query.prepare("UPDATE show SET episodes_last_check_date=:epoch WHERE show_id=:showid");
-	query.bindValue(":epoch", QDateTime::currentMSecsSinceEpoch() / 1000);
-	query.bindValue(":showid", showId);
-	query.exec();
 	QSqlDatabase::database().commit();
 }
 
@@ -181,7 +180,7 @@ void Cache::parseShowInfos(const QString &showId, const QByteArray &response)
 	foreach (const QString &key, seasonsJson.keys()) {
 		QJsonObject seasonJson = seasonsJson.value(key).toObject();
 
-		query.prepare("INSERT INTO season (show_id, number, episode_count) "
+		query.prepare("REPLACE INTO season (show_id, number, episode_count) "
 					  "VALUES (:show_id, :number, :episode_count)");
 		query.bindValue(":show_id", showId);
 		query.bindValue(":number", seasonJson.value("number").toString().toInt());
@@ -192,14 +191,23 @@ void Cache::parseShowInfos(const QString &showId, const QByteArray &response)
 	QSqlDatabase::database().commit();
 }
 
-void Cache::showInfosCallback(const QString &showId, const QByteArray &response)
+void Cache::showInfosCallback(const ActionId &id, const QByteArray &response)
 {
+	QString showId = id["showId"].toString();
 	// TODO: parseShowInfos must return a boolean for potential errors
 	parseShowInfos(showId, response);
-	emit showInfosSynchronized(showId);
+	emit synchronized(Data_ShowInfos, id);
+//	emit showInfosSynchronized(showId);
 }
 
-int Cache::refreshOnExpired(const QString &showId, int season, int episode, bool description)
+void Cache::episodeListCallback(const Cache::ActionId &id, const QByteArray &response)
+{
+	QString showId = id["showId"].toString();
+	parseSeasons(showId, response);
+	emit synchronized(Data_EpisodeList, id);
+}
+
+/*int Cache::refreshOnExpired(const QString &showId, int season, int episode, bool description)
 {
 	QSqlQuery query;
 	qint64 last_check_epoch = 0;
@@ -219,7 +227,7 @@ int Cache::refreshOnExpired(const QString &showId, int season, int episode, bool
 		return 1;
 	} else
 		return 0;
-}
+}*/
 
 int Cache::synchronizeShowInfos(const QString &showId)
 {
@@ -238,7 +246,7 @@ int Cache::synchronizeShowInfos(const QString &showId)
 	}
 
 	// is there a current action about it?
-	QMap<QString,QVariant> id;
+	ActionId id;
 	id.insert("showId", showId);
 	SynchronizeAction *action = getAction(SynchronizeAction::Action_ShowInfos, id);
 	if (action) {
@@ -247,20 +255,60 @@ int Cache::synchronizeShowInfos(const QString &showId)
 	}
 
 	// expired data, we need to launch the request
-	emit showInfosSynchronizing(showId);
+	emit synchronizing(Data_ShowInfos, id);
 
 	// store the synchronize action
 	action = new SynchronizeAction;
 	action->actionType = SynchronizeAction::Action_ShowInfos;
-	action->id.insert("showId", showId);
-	currentActions << action;
-
+	action->id = id;
+	action->parseMethodName = "showInfosCallback";
 	Command *command = CommandManager::instance().showsDisplay(showId);
-	parsing.insert(command, TicketData(showId, "showInfosCallback"));
 	connect(command, &Command::finished, this, &Cache::commandFinished);
+	action->commands << command;
+	currentActions << action;
 	return 1;
 }
 
 int Cache::synchronizeSeasonEpisodeList(const QString &showId, int season)
 {
+	qint64 last_sync_epoch = 0;
+	qint64 expiration = 24 * 60 * 60 * 1000; // one day => TODO customizable
+	// have we the season in database?
+	// take the expiration date in account
+	QSqlQuery query;
+	query.prepare("SELECT last_sync_episode_list FROM season WHERE show_id=:show_id AND number=:number");
+	query.bindValue(":show_id", showId);
+	query.bindValue(":number", season);
+	query.exec();
+	if (query.next() && !query.value(0).isNull()) {
+		last_sync_epoch = query.value(0).toLongLong() * 1000;
+	}
+	if (QDateTime::currentDateTime().toMSecsSinceEpoch() - last_sync_epoch <= expiration) {
+		// data are already synchronized, we can use them
+		return 0;
+	}
+
+	// is there a current action about it?
+	ActionId id;
+	id.insert("showId", showId);
+	id.insert("season", season);
+	SynchronizeAction *action = getAction(SynchronizeAction::Action_SeasonEpisodeList, id);
+	if (action) {
+		// an action is already running, so just wait for the end of it
+		return 1;
+	}
+
+	// expired data, we need to launch the request
+	emit synchronizing(Data_EpisodeList, id);
+
+	// store the synchronize action
+	action = new SynchronizeAction;
+	action->actionType = SynchronizeAction::Action_SeasonEpisodeList;
+	action->id = id;
+	action->parseMethodName = "episodeListCallback";
+	Command *command = CommandManager::instance().showsEpisodes(showId, season);
+	connect(command, &Command::finished, this, &Cache::commandFinished);
+	action->commands << command;
+	currentActions << action;
+	return 1;
 }

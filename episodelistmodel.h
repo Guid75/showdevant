@@ -1,6 +1,7 @@
 #ifndef EPISODELISTMODEL_H
 #define EPISODELISTMODEL_H
 
+#include "cache.h"
 #include "sqlquerymodel.h"
 
 class EpisodeListModel : public SqlQueryModel
@@ -23,7 +24,12 @@ private:
 	QString _show;
 	int _season;
 
-	void refreshQuery();
+	void select();
+	void load();
+
+private slots:
+	void synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
+	void synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
 };
 
 #endif // EPISODELISTMODEL_H

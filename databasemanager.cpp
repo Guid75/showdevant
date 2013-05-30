@@ -26,6 +26,16 @@ DatabaseManager::DatabaseManager(QObject *parent) :
 {
 }
 
+bool DatabaseManager::createTable(QSqlQuery &query, const QString &table, const QString &request)
+{
+	bool b = query.exec(QString("CREATE TABLE %1 ").arg(table) + request);
+	if (!b) {
+		qCritical("Fail to create the \"%s\" table: %s", qPrintable(table), qPrintable(query.lastError().text()));
+		return false;
+	}
+	return true;
+}
+
 int DatabaseManager::openDB()
 {
 	// Find QSLite driver
@@ -59,32 +69,40 @@ int DatabaseManager::openDB()
 	query.exec("PRAGMA foreign_keys = ON;");
 
 	// shows
-	query.exec("CREATE TABLE show (show_id text primary key, last_sync integer, title text, "
-			   "description text, network text, duration integer, "
-			   "UNIQUE (show_id) ON CONFLICT REPLACE)");
+	if (!createTable(query, "show",
+					 "(show_id text primary key, last_sync integer, title text, "
+					 "description text, network text, duration integer, "
+					 "UNIQUE (show_id) ON CONFLICT REPLACE)"))
+		return ret;
 
 	// seasons
-	query.exec("CREATE TABLE season (id integer primary key, show_id text, number integer, episode_count integer, "
-					"FOREIGN KEY (show_id) REFERENCES show(show_id) ON DELETE CASCADE)");
+	if (!createTable(query, "season",
+					 "(show_id text, number integer, episode_count integer, last_sync_episode_list integer, "
+					 "PRIMARY KEY (show_id, number), "
+					 "FOREIGN KEY (show_id) REFERENCES show(show_id) ON DELETE CASCADE)"))
+		return ret;
 
 	// episodes
-	query.exec("CREATE TABLE episode "
-			   "(show_id text, season integer, episode integer, title text, "
-			   "number text, global integer, date integer, "
-			   "comments integer, subtitles_last_check_date integer, PRIMARY KEY (show_id, season, episode))");
+	if (!createTable(query, "episode",
+					 "(show_id text, season integer, episode integer, title text, "
+					 "number text, global integer, date integer, "
+					 "comments integer, subtitles_last_check_date integer, "
+					 "PRIMARY KEY (show_id, season, episode), "
+					 "FOREIGN KEY (show_id, season) REFERENCES season(show_id, number) ON DELETE CASCADE)"))
+		return ret;
 
-//	// subtitles
-//	query.exec("CREATE TABLE subtitle "
-//			   "(id integer primary key, show_id text, season integer, episode integer, "
-//			   "language text, source text, file text, "
-//			   "url text, quality integer, "
-//			   "UNIQUE (show_id, season, episode, url) ON CONFLICT REPLACE)");
+	//	// subtitles
+	//	query.exec("CREATE TABLE subtitle "
+	//			   "(id integer primary key, show_id text, season integer, episode integer, "
+	//			   "language text, source text, file text, "
+	//			   "url text, quality integer, "
+	//			   "UNIQUE (show_id, season, episode, url) ON CONFLICT REPLACE)");
 
-//	// subtitles content
-//	query.exec("CREATE TABLE subtitle_content "
-//			   "(subtitle_id integer, file text, "
-//			   "FOREIGN KEY (subtitle_id) REFERENCES subtitle(id) ON DELETE CASCADE, "
-//			   "UNIQUE (subtitle_id, file) ON CONFLICT REPLACE)");
+	//	// subtitles content
+	//	query.exec("CREATE TABLE subtitle_content "
+	//			   "(subtitle_id integer, file text, "
+	//			   "FOREIGN KEY (subtitle_id) REFERENCES subtitle(id) ON DELETE CASCADE, "
+	//			   "UNIQUE (subtitle_id, file) ON CONFLICT REPLACE)");
 
 	emit opened();
 

@@ -19,6 +19,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QVariant>
 
 class Command;
 
@@ -26,6 +27,11 @@ class Cache : public QObject
 {
 	Q_OBJECT
 public:
+	enum CacheDataType {
+		Data_ShowInfos,
+		Data_EpisodeList
+	};
+
 	static Cache &instance();
 
 	/*! \brief If a show item is expired, reload it from the website
@@ -33,28 +39,32 @@ public:
 	 * \retval 1 if the show is expired and a request ticket has been emitted
 	 * \retval -1 if the request ticket could not be given by the request manager
 	 */
-	Q_INVOKABLE int refreshOnExpired(const QString &showid, int season = -1, int episode = -1, bool description = false);
+//	Q_INVOKABLE int refreshOnExpired(const QString &showid, int season = -1, int episode = -1, bool description = false);
 
-	/*! \brief Synchronize show informations
-	 */
 	Q_INVOKABLE int synchronizeShowInfos(const QString &showId);
 
 	Q_INVOKABLE int synchronizeSeasonEpisodeList(const QString &showId, int season);
 
 signals:
-	void showInfosSynchronizing(const QString &showId);
+	void synchronizing(CacheDataType dataType, QMap<QString,QVariant> id);
+	void synchronized(CacheDataType dataType, QMap<QString,QVariant> id);
+/*	void showInfosSynchronizing(const QString &showId);
 	void showInfosSynchronized(const QString &showId);
-	void refreshDone(const QString &showId);
+
+	void episodeListSynchronizing(const QString &showId, int season);
+	void episodeListSynchronized(const QString &showId, int season);*/
+
+//	void refreshDone(const QString &showId);
 
 private:
-	struct TicketData {
+/*	struct TicketData {
 		TicketData() {}
 		TicketData(const QString &_showId, const QString &_parseMethodName) :
 			showId(_showId), parseMethodName(_parseMethodName) {}
 		QString showId;
 		QString parseMethodName;
-	};
-
+	};*/
+	typedef QMap<QString,QVariant> ActionId;
 	struct SynchronizeAction {
 		enum ActionType {
 			Action_ShowInfos,
@@ -63,17 +73,20 @@ private:
 
 		ActionType actionType;
 		// TODO make a generic list for the values below
-		QMap<QString,QVariant> id;
+		ActionId id;
+		QString parseMethodName;
+		QList<Command*> commands; // all commands belonging to the action
 	};
 
 	static Cache *_instance;
-	QMap<Command*,TicketData> parsing;
 	QList<SynchronizeAction*> currentActions;
 
 	explicit Cache();
 
 	SynchronizeAction *getAction(SynchronizeAction::ActionType actionType,
-								 const QMap<QString,QVariant> &id);
+								 const ActionId &id) const;
+
+	SynchronizeAction *getAction(Command *command) const;
 
 private slots:
 	void commandFinished(const QByteArray &response);
@@ -83,7 +96,8 @@ private slots:
 	void parseEpisodes(const QString &showId, int season, const QJsonObject &root);
 	void parseSeasons(const QString &showId, const QByteArray &response);
 	void parseShowInfos(const QString &showId, const QByteArray &response);
-	void showInfosCallback(const QString &showId, const QByteArray &response);
+	void showInfosCallback(const ActionId &id, const QByteArray &response);
+	void episodeListCallback(const ActionId &id, const QByteArray &response);
 };
 
 #endif // CACHE_H

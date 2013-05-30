@@ -11,11 +11,11 @@ SeasonListModel::SeasonListModel(QObject *parent) :
 	_show = "a";
 	select();
 
-	connect(&Cache::instance(), &Cache::showInfosSynchronizing,
-			this, &SeasonListModel::showInfosSynchronizing);
+	connect(&Cache::instance(), &Cache::synchronizing,
+			this, &SeasonListModel::synchronizing);
 
-	connect(&Cache::instance(), &Cache::showInfosSynchronized,
-			this, &SeasonListModel::showInfosSynchronized);
+	connect(&Cache::instance(), &Cache::synchronized,
+			this, &SeasonListModel::synchronized);
 }
 
 void SeasonListModel::setShow(const QString &show)
@@ -47,18 +47,25 @@ void SeasonListModel::select()
 	setQuery(query);
 }
 
-void SeasonListModel::showInfosSynchronizing(const QString &showId)
+void SeasonListModel::synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id)
 {
-	if (showId != _show)
+	if (dataType != Cache::Data_ShowInfos)
+		return;
+
+	if (id["showId"].toString() != _show)
 		return;
 
 	setSynchronizing(true);
 	setSynchronized(false);
+
 }
 
-void SeasonListModel::showInfosSynchronized(const QString &showId)
+void SeasonListModel::synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id)
 {
-	if (showId != _show)
+	if (dataType != Cache::Data_ShowInfos)
+		return;
+
+	if (id["showId"].toString() != _show)
 		return;
 
 	setSynchronizing(false);

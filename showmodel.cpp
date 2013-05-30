@@ -1,6 +1,7 @@
 #include <QSqlTableModel>
 #include <QSqlField>
 #include <QSqlQuery>
+#include <QSqlError>
 
 #include "showmodel.h"
 
@@ -21,6 +22,9 @@ bool ShowModel::addShow(const QString &showId, const QString &title)
 
 	if (v)
 		select();
+	else
+		qDebug(qPrintable(query.lastError().text()));
+
 
 	return v;
 
