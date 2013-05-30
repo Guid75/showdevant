@@ -6,7 +6,6 @@
 
 #include "sqltablemodel.h"
 
-//class ShowModel : public QAbstractListModel
 class ShowModel : public SqlTableModel
 {
 	Q_OBJECT
@@ -16,9 +15,6 @@ public:
 
 	// custom
 	Q_INVOKABLE bool addShow(const QString &showId, const QString &title);
-
-private:
-	QList<QSqlRecord> shows;
 };
 
 #endif // SHOWMODEL_H

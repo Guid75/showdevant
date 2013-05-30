@@ -4,6 +4,8 @@
 
 SqlTableModel::SqlTableModel(QObject *parent) :
 	QSqlTableModel(parent),
+	_synchronized(false),
+	_synchronizing(false),
 	_sortOrder(Qt::AscendingOrder)
 {
 }
@@ -65,4 +67,23 @@ void SqlTableModel::setSortField(const QString &field)
 		return;
 
 	_sortField = field;
+}
+
+
+void SqlTableModel::setSynchronized(bool value)
+{
+	if (_synchronized == value)
+		return;
+
+	_synchronized = value;
+	emit synchronizedChanged();
+}
+
+void SqlTableModel::setSynchronizing(bool value)
+{
+	if (_synchronizing == value)
+		return;
+
+	_synchronizing = value;
+	emit synchronizingChanged();
 }

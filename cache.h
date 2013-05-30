@@ -1,32 +1,32 @@
 //  Copyright 2013 Guillaume Denry (guillaume.denry@gmail.com)
-//  This file is part of BetaSeeker.
+//  This file is part of ShowDevant.
 //
-//  BetaSeeker is free software: you can redistribute it and/or modify
+//  ShowDevant is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
-//  BetaSeeker is distributed in the hope that it will be useful,
+//  ShowDevant is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with BetaSeeker.  If not, see <http://www.gnu.org/licenses/>.
+//  along with ShowDevant.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SHOWMANAGER_H
-#define SHOWMANAGER_H
+#ifndef CACHE_H
+#define CACHE_H
 
 #include <QObject>
 #include <QMap>
 
 class Command;
 
-class ShowManager : public QObject
+class Cache : public QObject
 {
 	Q_OBJECT
 public:
-	static ShowManager &instance();
+	static Cache &instance();
 
 	/*! \brief If a show item is expired, reload it from the website
 	 * \retval 0 if the show item is still fresh
@@ -35,7 +35,15 @@ public:
 	 */
 	Q_INVOKABLE int refreshOnExpired(const QString &showid, int season = -1, int episode = -1, bool description = false);
 
+	/*! \brief Synchronize show informations
+	 */
+	Q_INVOKABLE int synchronizeShowInfos(const QString &showId);
+
+	Q_INVOKABLE int synchronizeSeasonEpisodeList(const QString &showId, int season);
+
 signals:
+	void showInfosSynchronizing(const QString &showId);
+	void showInfosSynchronized(const QString &showId);
 	void refreshDone(const QString &showId);
 
 private:
@@ -47,10 +55,25 @@ private:
 		QString parseMethodName;
 	};
 
-	static ShowManager *_instance;
-	QMap<Command*,TicketData> parsing;
+	struct SynchronizeAction {
+		enum ActionType {
+			Action_ShowInfos,
+			Action_SeasonEpisodeList
+		};
 
-	explicit ShowManager();
+		ActionType actionType;
+		// TODO make a generic list for the values below
+		QMap<QString,QVariant> id;
+	};
+
+	static Cache *_instance;
+	QMap<Command*,TicketData> parsing;
+	QList<SynchronizeAction*> currentActions;
+
+	explicit Cache();
+
+	SynchronizeAction *getAction(SynchronizeAction::ActionType actionType,
+								 const QMap<QString,QVariant> &id);
 
 private slots:
 	void commandFinished(const QByteArray &response);
@@ -59,6 +82,8 @@ private slots:
 	void parseEpisode(const QString &showId, int season, const QJsonObject &root);
 	void parseEpisodes(const QString &showId, int season, const QJsonObject &root);
 	void parseSeasons(const QString &showId, const QByteArray &response);
+	void parseShowInfos(const QString &showId, const QByteArray &response);
+	void showInfosCallback(const QString &showId, const QByteArray &response);
 };
 
-#endif // SHOWMANAGER_H
+#endif // CACHE_H

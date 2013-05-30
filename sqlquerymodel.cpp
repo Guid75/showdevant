@@ -54,3 +54,22 @@ QVariant SqlQueryModel::get(int row)
 
 	return QVariant(itemData);
 }
+
+
+void SqlQueryModel::setSynchronized(bool value)
+{
+	if (_synchronized == value)
+		return;
+
+	_synchronized = value;
+	emit synchronizedChanged();
+}
+
+void SqlQueryModel::setSynchronizing(bool value)
+{
+	if (_synchronizing == value)
+		return;
+
+	_synchronizing = value;
+	emit synchronizingChanged();
+}

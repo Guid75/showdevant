@@ -31,12 +31,15 @@ signals:
 	void synchronizedChanged();
 	void synchronizingChanged();
 
-public slots:
+protected:
+	void setSynchronized(bool value);
+	void setSynchronizing(bool value);
 
 private:
 	int count;
 	QString _query;
 	QHash<int, QByteArray> roles;
+
 	bool _synchronized;
 	bool _synchronizing;
 

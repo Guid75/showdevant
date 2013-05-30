@@ -26,7 +26,7 @@ Rectangle {
 	}
 
 	Connections {
-		target: showManager
+		target: cache
 		onRefreshDone: {
 			loadingWidget.active = false;
 			__showReady(showId);
@@ -108,10 +108,12 @@ Rectangle {
 					bannerImage.source = "http://api.betaseries.com/pictures/show/" + showId + ".jpg?key=9adb4ab628c6";
 					bannerText.text = title;
 
-					if (showManager.refreshOnExpired(showId) === 0)
+					__showReady(showId);
+					//cache.synchronizeShowInfos(showId);
+/*					if (cache.refreshOnExpired(showId) === 0)
 						__showReady(showId);
 					else
-						loadingWidget.active = true;
+						loadingWidget.active = true;*/
 				}
 			}
 		}

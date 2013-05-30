@@ -59,29 +59,32 @@ int DatabaseManager::openDB()
 	query.exec("PRAGMA foreign_keys = ON;");
 
 	// shows
-	query.exec("CREATE TABLE show (show_id text primary key, title text, episodes_last_check_date integer)");
+	query.exec("CREATE TABLE show (show_id text primary key, last_sync integer, title text, "
+			   "description text, network text, duration integer, "
+			   "UNIQUE (show_id) ON CONFLICT REPLACE)");
 
 	// seasons
-	query.exec("CREATE TABLE season (show_id text, number integer, PRIMARY KEY (show_id, number))");
+	query.exec("CREATE TABLE season (id integer primary key, show_id text, number integer, episode_count integer, "
+					"FOREIGN KEY (show_id) REFERENCES show(show_id) ON DELETE CASCADE)");
 
-	// episodes
-	query.exec("CREATE TABLE episode "
-			   "(show_id text, season integer, episode integer, title text, "
-			   "number text, global integer, date integer, "
-			   "comments integer, subtitles_last_check_date integer, PRIMARY KEY (show_id, season, episode))");
+//	// episodes
+//	query.exec("CREATE TABLE episode "
+//			   "(show_id text, season integer, episode integer, title text, "
+//			   "number text, global integer, date integer, "
+//			   "comments integer, subtitles_last_check_date integer, PRIMARY KEY (show_id, season, episode))");
 
-	// subtitles
-	query.exec("CREATE TABLE subtitle "
-			   "(id integer primary key, show_id text, season integer, episode integer, "
-			   "language text, source text, file text, "
-			   "url text, quality integer, "
-			   "UNIQUE (show_id, season, episode, url) ON CONFLICT REPLACE)");
+//	// subtitles
+//	query.exec("CREATE TABLE subtitle "
+//			   "(id integer primary key, show_id text, season integer, episode integer, "
+//			   "language text, source text, file text, "
+//			   "url text, quality integer, "
+//			   "UNIQUE (show_id, season, episode, url) ON CONFLICT REPLACE)");
 
-	// subtitles content
-	query.exec("CREATE TABLE subtitle_content "
-			   "(subtitle_id integer, file text, "
-			   "FOREIGN KEY (subtitle_id) REFERENCES subtitle(id) ON DELETE CASCADE, "
-			   "UNIQUE (subtitle_id, file) ON CONFLICT REPLACE)");
+//	// subtitles content
+//	query.exec("CREATE TABLE subtitle_content "
+//			   "(subtitle_id integer, file text, "
+//			   "FOREIGN KEY (subtitle_id) REFERENCES subtitle(id) ON DELETE CASCADE, "
+//			   "UNIQUE (subtitle_id, file) ON CONFLICT REPLACE)");
 
 	emit opened();
 

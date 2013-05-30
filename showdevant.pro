@@ -24,11 +24,11 @@ SOURCES += main.cpp \
     showmodel.cpp \
     sqlquerymodel.cpp \
     sortfilterproxymodel.cpp \
-    showmanager.cpp \
     episodemodel.cpp \
     seasonlistmodel.cpp \
     command.cpp \
-    download.cpp
+    download.cpp \
+    cache.cpp
 
 # Installation path
 # target.path =
@@ -54,7 +54,8 @@ OTHER_FILES += \
     qml/showdevant/EpisodeDetail.qml \
     qml/showdevant/EpisodesViewer.qml \
     qml/showdevant/SeasonsViewer.qml \
-    qml/showdevant/EpisodeResume.qml
+    qml/showdevant/EpisodeResume.qml \
+    api_samples/shows_display.json
 
 HEADERS += \
     downloadmanager.h \
@@ -66,8 +67,8 @@ HEADERS += \
     showmodel.h \
     sqlquerymodel.h \
     sortfilterproxymodel.h \
-    showmanager.h \
     episodemodel.h \
     seasonlistmodel.h \
     command.h \
-    download.h
+    download.h \
+    cache.h

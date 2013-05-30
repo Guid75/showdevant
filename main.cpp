@@ -14,7 +14,7 @@
 #include "seasonlistmodel.h"
 #include "episodemodel.h"
 #include "sortfilterproxymodel.h"
-#include "showmanager.h"
+#include "cache.h"
 
 #include "qtquick2applicationviewer.h"
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	viewer.rootContext()->setContextProperty("commandManager", &CommandManager::instance());
 	viewer.rootContext()->setContextProperty("downloadManager", &DownloadManager::instance());
 	viewer.rootContext()->setContextProperty("databaseManager", &DatabaseManager::instance());
-	viewer.rootContext()->setContextProperty("showManager", &ShowManager::instance());
+	viewer.rootContext()->setContextProperty("cache", &Cache::instance());
 	viewer.setMainQmlFile(QStringLiteral("qml/showdevant/main.qml"));
 	viewer.setTitle("ShowDevant - Alpha");
 	viewer.showExpanded();

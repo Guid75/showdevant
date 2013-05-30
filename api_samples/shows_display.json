@@ -1,0 +1,33 @@
+{
+  "root": {
+	"key": "9adb4ab628c6",
+    "show": {
+      "title": "The Lost Room",
+      "id_thetvdb": "79637",
+      "url": "thelostroom",
+      "description": "Juste avant de mourir, un jeune homme confie \u00e0 l'inspecteur Joe Miller la cl\u00e9 d'une chambre de l'h\u00f4tel Sunshine, situ\u00e9e aux abords de la mythique Route 66. Il ne sait pas encore qu'il vient d'entrer en possession d'un objet puissant et terriblement convo\u00eet\u00e9, ouvrant une porte vers un univers parall\u00e8le. Miller, qui s'est lanc\u00e9 \u00e0 la recherche de sa fille perdue dans cette chambre d'h\u00f4tel, devient la proie de tous et de tout ce qui d\u00e9sire son bien le plus pr\u00e9cieux : la cl\u00e9.",
+	  "duration": "90",
+	  "network": "SciFi",
+	  "status": "Ended",
+	  "banner": "https:\/\/www.betaseries.com\/images\/fonds\/banner\/393_1362853578.jpg",
+      "seasons": {
+        "1": {
+          "number":"1",
+          "episodes":3
+         }
+      },
+      "genres": {
+		"0": "Drama",
+		"1": "Mini-Series",
+		"2": "Science-Fiction"
+      },
+      "note": {
+        "members": 109,
+        "mean": 4.39,
+        "self": null
+      }
+    },
+    "code": 1,
+    "errors": {}
+  }
+}

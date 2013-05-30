@@ -52,9 +52,15 @@ Command *CommandManager::showsSearch(const QString &expression)
 	return pushCommand(QString("%1/shows/search.json?title=%2&key=%3").arg(websiteUrl).arg(expression).arg(apiKey));
 }
 
+Command *CommandManager::showsDisplay(const QString &showId)
+{
+	QString str = QString("%1/shows/display/%2.json?key=%3").arg(websiteUrl).arg(showId).arg(apiKey);
+	return pushCommand(str);
+}
+
 Command *CommandManager::showsEpisodes(const QString &showId, int season, int episode, bool summary, bool hide_notes)
 {
-	QString str = QString("%1/shows/episodes/%2.json?&key=%3").arg(websiteUrl).arg(showId).arg(apiKey);
+	QString str = QString("%1/shows/episodes/%2.json?key=%3").arg(websiteUrl).arg(showId).arg(apiKey);
 
 	if (season >= 0)
 		str.append(QString("&season=%1").arg(season));
@@ -70,7 +76,7 @@ Command *CommandManager::showsEpisodes(const QString &showId, int season, int ep
 
 Command *CommandManager::subtitlesShow(const QString &showId, int season, int episode, const QString &language)
 {
-	QString str = QString("%1/subtitles/show/%2.json?&key=%3").arg(websiteUrl).arg(showId).arg(apiKey);
+	QString str = QString("%1/subtitles/show/%2.json?key=%3").arg(websiteUrl).arg(showId).arg(apiKey);
 	if (season >= 0)
 		str.append(QString("&season=%1").arg(season));
 	if (episode >= 0)
@@ -83,7 +89,7 @@ Command *CommandManager::subtitlesShow(const QString &showId, int season, int ep
 
 Command *CommandManager::subtitlesShowByFile(const QString &showId, const QString &fileName, const QString &language)
 {
-	QString str = QString("%1/subtitles/show/%2.json?&key=%3&file=%4").arg(websiteUrl).arg(showId).arg(apiKey).arg(fileName);
+	QString str = QString("%1/subtitles/show/%2.json?key=%3&file=%4").arg(websiteUrl).arg(showId).arg(apiKey).arg(fileName);
 	if (!language.isEmpty())
 		str.append(QString("&language=%1").arg(language));
 

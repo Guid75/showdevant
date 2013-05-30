@@ -16,6 +16,12 @@ public:
 
 private:
 	QString _show;
+
+	void select();
+
+private slots:
+	void showInfosSynchronizing(const QString &showId);
+	void showInfosSynchronized(const QString &showId);
 };
 
 #endif // SEASONLISTMODEL_H
