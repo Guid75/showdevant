@@ -1,9 +1,9 @@
-#ifndef EPISODEMODEL_H
-#define EPISODEMODEL_H
+#ifndef EPISODELISTMODEL_H
+#define EPISODELISTMODEL_H
 
 #include "sqlquerymodel.h"
 
-class EpisodeModel : public SqlQueryModel
+class EpisodeListModel : public SqlQueryModel
 {
 	Q_OBJECT
 
@@ -11,7 +11,7 @@ class EpisodeModel : public SqlQueryModel
 	Q_PROPERTY(int season READ getSeason() WRITE setSeason(episode))
 
 public:
-	explicit EpisodeModel(QObject *parent = 0);
+	explicit EpisodeListModel(QObject *parent = 0);
 	
 	const QString &getShow() const { return _show; }
 	void setShow(const QString &show);
@@ -26,4 +26,4 @@ private:
 	void refreshQuery();
 };
 
-#endif // EPISODEMODEL_H
+#endif // EPISODELISTMODEL_H

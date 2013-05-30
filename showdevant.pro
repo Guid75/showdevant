@@ -24,11 +24,11 @@ SOURCES += main.cpp \
     showmodel.cpp \
     sqlquerymodel.cpp \
     sortfilterproxymodel.cpp \
-    episodemodel.cpp \
     seasonlistmodel.cpp \
     command.cpp \
     download.cpp \
-    cache.cpp
+    cache.cpp \
+    episodelistmodel.cpp
 
 # Installation path
 # target.path =
@@ -67,8 +67,8 @@ HEADERS += \
     showmodel.h \
     sqlquerymodel.h \
     sortfilterproxymodel.h \
-    episodemodel.h \
     seasonlistmodel.h \
     command.h \
     download.h \
-    cache.h
+    cache.h \
+    episodelistmodel.h

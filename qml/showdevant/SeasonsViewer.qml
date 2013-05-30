@@ -34,8 +34,8 @@ Item {
 				model: seasonListModel
 				SeasonItem {
 					onItemClicked: {
-						episodeModel.show = show_id;
-						episodeModel.season = number;
+						episodeListModel.show = show_id;
+						episodeListModel.season = number;
 						seasonSelector.current = number;
 						seasonSelector.min = 1;
 						seasonSelector.max = seasonListModel.count;
@@ -64,8 +64,9 @@ Item {
 		anchors.centerIn: parent
 		sourceComponent: LoadingWidget {
 			anchors.centerIn: parent
-			color: "#666666"
-			size: 8
+			color: "#AAAAAA"
+			count: 20
+			size: 16
 			width: 200
 			height: 200
 		}

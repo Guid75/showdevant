@@ -1,15 +1,15 @@
 #include <QSqlQuery>
 
-#include "episodemodel.h"
+#include "episodelistmodel.h"
 
-EpisodeModel::EpisodeModel(QObject *parent) :
+EpisodeListModel::EpisodeListModel(QObject *parent) :
 	SqlQueryModel(parent),
 	_season(1)
 {
 	setShow("a");
 }
 
-void EpisodeModel::setShow(const QString &show)
+void EpisodeListModel::setShow(const QString &show)
 {
 	if (_show == show)
 		return;
@@ -18,7 +18,7 @@ void EpisodeModel::setShow(const QString &show)
 	refreshQuery();
 }
 
-void EpisodeModel::setSeason(int season)
+void EpisodeListModel::setSeason(int season)
 {
 	if (_season == season)
 		return;
@@ -27,7 +27,7 @@ void EpisodeModel::setSeason(int season)
 	refreshQuery();
 }
 
-void EpisodeModel::refreshQuery()
+void EpisodeListModel::refreshQuery()
 {
 	if (_show.isEmpty() || _season < 0)
 		return;

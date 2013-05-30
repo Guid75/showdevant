@@ -67,11 +67,11 @@ int DatabaseManager::openDB()
 	query.exec("CREATE TABLE season (id integer primary key, show_id text, number integer, episode_count integer, "
 					"FOREIGN KEY (show_id) REFERENCES show(show_id) ON DELETE CASCADE)");
 
-//	// episodes
-//	query.exec("CREATE TABLE episode "
-//			   "(show_id text, season integer, episode integer, title text, "
-//			   "number text, global integer, date integer, "
-//			   "comments integer, subtitles_last_check_date integer, PRIMARY KEY (show_id, season, episode))");
+	// episodes
+	query.exec("CREATE TABLE episode "
+			   "(show_id text, season integer, episode integer, title text, "
+			   "number text, global integer, date integer, "
+			   "comments integer, subtitles_last_check_date integer, PRIMARY KEY (show_id, season, episode))");
 
 //	// subtitles
 //	query.exec("CREATE TABLE subtitle "

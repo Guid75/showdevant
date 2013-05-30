@@ -47,7 +47,7 @@ Item {
 		__launchAnimation(futureSeason);
 	}
 
-	EpisodeModel {
+	EpisodeListModel {
 		id: previousModel
 	}
 	Binding {
@@ -55,7 +55,7 @@ Item {
 		property: "show"
 		value: currentShow
 	}
-	EpisodeModel {
+	EpisodeListModel {
 		id: currentModel
 	}
 	Binding {
@@ -63,7 +63,7 @@ Item {
 		property: "show"
 		value: currentShow
 	}
-	EpisodeModel {
+	EpisodeListModel {
 		id: nextModel
 	}
 	Binding {
