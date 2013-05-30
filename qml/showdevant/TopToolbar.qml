@@ -21,6 +21,7 @@ ShadowRectangle {
 									 var compo = Qt.createComponent("SearchResultList.qml");
 
 									 // fill the model
+									 searchModel.clear();
 									 for (var showName in json.shows) {
 										 if (!json.shows.hasOwnProperty(showName)) {
 											 continue;

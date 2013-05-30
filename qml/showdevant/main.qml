@@ -27,10 +27,10 @@ Rectangle {
 
 	Connections {
 		target: cache
-		onRefreshDone: {
-			loadingWidget.active = false;
-			__showReady(showId);
-		}
+//		onRefreshDone: {
+//			loadingWidget.active = false;
+//			__showReady(showId);
+//		}
 	}
 
 	SeasonListModel {
@@ -39,13 +39,6 @@ Rectangle {
 
 	EpisodeModel {
 		id: episodeModel
-	}
-
-	function __showReady(showId) {
-		seasonListModel.show = showId;
-		playgroundLoader.source = "SeasonsViewer.qml";
-		seasonSelector.visible = false;
-		episodeSelector.visible = false;
 	}
 
 	Component.onCompleted: {
@@ -108,12 +101,10 @@ Rectangle {
 					bannerImage.source = "http://api.betaseries.com/pictures/show/" + showId + ".jpg?key=9adb4ab628c6";
 					bannerText.text = title;
 
-					__showReady(showId);
-					//cache.synchronizeShowInfos(showId);
-/*					if (cache.refreshOnExpired(showId) === 0)
-						__showReady(showId);
-					else
-						loadingWidget.active = true;*/
+					seasonListModel.show = showId;
+					playgroundLoader.source = "SeasonsViewer.qml";
+					seasonSelector.visible = false;
+					episodeSelector.visible = false;
 				}
 			}
 		}

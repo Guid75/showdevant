@@ -29,8 +29,11 @@ void SeasonListModel::setShow(const QString &show)
 		select();
 		setSynchronized(true);
 		setSynchronizing(false);
+		return;
 	}
 
+	clear();
+	select();
 	setSynchronized(false);
 	setSynchronizing(true);
 }
