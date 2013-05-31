@@ -10,6 +10,9 @@ Item {
 
 	Component.onCompleted: {
 		currentModel.season = currentSeason;
+		// pre-caching the previous and next season
+		cache.synchronizeSeasonEpisodeList(currentShow, currentSeason - 1);
+		cache.synchronizeSeasonEpisodeList(currentShow, currentSeason + 1);
 		constructionAnimation.start();
 	}
 
@@ -44,6 +47,10 @@ Item {
 		if (toLeftAnimation.running || toRightAnimation.running)
 			return;
 
+		// pre-caching the previous and next season
+		cache.synchronizeSeasonEpisodeList(currentShow, season - 1);
+		cache.synchronizeSeasonEpisodeList(currentShow, season + 1);
+
 		__launchAnimation(futureSeason);
 	}
 
@@ -72,73 +79,123 @@ Item {
 		value: currentShow
 	}
 
-	Flickable {
-		id: previousFlickable
+	Item {
+		id: previousItem
 		width: parent.width
 		height: parent.height
 		x: - parent.width
-		contentWidth: Math.max(width, 208)
-		contentHeight: previousFlow.childrenRect.height + 8
-		clip: true
-		Flow {
-			id: previousFlow
+		Flickable {
 			anchors.fill: parent
-			anchors.margins: 4
-			spacing: 10
-			Repeater {
-				model: previousModel
-				EpisodeItem {
-					onItemClicked: __itemClicked(episode)
+			contentWidth: Math.max(width, 208)
+			contentHeight: previousFlow.childrenRect.height + 8
+			clip: true
+			Flow {
+				id: previousFlow
+				anchors.fill: parent
+				anchors.margins: 4
+				spacing: 10
+				Repeater {
+					model: previousModel
+					EpisodeItem {
+						onItemClicked: __itemClicked(episode)
+					}
 				}
 			}
 		}
-	}
-
-	Flickable {
-		id: currentFlickable
-		width: parent.width
-		height: parent.height
-		anchors.left: previousFlickable.right
-		contentWidth: Math.max(width, 208)
-		contentHeight: currentFlow.childrenRect.height + 8
-		clip: true
-		Flow {
-			id: currentFlow
-			anchors {
-				left: parent.left
-				right: parent.right
+		Loader {
+			id: previousLoadingWidget
+			anchors.centerIn: parent
+			sourceComponent: LoadingWidget {
+				anchors.centerIn: parent
+				color: "#AAAAAA"
+				count: 20
+				size: 16
+				width: 200
+				height: 200
 			}
-			height: parent.height
-			anchors.margins: 4
-			spacing: 10
-			Repeater {
-				model: currentModel
-				EpisodeItem {
-					onItemClicked: __itemClicked(episode)
-				}
-			}
+			active: previousModel.synchronizing
+			asynchronous: true
 		}
 	}
 
-	Flickable {
-		id: nextFlickable
+	Item {
+		id: currentItem
 		width: parent.width
 		height: parent.height
-		anchors.left: currentFlickable.right
-		contentWidth: Math.max(width, 208)
-		contentHeight: nextFlow.childrenRect.height + 8
-		clip: true
-		Flow {
-			id: nextFlow
+		anchors.left: previousItem.right
+		Flickable {
 			anchors.fill: parent
-			anchors.margins: 4
-			spacing: 10
-			Repeater {
-				model: nextModel
-				EpisodeItem {
-					onItemClicked: __itemClicked(episode)
+			contentWidth: Math.max(width, 208)
+			contentHeight: currentFlow.childrenRect.height + 8
+			clip: true
+			Flow {
+				id: currentFlow
+				anchors {
+					left: parent.left
+					right: parent.right
+				}
+				height: parent.height
+				anchors.margins: 4
+				spacing: 10
+				Repeater {
+					model: currentModel
+					EpisodeItem {
+						onItemClicked: __itemClicked(episode)
+					}
 				}
 			}
+		}
+		Loader {
+			id: currentLoadingWidget
+			anchors.centerIn: parent
+			sourceComponent: LoadingWidget {
+				anchors.centerIn: parent
+				color: "#AAAAAA"
+				count: 20
+				size: 16
+				width: 200
+				height: 200
+			}
+			active: currentModel.synchronizing
+			asynchronous: true
+		}
+	}
+
+	Item {
+		width: parent.width
+		height: parent.height
+		anchors.left: currentItem.right
+		Flickable {
+			anchors.fill: parent
+			contentWidth: Math.max(width, 208)
+			contentHeight: nextFlow.childrenRect.height + 8
+			clip: true
+			Flow {
+				id: nextFlow
+				anchors.fill: parent
+				anchors.margins: 4
+				spacing: 10
+				Repeater {
+					model: nextModel
+					EpisodeItem {
+						onItemClicked: __itemClicked(episode)
+					}
+				}
+			}
+		}
+		Loader {
+			id: nextLoadingWidget
+			anchors.centerIn: parent
+			sourceComponent: LoadingWidget {
+				anchors.centerIn: parent
+				color: "#AAAAAA"
+				count: 20
+				size: 16
+				width: 200
+				height: 200
+			}
+			active: nextModel.synchronizing
+			asynchronous: true
 		}
 	}
 
@@ -153,7 +210,7 @@ Item {
 
 	PropertyAnimation {
 		id: toLeftAnimation
-		target: previousFlickable
+		target: previousItem
 		property: 'x'
 		from: parent ? - parent.width : 0
 		to: 0
@@ -171,7 +228,7 @@ Item {
 
 	PropertyAnimation {
 		id: toRightAnimation
-		target: previousFlickable
+		target: previousItem
 		property: 'x'
 		from: parent ? - parent.width : 0
 		to: parent ? - 2 * parent.width : 0

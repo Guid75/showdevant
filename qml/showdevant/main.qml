@@ -94,13 +94,13 @@ Rectangle {
 				anchors.topMargin: 6
 				anchors.bottomMargin: 40
 				onShowSelected: {
-					bannerImage.source = "http://api.betaseries.com/pictures/show/" + showId + ".jpg?key=9adb4ab628c6";
-					bannerText.text = title;
-
 					seasonListModel.show = showId;
 					playgroundLoader.source = "SeasonsViewer.qml";
 					seasonSelector.visible = false;
 					episodeSelector.visible = false;
+
+					bannerImage.source = "http://api.betaseries.com/pictures/show/" + showId + ".jpg?key=9adb4ab628c6";
+					bannerText.text = title;
 				}
 			}
 		}

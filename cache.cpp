@@ -20,11 +20,16 @@
 #include <QDateTime>
 #include <QVariant>
 #include <QDebug>
+#include <QMetaType>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include "commandmanager.h"
 #include "command.h"
 #include "jsonparser.h"
 #include "cache.h"
+
+// alias only for invokeMethod
+typedef QMap<QString,QVariant> ActionId;
 
 Cache *Cache::_instance = 0;
 
@@ -38,9 +43,11 @@ Cache &Cache::instance()
 Cache::Cache() :
 	QObject()
 {
+	qRegisterMetaType<ActionId>("ActionId");
+	qRegisterMetaType<CacheDataType>("CacheDataType");
 }
 
-Cache::SynchronizeAction *Cache::getAction(Cache::SynchronizeAction::ActionType actionType, const ActionId &id) const
+Cache::SynchronizeAction *Cache::getAction(Cache::SynchronizeAction::ActionType actionType, const QMap<QString,QVariant> &id) const
 {
 	foreach (SynchronizeAction *action, currentActions) {
 		if (action->actionType == actionType &&
@@ -60,6 +67,10 @@ Cache::SynchronizeAction *Cache::getAction(Command *command) const
 	return 0;
 }
 
+void Cache::launch_callback(Cache::SynchronizeAction *action, const QByteArray &response) {
+	QMetaObject::invokeMethod(this, action->parseMethodName.toLocal8Bit(), Qt::DirectConnection, Q_ARG(ActionId, action->id), Q_ARG(QByteArray, response));
+}
+
 void Cache::commandFinished(const QByteArray &response)
 {
 	Command *command = qobject_cast<Command*>(sender());
@@ -67,7 +78,13 @@ void Cache::commandFinished(const QByteArray &response)
 
 	Q_ASSERT(action != 0); // command MUST belong to an existing action
 
-	QMetaObject::invokeMethod(this, action->parseMethodName.toLocal8Bit(), Q_ARG(ActionId, action->id), Q_ARG(QByteArray, response));
+	action->future = QtConcurrent::run(this, &Cache::launch_callback, action, response);
+	action->watcher.setFuture(action->future);
+	connect(&action->watcher, &QFutureWatcher<void>::finished, this, &Cache::futureFinished);
+}
+
+void Cache::futureFinished()
+{
 }
 
 void Cache::parseEpisode(const QString &showId, int season, const QJsonObject &root)
@@ -191,43 +208,20 @@ void Cache::parseShowInfos(const QString &showId, const QByteArray &response)
 	QSqlDatabase::database().commit();
 }
 
-void Cache::showInfosCallback(const ActionId &id, const QByteArray &response)
+void Cache::showInfosCallback(const QMap<QString,QVariant> &id, const QByteArray &response)
 {
 	QString showId = id["showId"].toString();
 	// TODO: parseShowInfos must return a boolean for potential errors
 	parseShowInfos(showId, response);
 	emit synchronized(Data_ShowInfos, id);
-//	emit showInfosSynchronized(showId);
 }
 
-void Cache::episodeListCallback(const Cache::ActionId &id, const QByteArray &response)
+void Cache::episodeListCallback(const QMap<QString,QVariant> &id, const QByteArray &response)
 {
 	QString showId = id["showId"].toString();
 	parseSeasons(showId, response);
 	emit synchronized(Data_EpisodeList, id);
 }
-
-/*int Cache::refreshOnExpired(const QString &showId, int season, int episode, bool description)
-{
-	QSqlQuery query;
-	qint64 last_check_epoch = 0;
-	qint64 expiration = 24 * 60 * 60 * 1000; // one day => TODO customizable
-	// have we the season in database?
-	// take the expiration date in account
-	query.exec(QString("SELECT episodes_last_check_date FROM show WHERE show_id='%1'").arg(showId));
-	if (query.next() && !query.value(0).isNull()) {
-		last_check_epoch = query.value(0).toLongLong() * 1000;
-	}
-	if (QDateTime::currentDateTime().toMSecsSinceEpoch() - last_check_epoch > expiration) {
-		// expired data, we need to launch the request
-		Command *command = CommandManager::instance().showsEpisodes(showId);
-		// TODO ticket can be invalid, manage it
-		parsing.insert(command, TicketData(showId, "parseSeasons"));
-		connect(command, &Command::finished, this, &Cache::commandFinished);
-		return 1;
-	} else
-		return 0;
-}*/
 
 int Cache::synchronizeShowInfos(const QString &showId)
 {
@@ -246,7 +240,7 @@ int Cache::synchronizeShowInfos(const QString &showId)
 	}
 
 	// is there a current action about it?
-	ActionId id;
+	QMap<QString,QVariant> id;
 	id.insert("showId", showId);
 	SynchronizeAction *action = getAction(SynchronizeAction::Action_ShowInfos, id);
 	if (action) {
@@ -289,7 +283,7 @@ int Cache::synchronizeSeasonEpisodeList(const QString &showId, int season)
 	}
 
 	// is there a current action about it?
-	ActionId id;
+	QMap<QString,QVariant> id;
 	id.insert("showId", showId);
 	id.insert("season", season);
 	SynchronizeAction *action = getAction(SynchronizeAction::Action_SeasonEpisodeList, id);
