@@ -31,14 +31,17 @@ class Cache : public QObject
 public:
 	enum CacheDataType {
 		Data_ShowInfos,
-		Data_EpisodeList
+		Data_Episodes
 	};
 
 	static Cache &instance();
 
 	Q_INVOKABLE int synchronizeShowInfos(const QString &showId);
 
-	Q_INVOKABLE int synchronizeSeasonEpisodeList(const QString &showId, int season);
+	// if episode == -1, it means we want to synchronize ALL season episodes
+	Q_INVOKABLE int synchronizeEpisodes(const QString &showId, int season, int episode = -1, bool fullInfo = false);
+
+	//Q_INVOKABLE int synchronizeEpisodeDetail(const QString &showId, int season, int episode);
 
 signals:
 	void synchronizing(CacheDataType dataType, QMap<QString,QVariant> id);
@@ -46,13 +49,7 @@ signals:
 
 private:
 	struct SynchronizeAction {
-		enum ActionType {
-			Action_ShowInfos,
-			Action_SeasonEpisodeList
-		};
-
-		ActionType actionType;
-		// TODO make a generic list for the values below
+		CacheDataType dataType;
 		QMap<QString,QVariant> id;
 		QString parseMethodName;
 		QList<Command*> commands; // all commands belonging to the action
@@ -65,7 +62,7 @@ private:
 
 	explicit Cache();
 
-	SynchronizeAction *getAction(SynchronizeAction::ActionType actionType,
+	SynchronizeAction *getAction(CacheDataType dataType,
 								 const QMap<QString,QVariant> &id) const;
 
 	SynchronizeAction *getAction(Command *command) const;
@@ -73,16 +70,18 @@ private:
 	void launch_callback(Cache::SynchronizeAction *action, const QByteArray &response);
 
 private slots:
+	// thread callbacks
 	void commandFinished(const QByteArray &response);
 	void futureFinished();
 
-	// parsing methods
-	void parseEpisode(const QString &showId, int season, const QJsonObject &root);
-	void parseEpisodes(const QString &showId, int season, const QJsonObject &root);
-	void parseSeasons(const QString &showId, const QByteArray &response);
+	// parsing
+	void parseEpisodes(const QString &showId, int season, const QJsonObject &root, bool detailMode);
+	void parseSeasons(const QString &showId, const QByteArray &response, bool allEpisodes);
 	void parseShowInfos(const QString &showId, const QByteArray &response);
+
+	// action callbacks
 	void showInfosCallback(const QMap<QString,QVariant> &id, const QByteArray &response);
-	void episodeListCallback(const QMap<QString,QVariant> &id, const QByteArray &response);
+	void episodesCallback(const QMap<QString,QVariant> &id, const QByteArray &response);
 };
 
 #endif // CACHE_H

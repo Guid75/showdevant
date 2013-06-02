@@ -11,14 +11,19 @@ Item {
 	Component.onCompleted: {
 		currentModel.season = currentSeason;
 		// pre-caching the previous and next season
-		cache.synchronizeSeasonEpisodeList(currentShow, currentSeason - 1);
-		cache.synchronizeSeasonEpisodeList(currentShow, currentSeason + 1);
+		cache.synchronizeEpisodes(currentShow, currentSeason - 1);
+		cache.synchronizeEpisodes(currentShow, currentSeason + 1);
 		constructionAnimation.start();
 	}
 
 	function __launchAnimation(season) {
 		var toLeft = currentSeason > season;
 		currentSeason = season;
+
+		// pre-caching the previous and next season
+		cache.synchronizeEpisodes(currentShow, season - 1);
+		cache.synchronizeEpisodes(currentShow, season + 1);
+
 		if (toLeft)
 			toLeftAnimation.start();
 		else
@@ -46,10 +51,6 @@ Item {
 		// is animation is running, we stop here
 		if (toLeftAnimation.running || toRightAnimation.running)
 			return;
-
-		// pre-caching the previous and next season
-		cache.synchronizeSeasonEpisodeList(currentShow, season - 1);
-		cache.synchronizeSeasonEpisodeList(currentShow, season + 1);
 
 		__launchAnimation(futureSeason);
 	}

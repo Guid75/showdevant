@@ -21,6 +21,7 @@
 #include <QVariant>
 #include <QDebug>
 #include <QMetaType>
+#include <QSqlError>
 #include <QtConcurrent/QtConcurrentRun>
 
 #include "commandmanager.h"
@@ -47,10 +48,10 @@ Cache::Cache() :
 	qRegisterMetaType<CacheDataType>("CacheDataType");
 }
 
-Cache::SynchronizeAction *Cache::getAction(Cache::SynchronizeAction::ActionType actionType, const QMap<QString,QVariant> &id) const
+Cache::SynchronizeAction *Cache::getAction(CacheDataType dataType, const QMap<QString,QVariant> &id) const
 {
 	foreach (SynchronizeAction *action, currentActions) {
-		if (action->actionType == actionType &&
+		if (action->dataType == dataType &&
 				action->id == id) {
 			return action;
 		}
@@ -87,44 +88,40 @@ void Cache::futureFinished()
 {
 }
 
-void Cache::parseEpisode(const QString &showId, int season, const QJsonObject &root)
-{
-	bool ok;
-	int episode = root.value("episode").toString().toInt(&ok);
-	if (!ok)
-		return;
-	QString title = root.value("title").toString();
-	QString number = root.value("number").toString();
-	int global = root.value("global").toString().toInt();
-	int date = root.value("date").toDouble();
-	int comments = root.value("comments").toString().toInt();
-
-	QSqlQuery query;
-	query.prepare("INSERT INTO episode (show_id, season, episode, title, number, global, date, comments) "
-				  "VALUES (:show_id, :season, :episode, :title, :number, :global, :date, :comments)");
-	query.bindValue(":show_id", showId);
-	query.bindValue(":season", season);
-	query.bindValue(":episode", episode);
-	query.bindValue(":title", title);
-	query.bindValue(":number", number);
-	query.bindValue(":global", global);
-	query.bindValue(":date", date);
-	query.bindValue(":comments", comments);
-	query.exec();
-}
-
-void Cache::parseEpisodes(const QString &showId, int season, const QJsonObject &root)
+void Cache::parseEpisodes(const QString &showId, int season, const QJsonObject &root, bool detailMode)
 {
 	QJsonObject episodesJson = root.value("episodes").toObject();
 	foreach (const QString &key, episodesJson.keys()) {
 		QJsonObject episodeJson = episodesJson.value(key).toObject();
 		if (episodeJson.isEmpty())
 			continue;
-		parseEpisode(showId, season, episodeJson);
+
+		int episode = episodeJson.value("episode").toString().toInt();
+		QString title = episodeJson.value("title").toString();
+		QString number = episodeJson.value("number").toString();
+		int global = episodeJson.value("global").toString().toInt();
+		int date = episodeJson.value("date").toDouble();
+		int comments = episodeJson.value("comments").toString().toInt();
+
+		QSqlQuery query;
+		query.prepare("REPLACE INTO episode (show_id, season, episode, title, number, global, "
+					  "date, comments) "
+					  "VALUES (:show_id, :season, :episode, :title, :number, :global, "
+					  ":date, :comments)");
+
+		query.bindValue(":show_id", showId);
+		query.bindValue(":season", season);
+		query.bindValue(":episode", episode);
+		query.bindValue(":title", title);
+		query.bindValue(":number", number);
+		query.bindValue(":global", global);
+		query.bindValue(":date", date);
+		query.bindValue(":comments", comments);
+		query.exec();
 	}
 }
 
-void Cache::parseSeasons(const QString &showId, const QByteArray &response)
+void Cache::parseSeasons(const QString &showId, const QByteArray &response, bool allEpisodes)
 {
 	JsonParser parser(response);
 	if (!parser.isValid()) {
@@ -143,19 +140,19 @@ void Cache::parseSeasons(const QString &showId, const QByteArray &response)
 		if (seasonJson.isEmpty())
 			continue;
 
-		bool ok;
-		int number = seasonJson.value("number").toString().toInt(&ok);
-		if (!ok)
-			continue;
+		int number = seasonJson.value("number").toString().toInt();
 
-		parseEpisodes(showId, number, seasonJson);
+		parseEpisodes(showId, number, seasonJson, !allEpisodes);
 
-		QSqlQuery query;
-		query.prepare("UPDATE season SET last_sync_episode_list=:epoch WHERE show_id=:showid AND number=:number");
-		query.bindValue(":epoch", QDateTime::currentMSecsSinceEpoch() / 1000);
-		query.bindValue(":showid", showId);
-		query.bindValue(":number", number);
-		query.exec();
+		if (allEpisodes) {
+			// if we refresh all episodes, we can record the current date
+			QSqlQuery query;
+			query.prepare("UPDATE season SET last_sync_episode_list=:epoch WHERE show_id=:showid AND number=:number");
+			query.bindValue(":epoch", QDateTime::currentMSecsSinceEpoch() / 1000);
+			query.bindValue(":showid", showId);
+			query.bindValue(":number", number);
+			query.exec();
+		}
 	}
 
 	// update the episodes last check date of the show
@@ -188,20 +185,34 @@ void Cache::parseShowInfos(const QString &showId, const QByteArray &response)
 	query.bindValue(":show_id", showId);
 	query.exec();
 
-	// update the season list
-	query.prepare("DELETE FROM season WHERE show_id=:show_id");
+	// init the "to delete" list
+	QList<int> toDelete;
+	query.prepare("SELECT number FROM season WHERE show_id=:show_id");
 	query.bindValue(":show_id", showId);
 	query.exec();
+	while (query.next())
+		toDelete << query.value("number").toInt();
 
+	// make the replace/insertion operations and reduct the "to delete" list
 	QJsonObject seasonsJson = showJson.value("seasons").toObject();
 	foreach (const QString &key, seasonsJson.keys()) {
 		QJsonObject seasonJson = seasonsJson.value(key).toObject();
+		int number = seasonJson.value("number").toString().toInt();
+		toDelete.removeOne(number);
 
 		query.prepare("REPLACE INTO season (show_id, number, episode_count) "
 					  "VALUES (:show_id, :number, :episode_count)");
 		query.bindValue(":show_id", showId);
-		query.bindValue(":number", seasonJson.value("number").toString().toInt());
+		query.bindValue(":number", number);
 		query.bindValue(":episode_count", seasonJson.value("episodes").toDouble());
+		query.exec();
+	}
+
+	// delete all seasons that have not been found in the JSON return
+	foreach (int season, toDelete) {
+		query.prepare("DELETE FROM season WHERE show_id=:show_id AND season=:season");
+		query.bindValue(":show_id", showId);
+		query.bindValue(":season", season);
 		query.exec();
 	}
 
@@ -216,11 +227,11 @@ void Cache::showInfosCallback(const QMap<QString,QVariant> &id, const QByteArray
 	emit synchronized(Data_ShowInfos, id);
 }
 
-void Cache::episodeListCallback(const QMap<QString,QVariant> &id, const QByteArray &response)
+void Cache::episodesCallback(const QMap<QString,QVariant> &id, const QByteArray &response)
 {
 	QString showId = id["showId"].toString();
-	parseSeasons(showId, response);
-	emit synchronized(Data_EpisodeList, id);
+	parseSeasons(showId, response, id["episode"].isNull());
+	emit synchronized(Data_Episodes, id);
 }
 
 int Cache::synchronizeShowInfos(const QString &showId)
@@ -242,7 +253,7 @@ int Cache::synchronizeShowInfos(const QString &showId)
 	// is there a current action about it?
 	QMap<QString,QVariant> id;
 	id.insert("showId", showId);
-	SynchronizeAction *action = getAction(SynchronizeAction::Action_ShowInfos, id);
+	SynchronizeAction *action = getAction(Data_ShowInfos, id);
 	if (action) {
 		// an action is already running, so just wait for the end of it
 		return 1;
@@ -253,7 +264,7 @@ int Cache::synchronizeShowInfos(const QString &showId)
 
 	// store the synchronize action
 	action = new SynchronizeAction;
-	action->actionType = SynchronizeAction::Action_ShowInfos;
+	action->dataType = Data_ShowInfos;
 	action->id = id;
 	action->parseMethodName = "showInfosCallback";
 	Command *command = CommandManager::instance().showsDisplay(showId);
@@ -263,20 +274,26 @@ int Cache::synchronizeShowInfos(const QString &showId)
 	return 1;
 }
 
-int Cache::synchronizeSeasonEpisodeList(const QString &showId, int season)
+int Cache::synchronizeEpisodes(const QString &showId, int season, int episode, bool fullInfo)
 {
 	qint64 last_sync_epoch = 0;
 	qint64 expiration = 24 * 60 * 60 * 1000; // one day => TODO customizable
 	// have we the season in database?
 	// take the expiration date in account
 	QSqlQuery query;
-	query.prepare("SELECT last_sync_episode_list FROM season WHERE show_id=:show_id AND number=:number");
+
+	if (episode == -1)
+		query.prepare("SELECT last_sync_episode_list FROM season WHERE show_id=:show_id AND number=:season");
+	else
+		query.prepare("SELECT last_sync_detail FROM episode WHERE show_id=:show_id AND season=:season AND episode=:episode");
+
 	query.bindValue(":show_id", showId);
-	query.bindValue(":number", season);
+	query.bindValue(":season", season);
+	if (episode >= 0)
+		query.bindValue(":episode", episode);
 	query.exec();
-	if (query.next() && !query.value(0).isNull()) {
+	if (query.next() && !query.value(0).isNull())
 		last_sync_epoch = query.value(0).toLongLong() * 1000;
-	}
 	if (QDateTime::currentDateTime().toMSecsSinceEpoch() - last_sync_epoch <= expiration) {
 		// data are already synchronized, we can use them
 		return 0;
@@ -286,21 +303,23 @@ int Cache::synchronizeSeasonEpisodeList(const QString &showId, int season)
 	QMap<QString,QVariant> id;
 	id.insert("showId", showId);
 	id.insert("season", season);
-	SynchronizeAction *action = getAction(SynchronizeAction::Action_SeasonEpisodeList, id);
+	if (episode >= 0)
+		id.insert("episode", episode);
+	SynchronizeAction *action = getAction(Data_Episodes, id);
 	if (action) {
 		// an action is already running, so just wait for the end of it
 		return 1;
 	}
 
 	// expired data, we need to launch the request
-	emit synchronizing(Data_EpisodeList, id);
+	emit synchronizing(Data_Episodes, id);
 
 	// store the synchronize action
 	action = new SynchronizeAction;
-	action->actionType = SynchronizeAction::Action_SeasonEpisodeList;
+	action->dataType = Data_Episodes;
 	action->id = id;
-	action->parseMethodName = "episodeListCallback";
-	Command *command = CommandManager::instance().showsEpisodes(showId, season);
+	action->parseMethodName = "episodesCallback";
+	Command *command = CommandManager::instance().showsEpisodes(showId, season, episode, !fullInfo, !fullInfo);
 	connect(command, &Command::finished, this, &Cache::commandFinished);
 	action->commands << command;
 	currentActions << action;

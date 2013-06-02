@@ -28,7 +28,9 @@ SOURCES += main.cpp \
     command.cpp \
     download.cpp \
     cache.cpp \
-    episodelistmodel.cpp
+    episodelistmodel.cpp \
+    cacheobject.cpp \
+    episode.cpp
 
 # Installation path
 # target.path =
@@ -71,4 +73,6 @@ HEADERS += \
     command.h \
     download.h \
     cache.h \
-    episodelistmodel.h
+    episodelistmodel.h \
+    cacheobject.h \
+    episode.h

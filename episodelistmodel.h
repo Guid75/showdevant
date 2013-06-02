@@ -20,9 +20,13 @@ public:
 	int getSeason() const { return _season; }
 	void setSeason(int season);
 
+	int getEpisode() const { return _episode; }
+	void setEpisode(int episode);
+
 private:
 	QString _show;
 	int _season;
+	int _episode;
 
 	void select();
 	void load();

@@ -4,7 +4,8 @@
 
 EpisodeListModel::EpisodeListModel(QObject *parent) :
 	SqlQueryModel(parent),
-	_season(-1)
+	_season(-1),
+	_episode(-1)
 {
 	_show = "a";
 	select();
@@ -34,6 +35,15 @@ void EpisodeListModel::setSeason(int season)
 	load();
 }
 
+void EpisodeListModel::setEpisode(int episode)
+{
+	if (_episode == episode)
+		return;
+
+	_episode = episode;
+	load();
+}
+
 void EpisodeListModel::select()
 {
 	QSqlQuery query;
@@ -49,7 +59,7 @@ void EpisodeListModel::load()
 	if (_season < 0)
 		return;
 
-	if (Cache::instance().synchronizeSeasonEpisodeList(_show, _season) == 0) {
+	if (Cache::instance().synchronizeEpisodes(_show, _season) == 0) {
 		select();
 		setSynchronized(true);
 		setSynchronizing(false);
@@ -64,10 +74,10 @@ void EpisodeListModel::load()
 
 void EpisodeListModel::synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id)
 {
-	if (dataType != Cache::Data_EpisodeList)
+	if (dataType != Cache::Data_Episodes)
 		return;
 
-	if (id["showId"].toString() != _show || id["season"].toInt() != _season)
+	if (id["showId"].toString() != _show || id["season"].toInt() != _season || !id["episode"].isNull())
 		return;
 
 	setSynchronizing(true);
@@ -77,10 +87,10 @@ void EpisodeListModel::synchronizing(Cache::CacheDataType dataType, const QMap<Q
 
 void EpisodeListModel::synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id)
 {
-	if (dataType != Cache::Data_EpisodeList)
+	if (dataType != Cache::Data_Episodes)
 		return;
 
-	if (id["showId"].toString() != _show || id["season"].toInt() != _season)
+	if (id["showId"].toString() != _show || id["season"].toInt() != _season || !id["episode"].isNull())
 		return;
 
 	setSynchronizing(false);
