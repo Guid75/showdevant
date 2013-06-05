@@ -23,17 +23,19 @@ public:
 	int getEpisode() const { return _episode; }
 	void setEpisode(int episode);
 
+protected:
+	void select();
+
 private:
 	QString _show;
 	int _season;
 	int _episode;
 
-	void select();
 	void load();
 
 private slots:
-	void synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
-	void synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
+/*	void synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
+	void synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);*/
 };
 
 #endif // EPISODELISTMODEL_H

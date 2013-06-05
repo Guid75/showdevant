@@ -98,7 +98,10 @@ Command *CommandManager::subtitlesShowByFile(const QString &showId, const QStrin
 
 void CommandManager::httpError(QNetworkReply::NetworkError)
 {
-	// TODO manage errors
+	QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+	Command *command = commands[reply];
+	command->_error = true;
+	qCritical("CommandManager error: %s", qPrintable(reply->errorString()));
 }
 
 void CommandManager::httpReadyRead()
@@ -120,5 +123,5 @@ void CommandManager::httpFinished()
 
 	command->emitFinished();
 	commands.remove(reply);
-	delete command;
+//	delete command;
 }

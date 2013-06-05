@@ -20,8 +20,7 @@
 #include <QObject>
 #include <QMap>
 #include <QVariant>
-#include <QFuture>
-#include <QFutureWatcher>
+#include <QSignalMapper>
 
 class Command;
 
@@ -36,43 +35,43 @@ public:
 
 	static Cache &instance();
 
+	void start();
+
 	Q_INVOKABLE int synchronizeShowInfos(const QString &showId);
 
 	// if episode == -1, it means we want to synchronize ALL season episodes
 	Q_INVOKABLE int synchronizeEpisodes(const QString &showId, int season, int episode = -1, bool fullInfo = false);
 
-	//Q_INVOKABLE int synchronizeEpisodeDetail(const QString &showId, int season, int episode);
-
 signals:
-	void synchronizing(CacheDataType dataType, QMap<QString,QVariant> id);
-	void synchronized(CacheDataType dataType, QMap<QString,QVariant> id);
+	void synchronizing(CacheDataType dataType, const QMap<QString,QVariant> &id);
+	void synchronized(CacheDataType dataType, const QMap<QString,QVariant> &id);
+	void synchronizeFailed(CacheDataType dataType, const QMap<QString,QVariant> &id);
 
 private:
+	QThread *thread;
+
 	struct SynchronizeAction {
 		CacheDataType dataType;
 		QMap<QString,QVariant> id;
-		QString parseMethodName;
+		QString callbackMethodName;
 		QList<Command*> commands; // all commands belonging to the action
-		QFuture<void> future;
-		QFutureWatcher<void> watcher;
 	};
 
 	static Cache *_instance;
 	QList<SynchronizeAction*> currentActions;
+	QSignalMapper commandMapper;
 
 	explicit Cache();
+	~Cache();
 
 	SynchronizeAction *getAction(CacheDataType dataType,
 								 const QMap<QString,QVariant> &id) const;
 
 	SynchronizeAction *getAction(Command *command) const;
 
-	void launch_callback(Cache::SynchronizeAction *action, const QByteArray &response);
-
 private slots:
 	// thread callbacks
-	void commandFinished(const QByteArray &response);
-	void futureFinished();
+	void commandFinished(QObject *commandObj);
 
 	// parsing
 	void parseEpisodes(const QString &showId, int season, const QJsonObject &root, bool detailMode);

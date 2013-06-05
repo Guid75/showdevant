@@ -114,7 +114,7 @@ Item {
 				width: 200
 				height: 200
 			}
-			active: previousModel.synchronizing
+			active: previousModel.synchronizeState === CacheWatcher.Synchronize_Running
 			asynchronous: true
 		}
 	}
@@ -157,7 +157,7 @@ Item {
 				width: 200
 				height: 200
 			}
-			active: currentModel.synchronizing
+			active: currentModel.synchronizeState === CacheWatcher.Synchronizing
 			asynchronous: true
 		}
 	}
@@ -195,7 +195,7 @@ Item {
 				width: 200
 				height: 200
 			}
-			active: nextModel.synchronizing
+			active: nextModel.synchronizeState === CacheWatcher.Synchronizing
 			asynchronous: true
 		}
 	}

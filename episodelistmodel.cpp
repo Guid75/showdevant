@@ -10,11 +10,11 @@ EpisodeListModel::EpisodeListModel(QObject *parent) :
 	_show = "a";
 	select();
 
-	connect(&Cache::instance(), &Cache::synchronizing,
+/*	connect(&Cache::instance(), &Cache::synchronizing,
 			this, &EpisodeListModel::synchronizing);
 
 	connect(&Cache::instance(), &Cache::synchronized,
-			this, &EpisodeListModel::synchronized);
+			this, &EpisodeListModel::synchronized);*/
 }
 
 void EpisodeListModel::setShow(const QString &show)
@@ -59,42 +59,16 @@ void EpisodeListModel::load()
 	if (_season < 0)
 		return;
 
-	if (Cache::instance().synchronizeEpisodes(_show, _season) == 0) {
-		select();
-		setSynchronized(true);
-		setSynchronizing(false);
-		return;
+	cacheWatcher.clearWatching();
+	QMap<QString,QVariant> id;
+	id.insert("showId", _show);
+	id.insert("season", _season);
+	cacheWatcher.watchFor(Cache::Data_Episodes, id);
+	if (_episode >= 0) {
+		id.insert("episode", _episode);
+		cacheWatcher.watchFor(Cache::Data_Episodes, id);
 	}
 
-	clear();
-	select();
-	setSynchronized(false);
-	setSynchronizing(true);
-}
-
-void EpisodeListModel::synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id)
-{
-	if (dataType != Cache::Data_Episodes)
-		return;
-
-	if (id["showId"].toString() != _show || id["season"].toInt() != _season || !id["episode"].isNull())
-		return;
-
-	setSynchronizing(true);
-	setSynchronized(false);
-
-}
-
-void EpisodeListModel::synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id)
-{
-	if (dataType != Cache::Data_Episodes)
-		return;
-
-	if (id["showId"].toString() != _show || id["season"].toInt() != _season || !id["episode"].isNull())
-		return;
-
-	setSynchronizing(false);
-	setSynchronized(true);
-
+	Cache::instance().synchronizeEpisodes(_show, _season, _episode, _episode >= 0);
 	select();
 }

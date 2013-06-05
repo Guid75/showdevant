@@ -3,14 +3,15 @@
 
 #include <QSqlQueryModel>
 
+#include "cachewatcher.h"
+
 class SqlQueryModel : public QSqlQueryModel
 {
 	Q_OBJECT
 	Q_PROPERTY(QString query READ getQuery WRITE setQuery)
 	Q_PROPERTY(int count READ getCount() NOTIFY countChanged())
 
-	Q_PROPERTY(bool synchronized READ getSynchronized() NOTIFY synchronizedChanged())
-	Q_PROPERTY(bool synchronizing READ getSynchronizing() NOTIFY synchronizingChanged())
+	Q_PROPERTY(CacheWatcher::SynchronizeState synchronizeState READ synchronizeState() NOTIFY synchronizeStateChanged())
 
 public:
 	explicit SqlQueryModel(QObject *parent = 0);
@@ -23,27 +24,26 @@ public:
 	int getCount() { this->count = this->rowCount(); return count; }
 	Q_INVOKABLE QVariant get(int row);
 
-	bool getSynchronized() const { return _synchronized; }
-	bool getSynchronizing() const { return _synchronizing; }
+	CacheWatcher::SynchronizeState synchronizeState() const;
 
 signals:
 	void countChanged();
-	void synchronizedChanged();
-	void synchronizingChanged();
+	void synchronizeStateChanged();
 
 protected:
-	void setSynchronized(bool value);
-	void setSynchronizing(bool value);
+	CacheWatcher cacheWatcher;
+
+	virtual void select() = 0;
 
 private:
 	int count;
 	QString _query;
 	QHash<int, QByteArray> roles;
 
-	bool _synchronized;
-	bool _synchronizing;
-
 	void generateRoleNames();
+
+private slots:
+	void slotSynchronizeStateChanged();
 };
 
 #endif // SQLQUERYMODEL_H

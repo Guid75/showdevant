@@ -3,24 +3,27 @@
 #include <QtQml>
 #include <QDebug>
 #include <QNetworkAccessManager>
+#include <QThread>
 
 #include "downloadmanager.h"
 #include "commandmanager.h"
 #include "databasemanager.h"
 #include "shortcut.h"
 #include "sqltablemodel.h"
-#include "sqlquerymodel.h"
 #include "showmodel.h"
 #include "seasonlistmodel.h"
 #include "episodelistmodel.h"
 #include "sortfilterproxymodel.h"
 #include "cache.h"
+#include "cachewatcher.h"
 
 #include "qtquick2applicationviewer.h"
 
 int main(int argc, char *argv[])
 {
 	QGuiApplication app(argc, argv);
+
+	Cache::instance().start();
 
 	QNetworkAccessManager networkAccessManager;
 	CommandManager::instance().setNetworkAccessManager(&networkAccessManager);
@@ -29,11 +32,11 @@ int main(int argc, char *argv[])
 	QtQuick2ApplicationViewer viewer;
 	qmlRegisterType<Shortcut>("com.guid75", 1, 0, "Shortcut");
 	qmlRegisterType<SqlTableModel>("com.guid75", 1, 0, "SqlTableModel");
-	qmlRegisterType<SqlQueryModel>("com.guid75", 1, 0, "SqlQueryModel");
 	qmlRegisterType<SeasonListModel>("com.guid75", 1, 0, "SeasonListModel");
 	qmlRegisterType<EpisodeListModel>("com.guid75", 1, 0, "EpisodeListModel");
 	qmlRegisterType<ShowModel>("com.guid75", 1, 0, "ShowModel");
 	qmlRegisterType<SortFilterProxyModel>("com.guid75", 1, 0, "SortFilterProxyModel");
+	qmlRegisterType<CacheWatcher>("com.guid75", 1, 0, "CacheWatcher");
 
 	DatabaseManager::instance().openDB();
 

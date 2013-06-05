@@ -22,7 +22,7 @@
 #include <QDebug>
 #include <QMetaType>
 #include <QSqlError>
-#include <QtConcurrent/QtConcurrentRun>
+#include <QThread>
 
 #include "commandmanager.h"
 #include "command.h"
@@ -41,11 +41,28 @@ Cache &Cache::instance()
 	return *_instance;
 }
 
+void Cache::start()
+{
+	thread->start();
+}
+
 Cache::Cache() :
 	QObject()
 {
 	qRegisterMetaType<ActionId>("ActionId");
 	qRegisterMetaType<CacheDataType>("CacheDataType");
+
+	connect(&commandMapper, SIGNAL(mapped(QObject *)),
+			this, SLOT(commandFinished(QObject *)));
+
+	thread = new QThread;
+	this->moveToThread(thread);
+}
+
+Cache::~Cache()
+{
+	thread->exit();
+	delete thread;
 }
 
 Cache::SynchronizeAction *Cache::getAction(CacheDataType dataType, const QMap<QString,QVariant> &id) const
@@ -68,24 +85,18 @@ Cache::SynchronizeAction *Cache::getAction(Command *command) const
 	return 0;
 }
 
-void Cache::launch_callback(Cache::SynchronizeAction *action, const QByteArray &response) {
-	QMetaObject::invokeMethod(this, action->parseMethodName.toLocal8Bit(), Qt::DirectConnection, Q_ARG(ActionId, action->id), Q_ARG(QByteArray, response));
-}
-
-void Cache::commandFinished(const QByteArray &response)
-{
-	Command *command = qobject_cast<Command*>(sender());
+void Cache::commandFinished(QObject *commandObj)
+{	
+	Command *command = qobject_cast<Command*>(commandObj);
+	Q_ASSERT(command != 0);
 	SynchronizeAction *action = getAction(command);
+	Q_ASSERT(action != 0); // an action MUST exists for the command
 
-	Q_ASSERT(action != 0); // command MUST belong to an existing action
-
-	action->future = QtConcurrent::run(this, &Cache::launch_callback, action, response);
-	action->watcher.setFuture(action->future);
-	connect(&action->watcher, &QFutureWatcher<void>::finished, this, &Cache::futureFinished);
-}
-
-void Cache::futureFinished()
-{
+	if (command->error())
+		emit synchronizeFailed(action->dataType, action->id);
+	else
+		QMetaObject::invokeMethod(this, action->callbackMethodName.toLocal8Bit(), Qt::DirectConnection, Q_ARG(ActionId, action->id), Q_ARG(QByteArray, command->response()));
+	command->deleteLater();
 }
 
 void Cache::parseEpisodes(const QString &showId, int season, const QJsonObject &root, bool detailMode)
@@ -236,41 +247,43 @@ void Cache::episodesCallback(const QMap<QString,QVariant> &id, const QByteArray 
 
 int Cache::synchronizeShowInfos(const QString &showId)
 {
-	QSqlQuery query;
 	qint64 last_sync_epoch = 0;
 	qint64 expiration = 24 * 60 * 60 * 1000; // one day => TODO customizable
+	QMap<QString,QVariant> id;
+	id.insert("showId", showId);
 	// have we the season in database?
 	// take the expiration date in account
+	QSqlQuery query;
 	query.exec(QString("SELECT last_sync FROM show WHERE show_id='%1'").arg(showId));
 	if (query.next() && !query.value(0).isNull()) {
 		last_sync_epoch = query.value(0).toLongLong() * 1000;
 	}
 	if (QDateTime::currentDateTime().toMSecsSinceEpoch() - last_sync_epoch <= expiration) {
 		// data are already synchronized, we can use them
+		emit synchronized(Data_ShowInfos, id);
 		return 0;
 	}
 
+	// expired data, we need to launch the request if not already done
+	emit synchronizing(Data_ShowInfos, id);
+
 	// is there a current action about it?
-	QMap<QString,QVariant> id;
-	id.insert("showId", showId);
 	SynchronizeAction *action = getAction(Data_ShowInfos, id);
 	if (action) {
-		// an action is already running, so just wait for the end of it
+		// just wait for the end of it
 		return 1;
 	}
-
-	// expired data, we need to launch the request
-	emit synchronizing(Data_ShowInfos, id);
 
 	// store the synchronize action
 	action = new SynchronizeAction;
 	action->dataType = Data_ShowInfos;
 	action->id = id;
-	action->parseMethodName = "showInfosCallback";
+	action->callbackMethodName = "showInfosCallback";
 	Command *command = CommandManager::instance().showsDisplay(showId);
-	connect(command, &Command::finished, this, &Cache::commandFinished);
 	action->commands << command;
 	currentActions << action;
+	commandMapper.setMapping(command, command);
+	connect(command, SIGNAL(finished()), &commandMapper, SLOT(map()));
 	return 1;
 }
 
@@ -278,6 +291,13 @@ int Cache::synchronizeEpisodes(const QString &showId, int season, int episode, b
 {
 	qint64 last_sync_epoch = 0;
 	qint64 expiration = 24 * 60 * 60 * 1000; // one day => TODO customizable
+
+	QMap<QString,QVariant> id;
+	id.insert("showId", showId);
+	id.insert("season", season);
+	if (episode >= 0)
+		id.insert("episode", episode);
+
 	// have we the season in database?
 	// take the expiration date in account
 	QSqlQuery query;
@@ -296,32 +316,29 @@ int Cache::synchronizeEpisodes(const QString &showId, int season, int episode, b
 		last_sync_epoch = query.value(0).toLongLong() * 1000;
 	if (QDateTime::currentDateTime().toMSecsSinceEpoch() - last_sync_epoch <= expiration) {
 		// data are already synchronized, we can use them
+		emit synchronized(Data_Episodes, id);
 		return 0;
 	}
 
+	// expired data, we need to launch the request if not already done
+	emit synchronizing(Data_Episodes, id);
+
 	// is there a current action about it?
-	QMap<QString,QVariant> id;
-	id.insert("showId", showId);
-	id.insert("season", season);
-	if (episode >= 0)
-		id.insert("episode", episode);
 	SynchronizeAction *action = getAction(Data_Episodes, id);
 	if (action) {
-		// an action is already running, so just wait for the end of it
+		// just wait for the end of it
 		return 1;
 	}
-
-	// expired data, we need to launch the request
-	emit synchronizing(Data_Episodes, id);
 
 	// store the synchronize action
 	action = new SynchronizeAction;
 	action->dataType = Data_Episodes;
 	action->id = id;
-	action->parseMethodName = "episodesCallback";
+	action->callbackMethodName = "episodesCallback";
 	Command *command = CommandManager::instance().showsEpisodes(showId, season, episode, !fullInfo, !fullInfo);
-	connect(command, &Command::finished, this, &Cache::commandFinished);
 	action->commands << command;
 	currentActions << action;
+	commandMapper.setMapping(command, command);
+	connect(command, SIGNAL(finished()), &commandMapper, SLOT(map()));
 	return 1;
 }

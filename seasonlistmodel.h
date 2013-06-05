@@ -15,14 +15,11 @@ public:
 	const QString &getShow() const { return _show; }
 	void setShow(const QString &show);
 
-private:
-	QString _show;
-
+protected:
 	void select();
 
-private slots:
-	void synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
-	void synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
+private:
+	QString _show;
 };
 
 #endif // SEASONLISTMODEL_H

@@ -60,13 +60,12 @@ int DatabaseManager::openDB()
 		}
 	}
 	_openDBLastError = 2;
+	db.setConnectOptions("foreign_keys = ON");
 
 	// create tables?
 	// TODO: do not create if they exist and if they embed the needed fields
 	// TODO: use ids for all tables
 	QSqlQuery query;
-
-	query.exec("PRAGMA foreign_keys = ON;");
 
 	// shows
 	if (!createTable(query, "show",

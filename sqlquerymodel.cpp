@@ -4,11 +4,14 @@
 #include "sqlquerymodel.h"
 
 SqlQueryModel::SqlQueryModel(QObject *parent) :
-	QSqlQueryModel(parent),
-	_synchronized(false),
-	_synchronizing(false)
+	QSqlQueryModel(parent)
 {
-
+	// to re-emit the signal
+	connect(&cacheWatcher, &CacheWatcher::synchronizeStateChanged,
+			this, &SqlQueryModel::synchronizeStateChanged);
+	// to re-do the select
+	connect(&cacheWatcher, &CacheWatcher::synchronizeStateChanged,
+			this, &SqlQueryModel::slotSynchronizeStateChanged);
 }
 
 void SqlQueryModel::setQuery(const QString &query)
@@ -28,6 +31,12 @@ void SqlQueryModel::generateRoleNames()
 {
 	for( int i = 0; i < record().count(); i++)
 		roles.insert(Qt::UserRole + i + 1, record().fieldName(i).toLocal8Bit());
+}
+
+void SqlQueryModel::slotSynchronizeStateChanged()
+{
+	if (cacheWatcher.synchronizeState() == CacheWatcher::Synchronize_Ok)
+		select();
 }
 
 QVariant SqlQueryModel::data(const QModelIndex &index, int role) const
@@ -55,21 +64,7 @@ QVariant SqlQueryModel::get(int row)
 	return QVariant(itemData);
 }
 
-
-void SqlQueryModel::setSynchronized(bool value)
+CacheWatcher::SynchronizeState SqlQueryModel::synchronizeState() const
 {
-	if (_synchronized == value)
-		return;
-
-	_synchronized = value;
-	emit synchronizedChanged();
-}
-
-void SqlQueryModel::setSynchronizing(bool value)
-{
-	if (_synchronizing == value)
-		return;
-
-	_synchronizing = value;
-	emit synchronizingChanged();
+	return cacheWatcher.synchronizeState();
 }

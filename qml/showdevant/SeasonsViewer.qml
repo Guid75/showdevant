@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import com.guid75 1.0
 
 Item {
 	Flickable {
@@ -70,7 +71,7 @@ Item {
 			width: 200
 			height: 200
 		}
-		active: seasonListModel.synchronizing
+		active: seasonListModel.synchronizeState === CacheWatcher.Synchronizing
 		asynchronous: true
 	}
 }
