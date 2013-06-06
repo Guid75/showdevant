@@ -26,6 +26,8 @@ void SeasonListModel::setShow(const QString &show)
 
 	Cache::instance().synchronizeShowInfos(_show);
 	select();
+
+	emit showChanged();
 }
 
 void SeasonListModel::select()

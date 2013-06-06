@@ -18,7 +18,7 @@ Item {
 
 		Connections {
 			target: seasonListModel
-			onModelReset: flowAnimation.start()
+			onShowChanged: flowAnimation.start()
 		}
 
 		Flow {
@@ -58,7 +58,6 @@ Item {
 			to: 4
 			duration: 300
 		}
-
 	}
 	Loader {
 		id: loadingWidget
