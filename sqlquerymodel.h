@@ -2,6 +2,7 @@
 #define SQLQUERYMODEL_H
 
 #include <QSqlQueryModel>
+#include <QSqlRecord>
 
 #include "cachewatcher.h"
 
@@ -40,7 +41,7 @@ private:
 	QString _query;
 	QHash<int, QByteArray> roles;
 
-	void generateRoleNames();
+	void generateRoleNames(const QSqlRecord &rec = QSqlRecord());
 
 private slots:
 	void slotSynchronizeStateChanged();

@@ -7,3 +7,5 @@
 - Corriger le padding (S01E15)
 
 - Lorsque la gestion de compte sera avancée, je pourrais me contenter d'écraser les paramètres spécifique utilisateur nouvellement lus comme si l'épisode a été visionné ou non
+- Prendre en charge les images inexistantes et les remplacer par une image bidon
+- Attention, le texte des descriptions contient des balises html, les échapper

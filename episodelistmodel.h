@@ -8,8 +8,9 @@ class EpisodeListModel : public SqlQueryModel
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString show READ getShow() WRITE setShow(show))
-	Q_PROPERTY(int season READ getSeason() WRITE setSeason(episode))
+	Q_PROPERTY(QString show READ getShow() WRITE setShow(show) NOTIFY showChanged())
+	Q_PROPERTY(int season READ getSeason() WRITE setSeason(season) NOTIFY seasonChanged())
+	Q_PROPERTY(int episode READ getEpisode() WRITE setEpisode(episode) NOTIFY episodeChanged())
 
 public:
 	explicit EpisodeListModel(QObject *parent = 0);
@@ -22,6 +23,11 @@ public:
 
 	int getEpisode() const { return _episode; }
 	void setEpisode(int episode);
+
+signals:
+	void showChanged();
+	void seasonChanged();
+	void episodeChanged();
 
 protected:
 	void select();

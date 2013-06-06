@@ -35,8 +35,8 @@ Item {
 				model: seasonListModel
 				SeasonItem {
 					onItemClicked: {
-						episodeListModel.show = show_id;
-						episodeListModel.season = number;
+/*						episodeListModel.show = show_id;
+						episodeListModel.season = number;*/
 						seasonSelector.current = number;
 						seasonSelector.min = 1;
 						seasonSelector.max = seasonListModel.count;

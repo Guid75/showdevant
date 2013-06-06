@@ -7,9 +7,6 @@
 SeasonListModel::SeasonListModel(QObject *parent) :
 	SqlQueryModel(parent)
 {
-	// workaround to get the sql fields populated
-	_show = "a";
-	select();
 }
 
 void SeasonListModel::setShow(const QString &show)

@@ -83,7 +83,7 @@ int DatabaseManager::openDB()
 
 	// episodes
 	if (!createTable(query, "episode",
-					 "(show_id text, season integer, episode integer, title text, "
+					 "(show_id text, season integer, episode integer, title text, description text, "
 					 "number text, global integer, date integer, "
 					 "comments integer, last_sync_detail integer, subtitles_last_check_date integer, "
 					 "PRIMARY KEY (show_id, season, episode), "

@@ -5,7 +5,7 @@ Rectangle {
 	anchors {
 		left: parent.left
 		top: parent.top
-		margins: 4
+//		margins: 4
 	}
 	width: episodeImage.paintedWidth
 	height: episodeImage.paintedHeight
@@ -31,13 +31,55 @@ Rectangle {
 		anchors.fill: backgroundItem
 		Text {
 			id: bannerText
+			renderType: Text.NativeRendering
 			anchors.fill: parent
 			anchors.leftMargin: 6
 			verticalAlignment: Text.AlignVCenter
 			//font.bold: true
 			font.pointSize: 12
-			text: '"Dexter"'
+			text: '"Ep. title"'
 			color: "white"
 		}
+	}
+
+	Connections {
+		target: episodeDetailModel
+		onModelReset: {
+			titleText.text = '"%1"'.arg(episodeDetailModel.get(0).title);
+			resumeText.text = episodeDetailModel.get(0).description;
+		}
+	}
+
+	Text {
+		id: titleText
+		clip: true
+		anchors {
+			left: episodeImage.right
+			right: parent.right
+			top: parent.top
+			topMargin: 6
+			leftMargin: 8
+			rightMargin: 8
+		}
+		renderType: Text.NativeRendering
+		text: '"%1"'.arg(episodeDetailModel.get(0).title)
+		color: "#008800"
+		font.pointSize: 11
+	}
+
+	Text {
+		id: resumeText
+		clip: true
+		wrapMode: Text.WordWrap
+		anchors {
+			top: titleText.bottom
+			left: titleText.left
+			right: parent.right
+			topMargin: 6
+			rightMargin: 8
+			//leftMargin: 4
+		}
+		renderType: Text.NativeRendering
+		text: episodeDetailModel.get(0).description
 	}
 }

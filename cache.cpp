@@ -109,21 +109,23 @@ void Cache::parseEpisodes(const QString &showId, int season, const QJsonObject &
 
 		int episode = episodeJson.value("episode").toString().toInt();
 		QString title = episodeJson.value("title").toString();
+		QString description = episodeJson.value("description").toString();
 		QString number = episodeJson.value("number").toString();
 		int global = episodeJson.value("global").toString().toInt();
 		int date = episodeJson.value("date").toDouble();
 		int comments = episodeJson.value("comments").toString().toInt();
 
 		QSqlQuery query;
-		query.prepare("REPLACE INTO episode (show_id, season, episode, title, number, global, "
+		query.prepare("REPLACE INTO episode (show_id, season, episode, title, description, number, global, "
 					  "date, comments) "
-					  "VALUES (:show_id, :season, :episode, :title, :number, :global, "
+					  "VALUES (:show_id, :season, :episode, :title, :description, :number, :global, "
 					  ":date, :comments)");
 
 		query.bindValue(":show_id", showId);
 		query.bindValue(":season", season);
 		query.bindValue(":episode", episode);
 		query.bindValue(":title", title);
+		query.bindValue(":description", description);
 		query.bindValue(":number", number);
 		query.bindValue(":global", global);
 		query.bindValue(":date", date);

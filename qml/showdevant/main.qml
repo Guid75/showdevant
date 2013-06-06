@@ -33,9 +33,9 @@ Rectangle {
 		id: seasonListModel
 	}
 
-	EpisodeListModel {
+/*	EpisodeListModel {
 		id: episodeListModel
-	}
+	}*/
 
 	Component.onCompleted: {
 		switch (databaseManager.openDBLastError()) {
@@ -162,7 +162,7 @@ Rectangle {
 				}
 				visible: false
 				onCurrentIndexChanged: {
-					episodeListModel.season = current;
+//					episodeListModel.season = current;
 					episodeSelector.current = 1;
 					if (playgroundLoader.item.widgetType === "episodes") {
 						playgroundLoader.item.setCurrentSeason(current);
@@ -193,7 +193,8 @@ Rectangle {
 				visible: false
 				onCurrentIndexChanged: {
 					// TODO refresh current episode details
-					playgroundLoader.item.season = episodeListModel.season
+					//playgroundLoader.item.season = episodeListModel.season
+					playgroundLoader.item.season = seasonSelector.current;
 					playgroundLoader.item.episode = current;
 				}
 				onCloseMe: {

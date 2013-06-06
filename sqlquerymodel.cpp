@@ -1,5 +1,6 @@
 #include <QSqlRecord>
 #include <QSqlField>
+#include <QSqlQuery>
 
 #include "sqlquerymodel.h"
 
@@ -23,19 +24,25 @@ void SqlQueryModel::setQuery(const QString &query)
 
 void SqlQueryModel::setQuery(const QSqlQuery &query)
 {
+	generateRoleNames(query.record());
 	QSqlQueryModel::setQuery(query);
-	generateRoleNames();
 }
 
-void SqlQueryModel::generateRoleNames()
+void SqlQueryModel::generateRoleNames(const QSqlRecord &rec)
 {
-	for( int i = 0; i < record().count(); i++)
-		roles.insert(Qt::UserRole + i + 1, record().fieldName(i).toLocal8Bit());
+	roles.clear();
+	if (rec.isEmpty()) {
+		for( int i = 0; i < record().count(); i++)
+			roles.insert(Qt::UserRole + i + 1, record().fieldName(i).toLocal8Bit());
+	} else {
+		for( int i = 0; i < rec.count(); i++)
+			roles.insert(Qt::UserRole + i + 1, rec.fieldName(i).toLocal8Bit());
+	}
 }
 
 void SqlQueryModel::slotSynchronizeStateChanged()
 {
-	if (cacheWatcher.synchronizeState() == CacheWatcher::Synchronize_Ok)
+	if (cacheWatcher.synchronizeState() == CacheWatcher::Synchronized)
 		select();
 }
 

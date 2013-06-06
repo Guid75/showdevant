@@ -7,14 +7,6 @@ EpisodeListModel::EpisodeListModel(QObject *parent) :
 	_season(-1),
 	_episode(-1)
 {
-	_show = "a";
-	select();
-
-/*	connect(&Cache::instance(), &Cache::synchronizing,
-			this, &EpisodeListModel::synchronizing);
-
-	connect(&Cache::instance(), &Cache::synchronized,
-			this, &EpisodeListModel::synchronized);*/
 }
 
 void EpisodeListModel::setShow(const QString &show)
@@ -24,6 +16,7 @@ void EpisodeListModel::setShow(const QString &show)
 
 	_show = show;
 	load();
+	emit showChanged();
 }
 
 void EpisodeListModel::setSeason(int season)
@@ -33,6 +26,7 @@ void EpisodeListModel::setSeason(int season)
 
 	_season = season;
 	load();
+	emit seasonChanged();
 }
 
 void EpisodeListModel::setEpisode(int episode)
@@ -42,14 +36,20 @@ void EpisodeListModel::setEpisode(int episode)
 
 	_episode = episode;
 	load();
+	emit episodeChanged();
 }
 
 void EpisodeListModel::select()
 {
 	QSqlQuery query;
-	query.prepare("select * from episode where show_id=:show_id AND season=:season");
+	QString prepareStr = "select * from episode where show_id=:show_id AND season=:season";
+	if (_episode >= 0)
+		prepareStr.append(" AND episode=:episode");
+	query.prepare(prepareStr);
 	query.bindValue(":show_id", _show);
 	query.bindValue(":season", _season);
+	if (_episode >= 0)
+		query.bindValue(":episode", _episode);
 	query.exec();
 	setQuery(query);
 }
