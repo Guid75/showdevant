@@ -23,24 +23,24 @@ void CacheWatcher::setSynchronizeState(CacheWatcher::SynchronizeState state)
 	emit synchronizeStateChanged();
 }
 
-bool CacheWatcher::watchable(Cache::CacheDataType dataType, const QMap<QString, QVariant> &id)
+bool CacheWatcher::watchable(Cache::CacheDataType dataType, const QVariantMap &id)
 {
 	return watching.values(dataType).indexOf(id) >= 0;
 }
 
-void CacheWatcher::synchronizing(Cache::CacheDataType dataType, const QMap<QString, QVariant> &id)
+void CacheWatcher::synchronizing(Cache::CacheDataType dataType, const QVariantMap &id)
 {
 	if (watchable(dataType, id))
 		setSynchronizeState(Synchronizing);
 }
 
-void CacheWatcher::synchronized(Cache::CacheDataType dataType, const QMap<QString, QVariant> &id)
+void CacheWatcher::synchronized(Cache::CacheDataType dataType, const QVariantMap &id)
 {
 	if (watchable(dataType, id))
 		setSynchronizeState(Synchronized);
 }
 
-void CacheWatcher::synchronizeFailed(Cache::CacheDataType dataType, const QMap<QString, QVariant> &id)
+void CacheWatcher::synchronizeFailed(Cache::CacheDataType dataType, const QVariantMap &id)
 {
 	if (watchable(dataType, id))
 		setSynchronizeState(SynchronizeError);
@@ -51,7 +51,7 @@ void CacheWatcher::clearWatching()
 	watching.clear();
 }
 
-void CacheWatcher::watchFor(Cache::CacheDataType dataType, const QMap<QString, QVariant> &id)
+void CacheWatcher::watchFor(Cache::CacheDataType dataType, const QVariantMap &id)
 {
 	watching.insert(dataType, id);
 }

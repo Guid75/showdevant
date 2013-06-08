@@ -38,10 +38,6 @@ private:
 	int _episode;
 
 	void load();
-
-private slots:
-/*	void synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
-	void synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);*/
 };
 
 #endif // EPISODELISTMODEL_H

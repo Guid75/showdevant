@@ -33,7 +33,7 @@ Rectangle {
 		id: seasonListModel
 	}
 
-/*	EpisodeListModel {
+	/*	EpisodeListModel {
 		id: episodeListModel
 	}*/
 
@@ -162,7 +162,7 @@ Rectangle {
 				}
 				visible: false
 				onCurrentIndexChanged: {
-//					episodeListModel.season = current;
+					//					episodeListModel.season = current;
 					episodeSelector.current = 1;
 					if (playgroundLoader.item.widgetType === "episodes") {
 						playgroundLoader.item.setCurrentSeason(current);
@@ -232,9 +232,16 @@ Rectangle {
 		}
 	}
 
+	function __raiseLoginBox() {
+		loginBox.active = true;
+	}
+
 	TopToolbar {
 		id: topToolbar
 		y: -60
+		onAskForLogin: {
+			__raiseLoginBox();
+		}
 	}
 
 	PathAnimation {
@@ -252,8 +259,8 @@ Rectangle {
 	}
 
 	Loader {
-		anchors.fill: parent
 		id: epicFailMessage
+		anchors.fill: parent
 		sourceComponent: MessageBox {
 			message: "It seems we can\'t even use a memory database :-(<br>As a database is vital to this software, it can not continue anymore"
 			buttons: ListModel {
@@ -265,6 +272,23 @@ Rectangle {
 		}
 		active: false
 		asynchronous: true
+	}
+	Loader {
+		id: loginBox
+		anchors.fill: parent
+		sourceComponent: LoginBox {
+			onCancel: {
+				loginBox.active = false;
+			}
+		}
+		active: false
+		asynchronous: true
+		onLoaded: {
+			console.log(item);
+			if (active) {
+				item.initFocus();
+			}
+		}
 	}
 }
 

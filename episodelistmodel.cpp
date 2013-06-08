@@ -60,7 +60,7 @@ void EpisodeListModel::load()
 		return;
 
 	cacheWatcher.clearWatching();
-	QMap<QString,QVariant> id;
+	QVariantMap id;
 	id.insert("showId", _show);
 	id.insert("season", _season);
 	cacheWatcher.watchFor(Cache::Data_Episodes, id);

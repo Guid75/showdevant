@@ -27,23 +27,23 @@ signals:
 	void synchronizeStateChanged();
 
 public slots:
-	void watchFor(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
+	void watchFor(Cache::CacheDataType dataType, const QVariantMap &id);
 	void clearWatching();
 
 protected:
 	void setSynchronizeState(SynchronizeState state);
 
 	// returns true if the synchronize event matching the watching
-	bool watchable(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
+	bool watchable(Cache::CacheDataType dataType, const QVariantMap &id);
 
 private:
 	SynchronizeState _synchronizeState;
-	QMultiMap<Cache::CacheDataType,QMap<QString,QVariant> > watching;
+	QMultiMap<Cache::CacheDataType,QVariantMap > watching;
 
 private slots:
-	void synchronizing(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
-	void synchronized(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
-	void synchronizeFailed(Cache::CacheDataType dataType, const QMap<QString,QVariant> &id);
+	void synchronizing(Cache::CacheDataType dataType, const QVariantMap &id);
+	void synchronized(Cache::CacheDataType dataType, const QVariantMap &id);
+	void synchronizeFailed(Cache::CacheDataType dataType, const QVariantMap &id);
 };
 
 #endif // CACHEWATCHER_H

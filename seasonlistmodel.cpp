@@ -17,7 +17,7 @@ void SeasonListModel::setShow(const QString &show)
 	_show = show;
 
 	cacheWatcher.clearWatching();
-	QMap<QString,QVariant> id;
+	QVariantMap id;
 	id.insert("showId", _show);
 	cacheWatcher.watchFor(Cache::Data_ShowInfos, id);
 

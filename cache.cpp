@@ -29,9 +29,6 @@
 #include "jsonparser.h"
 #include "cache.h"
 
-// alias only for invokeMethod
-typedef QMap<QString,QVariant> ActionId;
-
 Cache *Cache::_instance = 0;
 
 Cache &Cache::instance()
@@ -49,7 +46,6 @@ void Cache::start()
 Cache::Cache() :
 	QObject()
 {
-	qRegisterMetaType<ActionId>("ActionId");
 	qRegisterMetaType<CacheDataType>("CacheDataType");
 
 	connect(&commandMapper, SIGNAL(mapped(QObject *)),
@@ -65,7 +61,7 @@ Cache::~Cache()
 	delete thread;
 }
 
-Cache::SynchronizeAction *Cache::getAction(CacheDataType dataType, const QMap<QString,QVariant> &id) const
+Cache::SynchronizeAction *Cache::getAction(CacheDataType dataType, const QVariantMap &id) const
 {
 	foreach (SynchronizeAction *action, currentActions) {
 		if (action->dataType == dataType &&
@@ -95,7 +91,7 @@ void Cache::commandFinished(QObject *commandObj)
 	if (command->error())
 		emit synchronizeFailed(action->dataType, action->id);
 	else
-		QMetaObject::invokeMethod(this, action->callbackMethodName.toLocal8Bit(), Qt::DirectConnection, Q_ARG(ActionId, action->id), Q_ARG(QByteArray, command->response()));
+		QMetaObject::invokeMethod(this, action->callbackMethodName.toLocal8Bit(), Qt::DirectConnection, Q_ARG(QVariantMap, action->id), Q_ARG(QByteArray, command->response()));
 	command->deleteLater();
 }
 
@@ -232,7 +228,7 @@ void Cache::parseShowInfos(const QString &showId, const QByteArray &response)
 	QSqlDatabase::database().commit();
 }
 
-void Cache::showInfosCallback(const QMap<QString,QVariant> &id, const QByteArray &response)
+void Cache::showInfosCallback(const QVariantMap &id, const QByteArray &response)
 {
 	QString showId = id["showId"].toString();
 	// TODO: parseShowInfos must return a boolean for potential errors
@@ -240,7 +236,7 @@ void Cache::showInfosCallback(const QMap<QString,QVariant> &id, const QByteArray
 	emit synchronized(Data_ShowInfos, id);
 }
 
-void Cache::episodesCallback(const QMap<QString,QVariant> &id, const QByteArray &response)
+void Cache::episodesCallback(const QVariantMap &id, const QByteArray &response)
 {
 	QString showId = id["showId"].toString();
 	parseSeasons(showId, response, id["episode"].isNull());
@@ -251,7 +247,7 @@ int Cache::synchronizeShowInfos(const QString &showId)
 {
 	qint64 last_sync_epoch = 0;
 	qint64 expiration = 24 * 60 * 60 * 1000; // one day => TODO customizable
-	QMap<QString,QVariant> id;
+	QVariantMap id;
 	id.insert("showId", showId);
 	// have we the season in database?
 	// take the expiration date in account
@@ -294,7 +290,7 @@ int Cache::synchronizeEpisodes(const QString &showId, int season, int episode, b
 	qint64 last_sync_epoch = 0;
 	qint64 expiration = 24 * 60 * 60 * 1000; // one day => TODO customizable
 
-	QMap<QString,QVariant> id;
+	QVariantMap id;
 	id.insert("showId", showId);
 	id.insert("season", season);
 	if (episode >= 0)

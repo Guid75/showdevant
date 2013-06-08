@@ -3,6 +3,7 @@ import com.guid75 1.0
 import "commands.js" as Commands
 
 ShadowRectangle {
+	signal askForLogin()
 	id: topToolbar
 	ListModel {
 		id: searchModel
@@ -28,9 +29,9 @@ ShadowRectangle {
 										 }
 										 var show = json.shows[showName];
 										 searchModel.append({
-															  showId: show["url"],
-															  title: show["title"]
-														  })
+																showId: show["url"],
+																title: show["title"]
+															})
 									 }
 
 									 if (!searchList) {
@@ -195,6 +196,26 @@ ShadowRectangle {
 		MouseArea {
 			anchors.fill: parent
 			onClicked: searchButton.focus = true
+		}
+	}
+
+	Text {
+		anchors {
+			right: parent.right
+			verticalCenter: parent.verticalCenter
+			rightMargin: 6
+		}
+		renderType: Text.NativeRendering
+		text: 'not logged'
+		font.underline: true
+		color: "blue"
+		MouseArea {
+			anchors.fill: parent
+			hoverEnabled: true
+			cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+			onClicked: {
+				askForLogin();
+			}
 		}
 	}
 }

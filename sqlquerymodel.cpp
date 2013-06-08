@@ -64,7 +64,7 @@ QVariant SqlQueryModel::data(const QModelIndex &index, int role) const
 
 QVariant SqlQueryModel::get(int row)
 {
-	QMap<QString, QVariant> itemData;
+	QVariantMap itemData;
 	foreach (int role, roles.keys())
 		itemData.insert(roles[role], data(createIndex(row, 0), role));
 

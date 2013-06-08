@@ -29,7 +29,8 @@ SOURCES += main.cpp \
     download.cpp \
     cache.cpp \
     episodelistmodel.cpp \
-    cachewatcher.cpp
+    cachewatcher.cpp \
+    settings.cpp
 
 # Installation path
 # target.path =
@@ -56,7 +57,8 @@ OTHER_FILES += \
     qml/showdevant/EpisodesViewer.qml \
     qml/showdevant/SeasonsViewer.qml \
     qml/showdevant/EpisodeResume.qml \
-    api_samples/shows_display.json
+    api_samples/shows_display.json \
+    qml/showdevant/LoginBox.qml
 
 HEADERS += \
     downloadmanager.h \
@@ -73,4 +75,5 @@ HEADERS += \
     download.h \
     cache.h \
     episodelistmodel.h \
-    cachewatcher.h
+    cachewatcher.h \
+    settings.h

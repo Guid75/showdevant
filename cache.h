@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QMap>
 #include <QVariant>
+#include <QVariantMap>
 #include <QSignalMapper>
 
 class Command;
@@ -43,16 +44,16 @@ public:
 	Q_INVOKABLE int synchronizeEpisodes(const QString &showId, int season, int episode = -1, bool fullInfo = false);
 
 signals:
-	void synchronizing(CacheDataType dataType, const QMap<QString,QVariant> &id);
-	void synchronized(CacheDataType dataType, const QMap<QString,QVariant> &id);
-	void synchronizeFailed(CacheDataType dataType, const QMap<QString,QVariant> &id);
+	void synchronizing(CacheDataType dataType, const QVariantMap &id);
+	void synchronized(CacheDataType dataType, const QVariantMap &id);
+	void synchronizeFailed(CacheDataType dataType, const QVariantMap &id);
 
 private:
 	QThread *thread;
 
 	struct SynchronizeAction {
 		CacheDataType dataType;
-		QMap<QString,QVariant> id;
+		QVariantMap id;
 		QString callbackMethodName;
 		QList<Command*> commands; // all commands belonging to the action
 	};
@@ -65,7 +66,7 @@ private:
 	~Cache();
 
 	SynchronizeAction *getAction(CacheDataType dataType,
-								 const QMap<QString,QVariant> &id) const;
+								 const QVariantMap &id) const;
 
 	SynchronizeAction *getAction(Command *command) const;
 
@@ -79,8 +80,8 @@ private slots:
 	void parseShowInfos(const QString &showId, const QByteArray &response);
 
 	// action callbacks
-	void showInfosCallback(const QMap<QString,QVariant> &id, const QByteArray &response);
-	void episodesCallback(const QMap<QString,QVariant> &id, const QByteArray &response);
+	void showInfosCallback(const QVariantMap &id, const QByteArray &response);
+	void episodesCallback(const QVariantMap &id, const QByteArray &response);
 };
 
 #endif // CACHE_H

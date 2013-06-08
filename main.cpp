@@ -5,6 +5,7 @@
 #include <QNetworkAccessManager>
 #include <QThread>
 
+#include "settings.h"
 #include "downloadmanager.h"
 #include "commandmanager.h"
 #include "databasemanager.h"
@@ -46,6 +47,8 @@ int main(int argc, char *argv[])
 	showProxyModel.setSourceModel(&showModel);
 	showProxyModel.sort(0, Qt::AscendingOrder);
 	viewer.rootContext()->setContextProperty("showModel", &showProxyModel);*/
+	Settings settings;
+	viewer.rootContext()->setContextProperty("settings", &settings);
 
 	viewer.rootContext()->setContextProperty("commandManager", &CommandManager::instance());
 	viewer.rootContext()->setContextProperty("downloadManager", &DownloadManager::instance());
