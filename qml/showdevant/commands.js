@@ -2,6 +2,7 @@
 
 var apiKey = "9adb4ab628c6";
 var websiteUrl = "http://api.betaseries.com";
+var tokenKey;
 
 function __createReadyStateChangeCallback(doc, callback) {
 	return function() {
@@ -56,6 +57,32 @@ function showsSearch(config, callback)
 
 	doc = new XMLHttpRequest();
 	doc.onreadystatechange = __createReadyStateChangeCallback(doc, function() {
+		var obj = JSON.parse(doc.responseText);
+		if (obj && obj.root)
+			callback(false, obj.root);
+		else
+			callback(true);
+	});
+
+	doc.open("GET", str, true);
+	doc.send();
+}
+
+function recordAuthToken(token)
+{
+	tokenKey = token;
+}
+
+function membersAuth(login, passwordHash, callback)
+{
+	var str;
+	var doc;
+
+	str = "%1/members/auth.json?login=%2&password=%3&key=%4".arg(websiteUrl).arg(login).arg(passwordHash).arg(apiKey);
+
+	doc = new XMLHttpRequest();
+	doc.onreadystatechange = __createReadyStateChangeCallback(doc, function() {
+		console.log(doc.responseText);
 		var obj = JSON.parse(doc.responseText);
 		if (obj && obj.root)
 			callback(false, obj.root);

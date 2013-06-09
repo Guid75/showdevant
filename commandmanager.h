@@ -16,9 +16,12 @@ public:
 
 	void setNetworkAccessManager(QNetworkAccessManager *nam);
 
+	// show commands
 	Command *showsSearch(const QString &expression);
 	Command *showsDisplay(const QString &showId);
 	Command *showsEpisodes(const QString &showId, int season = -1, int episode = -1, bool summary = true, bool hide_notes = true);
+
+	// subtitles commands
 	Command *subtitlesShow(const QString &showId, int season = -1, int episode = -1, const QString &language = QString());
 	Command *subtitlesShowByFile(const QString &showId, const QString &fileName, const QString &language = QString());
 

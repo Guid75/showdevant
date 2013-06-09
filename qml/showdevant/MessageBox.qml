@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-Item {
+ModalBox {
 	id: myself
 	anchors.fill: parent
 
@@ -9,24 +9,6 @@ Item {
 	property int padding : 10;
 
 	signal quit(string buttonLabel)
-
-	Rectangle {
-		id: back
-		anchors.fill: parent
-		opacity: 0.50
-		color: "black"
-
-		MouseArea {
-			hoverEnabled: true;
-			anchors.fill: parent;
-			onEntered:  { }
-			onExited:   { }
-			onReleased: { }
-			onPressed:  { }
-			onClicked:  { }
-			onWheel:    { }
-		}
-	}
 
 	Rectangle {
 		anchors.centerIn: parent

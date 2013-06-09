@@ -88,7 +88,6 @@ ShadowRectangle {
 			anchors.fill: betaSeriesImage
 			cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
 			onClicked: {
-				console.log("clicked on image")
 			}
 		}
 	}

@@ -58,7 +58,8 @@ OTHER_FILES += \
     qml/showdevant/SeasonsViewer.qml \
     qml/showdevant/EpisodeResume.qml \
     api_samples/shows_display.json \
-    qml/showdevant/LoginBox.qml
+    qml/showdevant/LoginBox.qml \
+    qml/showdevant/ModalBox.qml
 
 HEADERS += \
     downloadmanager.h \

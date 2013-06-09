@@ -4,6 +4,7 @@ import com.guid75 1.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
 import "notifications.js" as Notifications
+import "commands.js" as Commands
 //import "database.js" as Database
 
 Rectangle {
@@ -280,11 +281,15 @@ Rectangle {
 			onCancel: {
 				loginBox.active = false;
 			}
+//			onLogin: {
+//				Commands.membersAuth(login, Qt.md5(password), function(error, root) {
+
+//				});
+//			}
 		}
-		active: false
+		active: true
 		asynchronous: true
 		onLoaded: {
-			console.log(item);
 			if (active) {
 				item.initFocus();
 			}

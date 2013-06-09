@@ -1,34 +1,42 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
+import QtQuick.Controls.Styles 1.0
+import "commands.js" as Commands
 
-Item {
-	signal login(string login, string password)
+ModalBox {
 	signal cancel()
+
+	Keys.onPressed: {
+		if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+			__login();
+		else if (event.key === Qt.Key_Escape)
+			cancel();
+	}
 
 	function initFocus() {
 		loginTextField.forceActiveFocus();
 	}
 
-	Rectangle {
-		id: back
-		anchors.fill: parent
-		opacity: 0.50
-		color: "black"
+	function __login() {
+		var login = loginTextField.text;
+		var password = passwordTextField.text;
 
-		MouseArea {
-			hoverEnabled: true;
-			anchors.fill: parent;
-			onEntered:  { }
-			onExited:   { }
-			onReleased: { }
-			onPressed:  { }
-			onClicked:  { }
-			onWheel:    { }
-		}
+		if (!login || !password)
+			return;
+
+		Commands.membersAuth(login, Qt.md5(password), function(error, root) {
+			if (root.code === 1) {
+				// logged!
+				Commands.recordAuthToken(root.member.token);
+				cancel();
+			}
+		});
+
 	}
 
 	ShadowRectangle {
+		id: loginRectangle
 		color: "#FFEEEE"
 		anchors.centerIn: parent
 		width: 340
@@ -88,6 +96,7 @@ Item {
 					horizontalAlignment: Text.AlignRight
 				}
 				TextField {
+					id: passwordTextField
 					Layout.fillWidth: true
 					echoMode: TextInput.Password
 				}
@@ -121,6 +130,9 @@ Item {
 			}
 			Button {
 				text: '<b>Login</b>'
+				onClicked: {
+					__login();
+				}
 			}
 			Button {
 				text: 'Cancel'
