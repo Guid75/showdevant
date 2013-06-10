@@ -34,10 +34,6 @@ Rectangle {
 		id: seasonListModel
 	}
 
-	/*	EpisodeListModel {
-		id: episodeListModel
-	}*/
-
 	Component.onCompleted: {
 		switch (databaseManager.openDBLastError()) {
 		case 0:
@@ -53,6 +49,60 @@ Rectangle {
 			break;
 		}
 		topToolbarAnimation.start();
+
+		var user = settings.getValue("account/user");
+		var password = settings.getValue("account/password");
+		var autoLogin = settings.getBool("account/autologin");
+		if (autoLogin && user && password) {
+			topToolbar.beforeLogin();
+			Commands.membersAuth(user, password, function(error, root) {
+				if (root.code === 0) {
+					// something goes wrong
+					// TODO warn the user with a sign or something
+					wrongPasswordMessage.active = true;
+					topToolbar.abortLogin();
+					return;
+				}
+				__login(user, root.member.token);
+			});
+		}
+	}
+
+	function __loginBoxValidated(user, password, rememberMe) {
+		topToolbar.beforeLogin();
+		Commands.membersAuth(user, password, function(error, root) {
+			if (root.code === 0) {
+				// something goes wrong
+				// TODO warn the user with a sign or something
+				wrongPasswordMessage.active = true;
+				topToolbar.abortLogin();
+				return;
+			}
+
+			// logged!
+			if (rememberMe) {
+				// record it in the settings
+				settings.setValue("account/user", user);
+				settings.setValue("account/password", password);
+				settings.setValue("account/autologin", rememberMe);
+			} else {
+				settings.remove("account/user");
+				settings.remove("account/password");
+				settings.remove("account/autologin");
+			}
+
+			__login(user, root.member.token);
+		});
+
+	}
+
+	function __login(user, token) {
+
+		// logged!
+		Commands.recordAuthToken(token);
+		commandManager.recordAuthToken(token);
+
+		topToolbar.applyLogin(user);
 	}
 
 	SplitView {
@@ -275,19 +325,34 @@ Rectangle {
 		asynchronous: true
 	}
 	Loader {
+		id: wrongPasswordMessage
+		anchors.fill: parent
+		sourceComponent: MessageBox {
+			message: "Wrong password"
+			buttons: ListModel {
+				ListElement {
+					text: "Ok"
+				}
+			}
+			onQuit: { wrongPasswordMessage.active = false; }
+		}
+		active: false
+		asynchronous: true
+	}
+
+	Loader {
 		id: loginBox
 		anchors.fill: parent
 		sourceComponent: LoginBox {
 			onCancel: {
 				loginBox.active = false;
 			}
-//			onLogin: {
-//				Commands.membersAuth(login, Qt.md5(password), function(error, root) {
-
-//				});
-//			}
+			onLogin: {
+				loginBox.active = false;
+				root.__loginBoxValidated(user, password, rememberMe);
+			}
 		}
-		active: true
+		active: false
 		asynchronous: true
 		onLoaded: {
 			if (active) {

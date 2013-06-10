@@ -19,11 +19,34 @@ void Settings::setValue(const QString & key, const QVariant & value)
 	settings.setValue(key, value);
 }
 
-QVariant Settings::getValue( const QString & key, const QVariant & defaultValue) const
+QVariant Settings::getValue(const QString &key, const QVariant & defaultValue) const
 {
 	Q_SETTINGS;
 
 	return settings.value(key, defaultValue);
+}
+
+bool Settings::getBool(const QString &key, bool defaultValue) const
+{
+	QVariant v = getValue(key, defaultValue);
+	if (v.canConvert(QMetaType::Bool))
+		return v.toBool();
+	return defaultValue;
+}
+
+int Settings::getInt(const QString &key, int defaultValue) const
+{
+	QVariant v = getValue(key, defaultValue);
+	if (v.canConvert(QMetaType::Int))
+		return v.toInt();
+	return defaultValue;
+}
+
+void Settings::remove(const QString &key)
+{
+	Q_SETTINGS;
+
+	settings.remove(key);
 }
 
 // first index=0

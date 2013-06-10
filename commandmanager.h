@@ -16,6 +16,8 @@ public:
 
 	void setNetworkAccessManager(QNetworkAccessManager *nam);
 
+	Q_INVOKABLE void recordAuthToken(const QString &token);
+
 	// show commands
 	Command *showsSearch(const QString &expression);
 	Command *showsDisplay(const QString &showId);
@@ -29,6 +31,7 @@ private:
 	static CommandManager *_instance;
 	QNetworkAccessManager *nam;
 	QMap<QNetworkReply*,Command*> commands;
+	QString authToken;
 
 	explicit CommandManager(QObject *parent = 0);
 	Command *pushCommand(const QString &url);

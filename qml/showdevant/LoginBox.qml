@@ -6,6 +6,7 @@ import "commands.js" as Commands
 
 ModalBox {
 	signal cancel()
+	signal login(string user, string password, bool rememberMe)
 
 	Keys.onPressed: {
 		if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
@@ -19,20 +20,39 @@ ModalBox {
 	}
 
 	function __login() {
-		var login = loginTextField.text;
+		var user = loginTextField.text;
 		var password = passwordTextField.text;
+		var rememberMe = rememberMeCheckbox.checked;
 
-		if (!login || !password)
+		if (!user || !password)
 			return;
 
-		Commands.membersAuth(login, Qt.md5(password), function(error, root) {
-			if (root.code === 1) {
-				// logged!
-				Commands.recordAuthToken(root.member.token);
-				cancel();
-			}
-		});
+		password = Qt.md5(password);
 
+		login(user, password, rememberMe);
+
+//		Commands.membersAuth(user, password, function(error, root) {
+//			if (root.code === 0) {
+//				// something goes wrong
+//				// TODO warn the user with a sign or something
+
+//				return;
+//			}
+
+//			// logged!
+//			if (rememberMe) {
+//				// record it in the settings
+//				settings.setValue("account/user", user);
+//				settings.setValue("account/password", password);
+//				settings.setValue("account/autologin", rememberMe);
+//			} else {
+//				settings.remove("account/user");
+//				settings.remove("account/password");
+//				settings.remove("account/autologin");
+//			}
+
+//			login(user, root.member.token);
+//		});
 	}
 
 	ShadowRectangle {
@@ -115,6 +135,7 @@ ModalBox {
 					horizontalAlignment: Text.AlignRight
 				}
 				CheckBox {
+					id: rememberMeCheckbox
 					Layout.fillWidth: true
 					text: "Remember me on this computer"
 

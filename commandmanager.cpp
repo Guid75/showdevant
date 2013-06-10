@@ -27,6 +27,11 @@ void CommandManager::setNetworkAccessManager(QNetworkAccessManager *nam)
 	// TODO : remove all current QNetworkReply
 }
 
+void CommandManager::recordAuthToken(const QString &token)
+{
+	authToken = token;
+}
+
 CommandManager::CommandManager(QObject *parent) :
 	QObject(parent)
 {

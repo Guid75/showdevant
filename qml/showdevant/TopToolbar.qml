@@ -154,67 +154,127 @@ ShadowRectangle {
 		}
 	}
 
-	Rectangle {
-		id: searchButton
-		color: "#FFFF88"
-		border.color: "#888888"
-		border.width: 1
-		antialiasing: true
-		smooth: true
-		radius: 4
-		width: 70
-		height: 30
-		clip: true
-		anchors {
-			leftMargin: 5
-			left: searchRectangle.right
-			verticalCenter: parent.verticalCenter
-		}
-		Image {
-			source: "search.png"
-			smooth: true
+	//	Rectangle {
+	//		id: searchButton
+	//		color: "#FFFF88"
+	//		border.color: "#888888"
+	//		border.width: 1
+	//		antialiasing: true
+	//		smooth: true
+	//		radius: 4
+	//		width: 70
+	//		height: 30
+	//		clip: true
+	//		anchors {
+	//			leftMargin: 5
+	//			left: searchRectangle.right
+	//			verticalCenter: parent.verticalCenter
+	//		}
+	//		Image {
+	//			source: "search.png"
+	//			smooth: true
+	//			anchors {
+	//				horizontalCenter: parent.horizontalCenter
+	//				verticalCenter: parent.verticalCenter
+	//			}
+	//			width: 16
+	//			height: 16
+	//		}
+
+	//		/*		Text {
+	//			id: searchButtonText
+	//			color: "white"
+	//			horizontalAlignment: Text.AlignHCenter
+	//			text: "<b>search</b>"
+	//			clip: true
+	//			anchors.fill: parent
+	//			anchors.leftMargin: 8
+	//			anchors.rightMargin: 8
+	//			anchors.topMargin: 8
+	//		}*/
+	//		MouseArea {
+	//			anchors.fill: parent
+	//			onClicked: searchButton.focus = true
+	//		}
+	//	}
+
+	Component {
+		id: loggedComponent
+		Column {
 			anchors {
-				horizontalCenter: parent.horizontalCenter
+				right: parent.right
 				verticalCenter: parent.verticalCenter
 			}
-			width: 16
-			height: 16
-		}
+			Text {
+				renderType: Text.NativeRendering
+				text: 'Welcome, guid!'
 
-		/*		Text {
-			id: searchButtonText
-			color: "white"
-			horizontalAlignment: Text.AlignHCenter
-			text: "<b>search</b>"
-			clip: true
-			anchors.fill: parent
-			anchors.leftMargin: 8
-			anchors.rightMargin: 8
-			anchors.topMargin: 8
-		}*/
-		MouseArea {
-			anchors.fill: parent
-			onClicked: searchButton.focus = true
+			}
+			Text {
+				width: parent.width
+				renderType: Text.NativeRendering
+				text: 'Log out'
+				font.underline: true
+				color: "blue"
+				horizontalAlignment: Text.AlignRight
+			}
 		}
 	}
 
-	Text {
+	Component {
+		id: notLoggedComponent
+		Text {
+			anchors {
+				right: parent.right
+				verticalCenter: parent.verticalCenter
+			}
+			renderType: Text.NativeRendering
+			text: 'not logged'
+			font.underline: true
+			color: "blue"
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+				onClicked: {
+					askForLogin();
+				}
+			}
+		}
+	}
+
+	Component {
+		id: loadingComponent
+		LoadingWidget {
+			anchors.centerIn: parent
+			color: "#888888"
+			count: 12
+			width: topToolbar.height - 14
+		}
+	}
+
+	Loader {
+		id: rightLoader
+		active: true
+		asynchronous: true
 		anchors {
 			right: parent.right
 			verticalCenter: parent.verticalCenter
 			rightMargin: 6
 		}
-		renderType: Text.NativeRendering
-		text: 'not logged'
-		font.underline: true
-		color: "blue"
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-			onClicked: {
-				askForLogin();
-			}
-		}
+
+		sourceComponent: notLoggedComponent
+	}
+
+	function beforeLogin() {
+		rightLoader.sourceComponent = loadingComponent;
+	}
+
+	function applyLogin(login) {
+		rightLoader.sourceComponent = loggedComponent;
+	}
+
+	function abortLogin() {
+		rightLoader.sourceComponent = notLoggedComponent;
 	}
 }
