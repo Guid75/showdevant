@@ -34,6 +34,17 @@ Rectangle {
 		id: seasonListModel
 	}
 
+	Connections {
+		target: authenticator
+		onError: {
+			if (error === Authenticator.BadPassword) {
+				console.log("Bad password!");
+			} else if (error === Authenticator.UnknownUser) {
+				console.log("Unknown user!");
+			}
+		}
+	}
+
 	Component.onCompleted: {
 		switch (databaseManager.openDBLastError()) {
 		case 0:
@@ -50,11 +61,12 @@ Rectangle {
 		}
 		topToolbarAnimation.start();
 
-		var user = settings.getValue("account/user");
-		var password = settings.getValue("account/password");
-		var autoLogin = settings.getBool("account/autologin");
-		if (autoLogin && user && password) {
-			topToolbar.beforeLogin();
+		authenticator.autoLogin();
+//		var user = settings.getValue("account/user");
+//		var password = settings.getValue("account/password");
+//		if (user && password) {
+//			authenticator.login(user, password);
+/*			topToolbar.beforeLogin();
 			Commands.membersAuth(user, password, function(error, root) {
 				if (root.code === 0) {
 					// something goes wrong
@@ -64,11 +76,11 @@ Rectangle {
 					return;
 				}
 				__login(user, root.member.token);
-			});
-		}
+			});*/
+//		}
 	}
 
-	function __loginBoxValidated(user, password, rememberMe) {
+/*	function __loginBoxValidated(user, password, rememberMe) {
 		topToolbar.beforeLogin();
 		Commands.membersAuth(user, password, function(error, root) {
 			if (root.code === 0) {
@@ -93,16 +105,16 @@ Rectangle {
 
 			__login(user, root.member.token);
 		});
-
-	}
+	}*/
 
 	function __login(user, token) {
-
 		// logged!
 		Commands.recordAuthToken(token);
 		commandManager.recordAuthToken(token);
 
 		topToolbar.applyLogin(user);
+
+		Commands.membersInfos();
 	}
 
 	SplitView {
@@ -293,6 +305,9 @@ Rectangle {
 		onAskForLogin: {
 			__raiseLoginBox();
 		}
+		onAskForLogout: {
+			authenticator.forgetMe();
+		}
 	}
 
 	PathAnimation {
@@ -347,10 +362,10 @@ Rectangle {
 			onCancel: {
 				loginBox.active = false;
 			}
-			onLogin: {
-				loginBox.active = false;
-				root.__loginBoxValidated(user, password, rememberMe);
-			}
+//			onLogin: {
+//				loginBox.active = false;
+				//root.__loginBoxValidated(user, password, rememberMe);
+//			}
 		}
 		active: false
 		asynchronous: true

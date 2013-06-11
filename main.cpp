@@ -17,6 +17,7 @@
 #include "sortfilterproxymodel.h"
 #include "cache.h"
 #include "cachewatcher.h"
+#include "authenticator.h"
 
 #include "qtquick2applicationviewer.h"
 
@@ -38,17 +39,16 @@ int main(int argc, char *argv[])
 	qmlRegisterType<ShowModel>("com.guid75", 1, 0, "ShowModel");
 	qmlRegisterType<SortFilterProxyModel>("com.guid75", 1, 0, "SortFilterProxyModel");
 	qmlRegisterType<CacheWatcher>("com.guid75", 1, 0, "CacheWatcher");
+	// we use qmlRegisterUncreatableType because we only want to access enums from this class and not allow the instanciation
+	qmlRegisterUncreatableType<Authenticator>("com.guid75", 1, 0, "Authenticator", "This class cannot be created in QML");
 
 	DatabaseManager::instance().openDB();
 
-/*	ShowModel showModel;
-
-	SortFilterProxyModel showProxyModel;
-	showProxyModel.setSourceModel(&showModel);
-	showProxyModel.sort(0, Qt::AscendingOrder);
-	viewer.rootContext()->setContextProperty("showModel", &showProxyModel);*/
 	Settings settings;
 	viewer.rootContext()->setContextProperty("settings", &settings);
+
+	Authenticator authenticator;
+	viewer.rootContext()->setContextProperty("authenticator", &authenticator);
 
 	viewer.rootContext()->setContextProperty("commandManager", &CommandManager::instance());
 	viewer.rootContext()->setContextProperty("downloadManager", &DownloadManager::instance());

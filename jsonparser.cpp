@@ -19,26 +19,36 @@
 JsonParser::JsonParser(const QByteArray &content)
     : valid(false)
 {
-    QJsonParseError error;
-    doc = QJsonDocument::fromJson(content, &error);
-    if (doc.isNull()) {
-        qDebug("error while parsing json");
-        qDebug("%s: %d", qPrintable(error.errorString()), error.offset);
-        return;
-    }
+	if (content.isEmpty())
+		return;
 
-    if (!doc.isObject()) {
-        // TODO raise error, we except an object
-        return;
-    }
+	parse(content);
+}
 
-    QJsonObject obj = doc.object();
-    QJsonValue val = obj.value("root");
-    if (!val.isObject()) {
-        // TODO raise error, root must be an object
-        return;
-    }
+bool JsonParser::parse(const QByteArray &content)
+{
+	valid = false;
+	QJsonParseError error;
+	doc = QJsonDocument::fromJson(content, &error);
+	if (doc.isNull()) {
+		qDebug("error while parsing json");
+		qDebug("%s: %d", qPrintable(error.errorString()), error.offset);
+		return false;
+	}
 
-    _root = val.toObject();
-    valid = true;
+	if (!doc.isObject()) {
+		// we except an object for the doc
+		return false;
+	}
+
+	QJsonObject obj = doc.object();
+	QJsonValue val = obj.value("root");
+	if (!val.isObject()) {
+		// response root child must be an object
+		return false;
+	}
+
+	_root = val.toObject();
+	valid = true;
+	return true;
 }

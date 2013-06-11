@@ -2,7 +2,9 @@ import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
 import QtQuick.Controls.Styles 1.0
+import com.guid75 1.0
 import "commands.js" as Commands
+
 
 ModalBox {
 	signal cancel()
@@ -27,32 +29,7 @@ ModalBox {
 		if (!user || !password)
 			return;
 
-		password = Qt.md5(password);
-
-		login(user, password, rememberMe);
-
-//		Commands.membersAuth(user, password, function(error, root) {
-//			if (root.code === 0) {
-//				// something goes wrong
-//				// TODO warn the user with a sign or something
-
-//				return;
-//			}
-
-//			// logged!
-//			if (rememberMe) {
-//				// record it in the settings
-//				settings.setValue("account/user", user);
-//				settings.setValue("account/password", password);
-//				settings.setValue("account/autologin", rememberMe);
-//			} else {
-//				settings.remove("account/user");
-//				settings.remove("account/password");
-//				settings.remove("account/autologin");
-//			}
-
-//			login(user, root.member.token);
-//		});
+		authenticator.login(user, password, rememberMe);
 	}
 
 	ShadowRectangle {

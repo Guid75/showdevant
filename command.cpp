@@ -6,7 +6,8 @@ Command::Command(QObject *parent) :
 {
 }
 
-void Command::emitFinished()
+void Command::finalize()
 {
+	_jsonParser.parse(_response);
 	emit finished();
 }

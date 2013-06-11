@@ -27,6 +27,9 @@ public:
 	Command *subtitlesShow(const QString &showId, int season = -1, int episode = -1, const QString &language = QString());
 	Command *subtitlesShowByFile(const QString &showId, const QString &fileName, const QString &language = QString());
 
+	// members commands
+	Command *membersAuth(const QString &login, const QString &password);
+
 private:
 	static CommandManager *_instance;
 	QNetworkAccessManager *nam;

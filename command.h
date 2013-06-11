@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "jsonparser.h"
+
 class Command : public QObject
 {
 	friend class CommandManager;
@@ -12,6 +14,8 @@ public:
 
 	const QByteArray &response() const { return _response; }
 	bool error() const { return _error; }
+
+	const JsonParser &jsonParser() const { return _jsonParser; }
 	
 signals:
 	void finished();
@@ -19,8 +23,9 @@ signals:
 private:
 	bool _error;
 	QByteArray _response;
+	JsonParser _jsonParser;
 
-	void emitFinished();
+	void finalize();
 };
 
 #endif // COMMAND_H

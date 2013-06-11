@@ -24,9 +24,10 @@
 class JsonParser
 {
 public:
-    JsonParser(const QByteArray &content);
+	JsonParser(const QByteArray &content = "");
 
-    //JsonObject &root() { return _root; }
+	bool parse(const QByteArray &content);
+
     const QJsonObject &root() const { return _root; }
 
     bool isValid() const { return valid; }

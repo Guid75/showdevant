@@ -1,4 +1,6 @@
 #include <QNetworkAccessManager>
+#include <QCryptographicHash>
+#include <QDebug>
 
 #include "command.h"
 
@@ -101,6 +103,15 @@ Command *CommandManager::subtitlesShowByFile(const QString &showId, const QStrin
 	return pushCommand(str);
 }
 
+Command *CommandManager::membersAuth(const QString &login, const QString &password)
+{
+	QString str = QString("%1/members/auth.json?login=%2&password=%3&key=%4").arg(websiteUrl).arg(login).
+			arg(password).arg(apiKey);
+
+	qDebug() << str;
+	return pushCommand(str);
+}
+
 void CommandManager::httpError(QNetworkReply::NetworkError)
 {
 	QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
@@ -126,7 +137,7 @@ void CommandManager::httpFinished()
 
 	Q_ASSERT(command != NULL);
 
-	command->emitFinished();
+	command->finalize();
 	commands.remove(reply);
 //	delete command;
 }

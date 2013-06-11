@@ -73,7 +73,7 @@ function recordAuthToken(token)
 	tokenKey = token;
 }
 
-function membersAuth(login, passwordHash, callback)
+/*function membersAuth(login, passwordHash, callback)
 {
 	var str;
 	var doc;
@@ -93,3 +93,24 @@ function membersAuth(login, passwordHash, callback)
 	doc.open("GET", str, true);
 	doc.send();
 }
+
+function membersInfos(nodata, sinceDate)
+{
+	var str;
+	var doc;
+
+	str = "%1/members/infos.json?key=%2&token=%3".arg(websiteUrl).arg(apiKey).arg(tokenKey);
+
+	doc = new XMLHttpRequest();
+	doc.onreadystatechange = __createReadyStateChangeCallback(doc, function() {
+		console.log(doc.responseText);
+		var obj = JSON.parse(doc.responseText);
+		if (obj && obj.root)
+			callback(false, obj.root);
+		else
+			callback(true);
+	});
+
+	doc.open("GET", str, true);
+	doc.send();
+}*/

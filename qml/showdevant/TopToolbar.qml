@@ -4,6 +4,7 @@ import "commands.js" as Commands
 
 ShadowRectangle {
 	signal askForLogin()
+	signal askForLogout()
 	id: topToolbar
 	ListModel {
 		id: searchModel
@@ -207,8 +208,7 @@ ShadowRectangle {
 			}
 			Text {
 				renderType: Text.NativeRendering
-				text: 'Welcome, guid!'
-
+				text: 'Welcome, %1!'.arg(authenticator.user)
 			}
 			Text {
 				width: parent.width
@@ -217,6 +217,14 @@ ShadowRectangle {
 				font.underline: true
 				color: "blue"
 				horizontalAlignment: Text.AlignRight
+				MouseArea {
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+					onClicked: {
+						askForLogout();
+					}
+				}
 			}
 		}
 	}
@@ -263,18 +271,25 @@ ShadowRectangle {
 			rightMargin: 6
 		}
 
-		sourceComponent: notLoggedComponent
+		sourceComponent: authenticator.logState === Authenticator.Logging ? loadingComponent : notLoggedComponent
 	}
 
-	function beforeLogin() {
-		rightLoader.sourceComponent = loadingComponent;
-	}
-
-	function applyLogin(login) {
-		rightLoader.sourceComponent = loggedComponent;
-	}
-
-	function abortLogin() {
-		rightLoader.sourceComponent = notLoggedComponent;
+	Connections {
+		target: authenticator
+		onLogStateChanged: {
+			switch (authenticator.logState) {
+			case Authenticator.NotLogged:
+				rightLoader.sourceComponent = notLoggedComponent;
+				break;
+			case Authenticator.Logging:
+				rightLoader.sourceComponent = loadingComponent;
+				break;
+			case Authenticator.Logged:
+				rightLoader.sourceComponent = loggedComponent;
+				break;
+			default:
+				break;
+			}
+		}
 	}
 }
