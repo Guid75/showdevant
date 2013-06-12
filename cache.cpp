@@ -245,19 +245,36 @@ void Cache::parseMemberInfos(const QByteArray &response)
 
 	// TODO parse member inner infos
 
+	// init the "to delete" list
+	QStringList toDelete;
+	QSqlQuery query;
+	query.prepare("SELECT show_id FROM myshows");
+	query.exec();
+	while (query.next())
+		toDelete << query.value("show_id").toString();
+
 	// parse shows
 	QJsonObject showsJson = memberJson.value("shows").toObject();
 	for (QJsonObject::const_iterator iter = showsJson.constBegin(); iter != showsJson.constEnd(); iter++) {
 		QJsonObject showJson = (*iter).toObject();
 
-		QSqlQuery query;
 		query.prepare("REPLACE INTO myshows (show_id, title, archive) "
 					  "VALUES (:show_id, :title, :archive)");
 		query.bindValue(":show_id", showJson.value("url").toString());
 		query.bindValue(":title", showJson.value("title").toString());
 		query.bindValue(":archive", showJson.value("archive").toString().toInt());
 		query.exec();
+
+		toDelete.removeOne(showJson.value("url").toString());
 	}
+
+	// delete all shows that have not been found in the JSON return
+	foreach (const QString &showId, toDelete) {
+		query.prepare("DELETE FROM myshows WHERE show_id=:show_id");
+		query.bindValue(":show_id", showId);
+		query.exec();
+	}
+
 	QSqlDatabase::database().commit();
 }
 
