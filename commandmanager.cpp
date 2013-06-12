@@ -108,7 +108,18 @@ Command *CommandManager::membersAuth(const QString &login, const QString &passwo
 	QString str = QString("%1/members/auth.json?login=%2&password=%3&key=%4").arg(websiteUrl).arg(login).
 			arg(password).arg(apiKey);
 
-	qDebug() << str;
+	return pushCommand(str);
+}
+
+Command *CommandManager::membersInfos(const QString &login)
+{
+	QString str;
+	if (login.isEmpty()) {
+		Q_ASSERT(!authToken.isEmpty());
+		str = QString("%1/members/infos.json?key=%2&token=%3").arg(websiteUrl).arg(apiKey).arg(authToken);
+	} else {
+		str = QString("%1/members/infos/%2.json?key=%3&token=%4").arg(websiteUrl).arg(login).arg(apiKey).arg(authToken);
+	}
 	return pushCommand(str);
 }
 

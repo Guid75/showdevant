@@ -45,7 +45,7 @@ public:
 	const QString &user() const { return _user; }
 	const QString &token() const { return _token; }
 
-	AuthenticationError lastError() const { return _lastError; }
+	Q_INVOKABLE AuthenticationError lastError() const { return _lastError; }
 	
 signals:
 	void error(AuthenticationError error);

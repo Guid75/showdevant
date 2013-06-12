@@ -16,18 +16,28 @@ Rectangle {
 		id: showModel
 	}
 
+	MyShowsModel {
+		id: myShowsModel
+	}
+
+//	SortFilterProxyModel {
+//		id: showProxyModel
+//		sourceModel: showModel
+//		sortField: "title"
+//		sortOrder: Qt.AscendingOrder
+//		sortCaseSensitivity: Qt.CaseInsensitive
+//		filterField: "title"
+//		filterCaseSensitivity: Qt.CaseInsensitive
+//	}
+
 	SortFilterProxyModel {
 		id: showProxyModel
-		sourceModel: showModel
+		sourceModel: myShowsModel
 		sortField: "title"
 		sortOrder: Qt.AscendingOrder
 		sortCaseSensitivity: Qt.CaseInsensitive
 		filterField: "title"
 		filterCaseSensitivity: Qt.CaseInsensitive
-	}
-
-	Connections {
-		target: cache
 	}
 
 	SeasonListModel {
@@ -37,10 +47,12 @@ Rectangle {
 	Connections {
 		target: authenticator
 		onError: {
-			if (error === Authenticator.BadPassword) {
-				console.log("Bad password!");
-			} else if (error === Authenticator.UnknownUser) {
-				console.log("Unknown user!");
+			wrongPasswordMessage.active = true;
+		}
+		onLogStateChanged: {
+			if (authenticator.logState === Authenticator.Logged) {
+				// TODO refresh the show model with all user shows
+				cache.synchronizeMemberInfos();
 			}
 		}
 	}
@@ -62,59 +74,6 @@ Rectangle {
 		topToolbarAnimation.start();
 
 		authenticator.autoLogin();
-//		var user = settings.getValue("account/user");
-//		var password = settings.getValue("account/password");
-//		if (user && password) {
-//			authenticator.login(user, password);
-/*			topToolbar.beforeLogin();
-			Commands.membersAuth(user, password, function(error, root) {
-				if (root.code === 0) {
-					// something goes wrong
-					// TODO warn the user with a sign or something
-					wrongPasswordMessage.active = true;
-					topToolbar.abortLogin();
-					return;
-				}
-				__login(user, root.member.token);
-			});*/
-//		}
-	}
-
-/*	function __loginBoxValidated(user, password, rememberMe) {
-		topToolbar.beforeLogin();
-		Commands.membersAuth(user, password, function(error, root) {
-			if (root.code === 0) {
-				// something goes wrong
-				// TODO warn the user with a sign or something
-				wrongPasswordMessage.active = true;
-				topToolbar.abortLogin();
-				return;
-			}
-
-			// logged!
-			if (rememberMe) {
-				// record it in the settings
-				settings.setValue("account/user", user);
-				settings.setValue("account/password", password);
-				settings.setValue("account/autologin", rememberMe);
-			} else {
-				settings.remove("account/user");
-				settings.remove("account/password");
-				settings.remove("account/autologin");
-			}
-
-			__login(user, root.member.token);
-		});
-	}*/
-
-	function __login(user, token) {
-		// logged!
-		Commands.recordAuthToken(token);
-		commandManager.recordAuthToken(token);
-
-		topToolbar.applyLogin(user);
-
-		Commands.membersInfos();
 	}
 
 	SplitView {
@@ -340,10 +299,36 @@ Rectangle {
 		asynchronous: true
 	}
 	Loader {
+		id: loginBox
+		anchors.fill: parent
+		sourceComponent: LoginBox {
+			onCloseMe: {
+				loginBox.active = false;
+			}
+		}
+		active: false
+		asynchronous: true
+		onLoaded: {
+			if (active) {
+				item.initFocus();
+			}
+		}
+	}
+	Loader {
 		id: wrongPasswordMessage
 		anchors.fill: parent
 		sourceComponent: MessageBox {
-			message: "Wrong password"
+			message: {
+				switch (authenticator.lastError()) {
+				case Authenticator.BadPassword:
+					return "Wrong password";
+				case Authenticator.UnknownUser:
+					return "Unknown user";
+				case Authenticator.UnknownError:
+					return "Unknown error";
+				}
+				return "";
+			}
 			buttons: ListModel {
 				ListElement {
 					text: "Ok"
@@ -353,27 +338,6 @@ Rectangle {
 		}
 		active: false
 		asynchronous: true
-	}
-
-	Loader {
-		id: loginBox
-		anchors.fill: parent
-		sourceComponent: LoginBox {
-			onCancel: {
-				loginBox.active = false;
-			}
-//			onLogin: {
-//				loginBox.active = false;
-				//root.__loginBoxValidated(user, password, rememberMe);
-//			}
-		}
-		active: false
-		asynchronous: true
-		onLoaded: {
-			if (active) {
-				item.initFocus();
-			}
-		}
 	}
 }
 

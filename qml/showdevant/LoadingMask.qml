@@ -1,15 +1,15 @@
 import QtQuick 2.0
 
-FocusScope {
-	Component.onCompleted: {
-		backAnimation.start();
-		forceActiveFocus();
-	}
+Item {
+	property alias count : loadingWidget.count
+	property alias size : loadingWidget.size
+	property alias color : loadingWidget.color
+	property int speed : loadingWidget.speed
 
 	Rectangle {
 		id: back
 		anchors.fill: parent
-		opacity: 0
+		opacity: 0.2
 		color: "black"
 
 		MouseArea {
@@ -24,13 +24,8 @@ FocusScope {
 		}
 	}
 
-	NumberAnimation {
-		id: backAnimation
-		target: back
-		property: "opacity"
-		duration: 400
-		easing.type: Easing.InOutQuad
-		from: 0
-		to: 0.40
+	LoadingWidget {
+		id: loadingWidget
+		anchors.centerIn: parent
 	}
 }

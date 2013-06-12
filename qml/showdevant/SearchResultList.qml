@@ -77,7 +77,8 @@ Item {
 						hoverEnabled: true
 						cursorShape: "PointingHandCursor"
 						onClicked: {
-							showModel.addShow(model.showId, model.title);
+//							showModel.addShow(model.showId, model.title);
+							// TOREDO
 							mouse.accepted = false;
 						}
 					}

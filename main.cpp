@@ -18,6 +18,7 @@
 #include "cache.h"
 #include "cachewatcher.h"
 #include "authenticator.h"
+#include "myshowsmodel.h"
 
 #include "qtquick2applicationviewer.h"
 
@@ -34,10 +35,12 @@ int main(int argc, char *argv[])
 	QtQuick2ApplicationViewer viewer;
 	qmlRegisterType<Shortcut>("com.guid75", 1, 0, "Shortcut");
 	qmlRegisterType<SqlTableModel>("com.guid75", 1, 0, "SqlTableModel");
+	qmlRegisterType<SqlQueryModel>("com.guid75", 1, 0, "SqlQueryModel");
 	qmlRegisterType<SeasonListModel>("com.guid75", 1, 0, "SeasonListModel");
 	qmlRegisterType<EpisodeListModel>("com.guid75", 1, 0, "EpisodeListModel");
 	qmlRegisterType<ShowModel>("com.guid75", 1, 0, "ShowModel");
 	qmlRegisterType<SortFilterProxyModel>("com.guid75", 1, 0, "SortFilterProxyModel");
+	qmlRegisterType<MyShowsModel>("com.guid75", 1, 0, "MyShowsModel");
 	qmlRegisterType<CacheWatcher>("com.guid75", 1, 0, "CacheWatcher");
 	// we use qmlRegisterUncreatableType because we only want to access enums from this class and not allow the instanciation
 	qmlRegisterUncreatableType<Authenticator>("com.guid75", 1, 0, "Authenticator", "This class cannot be created in QML");

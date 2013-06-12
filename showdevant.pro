@@ -31,7 +31,8 @@ SOURCES += main.cpp \
     episodelistmodel.cpp \
     cachewatcher.cpp \
     settings.cpp \
-    authenticator.cpp
+    authenticator.cpp \
+    myshowsmodel.cpp
 
 # Installation path
 # target.path =
@@ -60,7 +61,8 @@ OTHER_FILES += \
     qml/showdevant/EpisodeResume.qml \
     api_samples/shows_display.json \
     qml/showdevant/LoginBox.qml \
-    qml/showdevant/ModalBox.qml
+    qml/showdevant/ModalBox.qml \
+    qml/showdevant/LoadingMask.qml
 
 HEADERS += \
     downloadmanager.h \
@@ -79,4 +81,5 @@ HEADERS += \
     episodelistmodel.h \
     cachewatcher.h \
     settings.h \
-    authenticator.h
+    authenticator.h \
+    myshowsmodel.h

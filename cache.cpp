@@ -228,6 +228,39 @@ void Cache::parseShowInfos(const QString &showId, const QByteArray &response)
 	QSqlDatabase::database().commit();
 }
 
+void Cache::parseMemberInfos(const QByteArray &response)
+{
+	JsonParser parser(response);
+	if (!parser.isValid()) {
+		// TODO manage error
+		return;
+	}
+
+	if (!QSqlDatabase::database().transaction()) {
+		qCritical("Error while beginning a transaction for SQL insertion");
+		return;
+	}
+
+	QJsonObject memberJson = parser.root().value("member").toObject();
+
+	// TODO parse member inner infos
+
+	// parse shows
+	QJsonObject showsJson = memberJson.value("shows").toObject();
+	for (QJsonObject::const_iterator iter = showsJson.constBegin(); iter != showsJson.constEnd(); iter++) {
+		QJsonObject showJson = (*iter).toObject();
+
+		QSqlQuery query;
+		query.prepare("REPLACE INTO myshows (show_id, title, archive) "
+					  "VALUES (:show_id, :title, :archive)");
+		query.bindValue(":show_id", showJson.value("url").toString());
+		query.bindValue(":title", showJson.value("title").toString());
+		query.bindValue(":archive", showJson.value("archive").toString().toInt());
+		query.exec();
+	}
+	QSqlDatabase::database().commit();
+}
+
 void Cache::showInfosCallback(const QVariantMap &id, const QByteArray &response)
 {
 	QString showId = id["showId"].toString();
@@ -241,6 +274,12 @@ void Cache::episodesCallback(const QVariantMap &id, const QByteArray &response)
 	QString showId = id["showId"].toString();
 	parseSeasons(showId, response, id["episode"].isNull());
 	emit synchronized(Data_Episodes, id);
+}
+
+void Cache::memberInfosCallback(const QVariantMap &id, const QByteArray &response)
+{
+	parseMemberInfos(response);
+	emit synchronized(Data_MemberInfos, id);
 }
 
 int Cache::synchronizeShowInfos(const QString &showId)
@@ -334,6 +373,33 @@ int Cache::synchronizeEpisodes(const QString &showId, int season, int episode, b
 	action->id = id;
 	action->callbackMethodName = "episodesCallback";
 	Command *command = CommandManager::instance().showsEpisodes(showId, season, episode, !fullInfo, !fullInfo);
+	action->commands << command;
+	currentActions << action;
+	commandMapper.setMapping(command, command);
+	connect(command, SIGNAL(finished()), &commandMapper, SLOT(map()));
+	return 1;
+}
+
+int Cache::synchronizeMemberInfos()
+{
+	QVariantMap id;
+
+	// expired data, we need to launch the request if not already done
+	emit synchronizing(Data_ShowInfos, id);
+
+	// is there a current action about it?
+	SynchronizeAction *action = getAction(Data_ShowInfos, id);
+	if (action) {
+		// just wait for the end of it
+		return 1;
+	}
+
+	// store the synchronize action
+	action = new SynchronizeAction;
+	action->dataType = Data_MemberInfos;
+	action->id = id;
+	action->callbackMethodName = "memberInfosCallback";
+	Command *command = CommandManager::instance().membersInfos();
 	action->commands << command;
 	currentActions << action;
 	commandMapper.setMapping(command, command);

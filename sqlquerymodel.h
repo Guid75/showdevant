@@ -21,7 +21,7 @@ public:
 	Q_INVOKABLE void setQuery(const QString &query);
 	Q_INVOKABLE void setQuery(const QSqlQuery &query);
 	QVariant data(const QModelIndex &index, int role) const;
-	virtual QHash<int, QByteArray> roleNames() const{return roles;}
+	virtual QHash<int, QByteArray> roleNames() const{ return roles; }
 	int getCount() { this->count = this->rowCount(); return count; }
 	Q_INVOKABLE QVariant get(int row);
 
@@ -34,7 +34,7 @@ signals:
 protected:
 	CacheWatcher cacheWatcher;
 
-	virtual void select() = 0;
+	virtual void select() {}
 
 private:
 	int count;

@@ -31,7 +31,8 @@ class Cache : public QObject
 public:
 	enum CacheDataType {
 		Data_ShowInfos,
-		Data_Episodes
+		Data_Episodes,
+		Data_MemberInfos
 	};
 
 	static Cache &instance();
@@ -42,6 +43,8 @@ public:
 
 	// if episode == -1, it means we want to synchronize ALL season episodes
 	Q_INVOKABLE int synchronizeEpisodes(const QString &showId, int season, int episode = -1, bool fullInfo = false);
+
+	Q_INVOKABLE int synchronizeMemberInfos();
 
 signals:
 	void synchronizing(CacheDataType dataType, const QVariantMap &id);
@@ -78,10 +81,12 @@ private slots:
 	void parseEpisodes(const QString &showId, int season, const QJsonObject &root, bool detailMode);
 	void parseSeasons(const QString &showId, const QByteArray &response, bool allEpisodes);
 	void parseShowInfos(const QString &showId, const QByteArray &response);
+	void parseMemberInfos(const QByteArray &response);
 
 	// action callbacks
 	void showInfosCallback(const QVariantMap &id, const QByteArray &response);
 	void episodesCallback(const QVariantMap &id, const QByteArray &response);
+	void memberInfosCallback(const QVariantMap &id, const QByteArray &response);
 };
 
 #endif // CACHE_H

@@ -6,23 +6,25 @@ SortFilterProxyModel::SortFilterProxyModel(QObject *parent) :
 {
 }
 
-SqlTableModel *SortFilterProxyModel::sourceModel() const
+SqlQueryModel *SortFilterProxyModel::sourceModel() const
 {
-	return qobject_cast<SqlTableModel*>(QSortFilterProxyModel::sourceModel());
+	return qobject_cast<SqlQueryModel*>(QSortFilterProxyModel::sourceModel());
 }
 
-void SortFilterProxyModel::setSourceModel(SqlTableModel *sourceModel)
+void SortFilterProxyModel::setSourceModel(SqlQueryModel *sourceModel)
 {
 	QSortFilterProxyModel::setSourceModel(sourceModel);
-	SqlTableModel *model = this->sourceModel();
+	SqlQueryModel *model = this->sourceModel();
 
 	if (!_sortField.isEmpty()) {
 		if (model)
-			sort(model->fieldIndex(_sortField), _sortOrder);
+			sort(model->record().indexOf(_sortField), _sortOrder);
+	//		sort(model->fieldIndex(_sortField), _sortOrder);
 	}
 	if (!_filterField.isEmpty()) {
 		if (model)
-			setFilterKeyColumn(model->fieldIndex(_filterField));
+//			setFilterKeyColumn(model->fieldIndex(_filterField));
+			setFilterKeyColumn(model->record().indexOf(_filterField));
 		if (!_filter.isEmpty())
 			setFilterFixedString(_filter);
 	}
@@ -34,9 +36,9 @@ void SortFilterProxyModel::setSortField(const QString &field)
 		return;
 
 	_sortField = field;
-	SqlTableModel *model = sourceModel();
+	SqlQueryModel *model = sourceModel();
 	if (model)
-		sort(model->fieldIndex(field), _sortOrder);
+		sort(model->record().indexOf(field), _sortOrder);
 }
 
 void SortFilterProxyModel::setSortOrder(Qt::SortOrder order)
@@ -45,9 +47,9 @@ void SortFilterProxyModel::setSortOrder(Qt::SortOrder order)
 		return;
 
 	_sortOrder = order;
-	SqlTableModel *model = sourceModel();
+	SqlQueryModel *model = sourceModel();
 	if (model && !_sortField.isEmpty())
-		sort(model->fieldIndex(_sortField), _sortOrder);
+		sort(model->record().indexOf(_sortField), _sortOrder);
 }
 
 void SortFilterProxyModel::setFilterField(const QString &field)
@@ -56,9 +58,9 @@ void SortFilterProxyModel::setFilterField(const QString &field)
 		return;
 
 	_filterField = field;
-	SqlTableModel *model = sourceModel();
+	SqlQueryModel *model = sourceModel();
 	if (model)
-		setFilterKeyColumn(model->fieldIndex(field));
+		setFilterKeyColumn(model->record().indexOf(field));
 }
 
 void SortFilterProxyModel::setFilter(const QString &filter)

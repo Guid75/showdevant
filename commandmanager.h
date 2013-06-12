@@ -29,6 +29,7 @@ public:
 
 	// members commands
 	Command *membersAuth(const QString &login, const QString &password);
+	Command *membersInfos(const QString &login = "");
 
 private:
 	static CommandManager *_instance;

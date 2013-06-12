@@ -1,0 +1,115 @@
+{
+    "root": {
+        "key": "9adb4ab628c6",
+        "token": "0f58c4b5cefb",
+        "member": {
+            "login": "guid",
+            "cached": "1355803100",
+            "avatar": "",
+            "stats": {
+                "friends": "0",
+                "shows": 14,
+                "seasons": 28,
+                "episodes": 495,
+                "progress": "53.46 %",
+                "episodes_to_watch": 431,
+                "time_on_tv": 20910,
+                "time_to_spend": 25800,
+                "badges": 11
+            },
+            "shows": {
+                "0": {
+                    "url": "breakingbad",
+                    "title": "Breaking Bad",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "1": {
+                    "url": "gameofthrones",
+                    "title": "Game of Thrones",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "2": {
+                    "url": "house-of-cards-2012",
+                    "title": "House of Cards (2013)",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "3": {
+                    "url": "intreatment",
+                    "title": "In Treatment",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "4": {
+                    "url": "real-humans",
+                    "title": "Real Humans",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "5": {
+                    "url": "sherlock",
+                    "title": "Sherlock",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "6": {
+                    "url": "supernatural",
+                    "title": "Supernatural",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "7": {
+                    "url": "thegoodwife",
+                    "title": "The Good Wife",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "8": {
+                    "url": "theofficeus",
+                    "title": "The Office US",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "9": {
+                    "url": "thesopranos",
+                    "title": "The Sopranos",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "10": {
+                    "url": "thewalkingdead",
+                    "title": "The Walking Dead",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "11": {
+                    "url": "thewire",
+                    "title": "The Wire",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "12": {
+                    "url": "trueblood",
+                    "title": "True Blood",
+                    "archive": "0",
+                    "is_in_account": 1
+                },
+                "13": {
+                    "url": "vikings",
+                    "title": "Vikings",
+                    "archive": "0",
+                    "is_in_account": 1
+                }
+            },
+            "options": {
+                "downloaded": 1,
+                "notation": 1,
+                "decalage": 1
+            }
+        },
+        "code": 1,
+        "errors": {}
+    }
+}

@@ -98,6 +98,8 @@ void Authenticator::commandFinished()
 			settings.setValue("account/password", _tmpPasswordMd5);
 		}
 
+		CommandManager::instance().recordAuthToken(_token);
+
 		setLogState(Logged);
 	}
 	currentCommand->deleteLater();

@@ -3,7 +3,7 @@
 
 #include <QSortFilterProxyModel>
 
-#include "sqltablemodel.h"
+#include "sqlquerymodel.h"
 
 class SortFilterProxyModel : public QSortFilterProxyModel
 {
@@ -11,7 +11,7 @@ class SortFilterProxyModel : public QSortFilterProxyModel
 	Q_PROPERTY(int count READ getCount() NOTIFY countChanged())
 	Q_PROPERTY(QString sortField READ getSortField() WRITE setSortField(field))
 	Q_PROPERTY(Qt::SortOrder sortOrder READ sortOrder() WRITE setSortOrder(order))
-	Q_PROPERTY(SqlTableModel *sourceModel READ sourceModel() WRITE setSourceModel(model))
+	Q_PROPERTY(SqlQueryModel *sourceModel READ sourceModel() WRITE setSourceModel(model))
 	Q_PROPERTY(QString filterField READ getFilterField() WRITE setFilterField(field))
 	Q_PROPERTY(QString filter READ getFilter() WRITE setFilter(filter))
 
@@ -20,8 +20,8 @@ public:
 
 	int getCount() { this->count = this->rowCount(); return count; }
 
-	SqlTableModel *sourceModel() const;
-	void setSourceModel(SqlTableModel *sourceModel);
+	SqlQueryModel *sourceModel() const;
+	void setSourceModel(SqlQueryModel *sourceModel);
 
 	const QString &getSortField() const { return _sortField; }
 	void setSortField(const QString &field);

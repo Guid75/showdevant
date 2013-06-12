@@ -67,6 +67,12 @@ int DatabaseManager::openDB()
 	// TODO: use ids for all tables
 	QSqlQuery query;
 
+	// my shows
+	if (!createTable(query, "myshows",
+					 "(show_id text, title text, archive integer, "
+					 "UNIQUE (show_id) ON CONFLICT REPLACE)"))
+		return ret;
+
 	// shows
 	if (!createTable(query, "show",
 					 "(show_id text primary key, last_sync integer, title text, "

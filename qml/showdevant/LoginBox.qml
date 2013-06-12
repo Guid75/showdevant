@@ -5,10 +5,8 @@ import QtQuick.Controls.Styles 1.0
 import com.guid75 1.0
 import "commands.js" as Commands
 
-
 ModalBox {
-	signal cancel()
-	signal login(string user, string password, bool rememberMe)
+	signal closeMe()
 
 	Keys.onPressed: {
 		if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
@@ -30,6 +28,14 @@ ModalBox {
 			return;
 
 		authenticator.login(user, password, rememberMe);
+	}
+
+	Connections {
+		target: authenticator
+		onLogStateChanged: {
+			if (authenticator.logState === Authenticator.Logged)
+				closeMe();
+		}
 	}
 
 	ShadowRectangle {
@@ -135,9 +141,17 @@ ModalBox {
 			Button {
 				text: 'Cancel'
 				onClicked: {
-					cancel();
+					closeMe();
 				}
 			}
+		}
+	}
+	Loader {
+		anchors.fill: loginRectangle
+		asynchronous: true
+		active: authenticator.logState === Authenticator.Logging
+		sourceComponent: LoadingMask {
+			anchors.fill: parent
 		}
 	}
 }
