@@ -17,6 +17,7 @@
 #include "sortfilterproxymodel.h"
 #include "cache.h"
 #include "cachewatcher.h"
+#include "cacheqmlproxy.h"
 #include "authenticator.h"
 #include "myshowsmodel.h"
 
@@ -53,6 +54,8 @@ int main(int argc, char *argv[])
 	Authenticator authenticator;
 	viewer.rootContext()->setContextProperty("authenticator", &authenticator);
 
+	CacheQmlProxy cacheQmlProxy;
+	viewer.rootContext()->setContextProperty("cacheQmlProxy", &cacheQmlProxy);
 	viewer.rootContext()->setContextProperty("commandManager", &CommandManager::instance());
 	viewer.rootContext()->setContextProperty("downloadManager", &DownloadManager::instance());
 	viewer.rootContext()->setContextProperty("databaseManager", &DatabaseManager::instance());

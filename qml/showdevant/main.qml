@@ -3,9 +3,7 @@ import QtQuick.LocalStorage 2.0
 import com.guid75 1.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
-import "notifications.js" as Notifications
 import "commands.js" as Commands
-//import "database.js" as Database
 
 Rectangle {
 	id: root
@@ -19,16 +17,6 @@ Rectangle {
 	MyShowsModel {
 		id: myShowsModel
 	}
-
-//	SortFilterProxyModel {
-//		id: showProxyModel
-//		sourceModel: showModel
-//		sortField: "title"
-//		sortOrder: Qt.AscendingOrder
-//		sortCaseSensitivity: Qt.CaseInsensitive
-//		filterField: "title"
-//		filterCaseSensitivity: Qt.CaseInsensitive
-//	}
 
 	SortFilterProxyModel {
 		id: showProxyModel
@@ -54,6 +42,13 @@ Rectangle {
 				// TODO refresh the show model with all user shows
 				cache.synchronizeMemberInfos();
 			}
+		}
+	}
+
+	Connections {
+		target: cacheQmlProxy
+		onShowAdded: {
+			notifyZone.notify('"%1" as been added to your followed tv shows'.arg(title), 4000);
 		}
 	}
 
@@ -281,6 +276,16 @@ Rectangle {
 		}
 		target: topToolbar
 		duration: 750
+	}
+
+	NotifyZone {
+		id: notifyZone
+		anchors {
+			horizontalCenter: parent.horizontalCenter
+			top: parent.top
+			bottom: parent.bottom
+		}
+		width: parent.width
 	}
 
 	Loader {

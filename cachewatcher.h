@@ -15,6 +15,7 @@ class CacheWatcher : public QObject
 
 public:
 	enum SynchronizeState {
+		Unsynchronized,
 		Synchronizing,
 		Synchronized,
 		SynchronizeError
@@ -38,7 +39,7 @@ protected:
 
 private:
 	SynchronizeState _synchronizeState;
-	QMultiMap<Cache::CacheDataType,QVariantMap > watching;
+	QMultiMap<Cache::CacheDataType,QVariantMap> watching;
 
 private slots:
 	void synchronizing(Cache::CacheDataType dataType, const QVariantMap &id);

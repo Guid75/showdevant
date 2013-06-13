@@ -75,4 +75,12 @@ Rectangle {
 		section.delegate: showSectionDelegate
 		delegate: showDelegate
 	}
+	Loader {
+		id: loadingMask
+		anchors.fill: parent
+		sourceComponent: LoadingMask {
+		}
+		active: myShowsModel.synchronizeState === CacheWatcher.Synchronizing
+		asynchronous: true
+	}
 }

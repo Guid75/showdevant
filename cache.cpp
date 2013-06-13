@@ -278,6 +278,37 @@ void Cache::parseMemberInfos(const QByteArray &response)
 	QSqlDatabase::database().commit();
 }
 
+void Cache::parseAddShow(const QString &showId, const QString &title, const QByteArray &response)
+{
+	JsonParser parser(response);
+	if (!parser.isValid()) {
+		// TODO manage error
+		return;
+	}
+
+	if (parser.code() == 0) {
+		// TODO manage error code
+		return;
+	}
+
+	if (!QSqlDatabase::database().transaction()) {
+		qCritical("Error while beginning a transaction for SQL insertion");
+		return;
+	}
+
+	QSqlQuery query;
+	query.prepare("INSERT INTO myshows (show_id, title, archive) "
+				  "VALUES (:show_id, :title, :archive)");
+	query.bindValue(":show_id", showId);
+	query.bindValue(":title", title);
+	query.bindValue(":archive", 0);
+	query.exec();
+
+	QSqlDatabase::database().commit();
+
+	emit showAdded(title);
+}
+
 void Cache::showInfosCallback(const QVariantMap &id, const QByteArray &response)
 {
 	QString showId = id["showId"].toString();
@@ -297,6 +328,12 @@ void Cache::memberInfosCallback(const QVariantMap &id, const QByteArray &respons
 {
 	parseMemberInfos(response);
 	emit synchronized(Data_MemberInfos, id);
+}
+
+void Cache::addShowCallback(const QVariantMap &id, const QByteArray &response)
+{
+	parseAddShow(id["showId"].toString(), id["title"].toString(), response);
+	emit synchronized(Data_AddShow, id);
 }
 
 int Cache::synchronizeShowInfos(const QString &showId)
@@ -402,10 +439,10 @@ int Cache::synchronizeMemberInfos()
 	QVariantMap id;
 
 	// expired data, we need to launch the request if not already done
-	emit synchronizing(Data_ShowInfos, id);
+	emit synchronizing(Data_MemberInfos, id);
 
 	// is there a current action about it?
-	SynchronizeAction *action = getAction(Data_ShowInfos, id);
+	SynchronizeAction *action = getAction(Data_MemberInfos, id);
 	if (action) {
 		// just wait for the end of it
 		return 1;
@@ -417,6 +454,36 @@ int Cache::synchronizeMemberInfos()
 	action->id = id;
 	action->callbackMethodName = "memberInfosCallback";
 	Command *command = CommandManager::instance().membersInfos();
+	action->commands << command;
+	currentActions << action;
+	commandMapper.setMapping(command, command);
+	connect(command, SIGNAL(finished()), &commandMapper, SLOT(map()));
+	return 1;
+}
+
+int Cache::addShow(const QString &showId, const QString &title)
+{
+	QVariantMap id;
+	id.insert("showId", showId);
+	id.insert("title", title);
+
+	// expired data, we need to launch the request if not already done
+	emit synchronizing(Data_AddShow, id);
+
+	// is there a current action about it?
+	// no particular reasons to forbid the same add show command for the same show id here
+/*	SynchronizeAction *action = getAction(Data_AddShow, id);
+	if (action) {
+		// just wait for the end of it
+		return 1;
+	}*/
+
+	// store the synchronize action
+	SynchronizeAction *action = new SynchronizeAction;
+	action->dataType = Data_AddShow;
+	action->id = id;
+	action->callbackMethodName = "addShowCallback";
+	Command *command = CommandManager::instance().showsAdd(showId);
 	action->commands << command;
 	currentActions << action;
 	commandMapper.setMapping(command, command);

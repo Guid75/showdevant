@@ -32,7 +32,8 @@ SOURCES += main.cpp \
     cachewatcher.cpp \
     settings.cpp \
     authenticator.cpp \
-    myshowsmodel.cpp
+    myshowsmodel.cpp \
+    cacheqmlproxy.cpp
 
 # Installation path
 # target.path =
@@ -46,8 +47,6 @@ OTHER_FILES += \
     README.md \
     qml/showdevant/SearchResultList.qml \
     qml/showdevant/ShowList.qml \
-    qml/showdevant/notifications.js \
-    qml/showdevant/NotificationBox.qml \
     qml/showdevant/MessageBox.qml \
     TODO.txt \
     qml/showdevant/SeasonItem.qml \
@@ -62,7 +61,9 @@ OTHER_FILES += \
     api_samples/shows_display.json \
     qml/showdevant/LoginBox.qml \
     qml/showdevant/ModalBox.qml \
-    qml/showdevant/LoadingMask.qml
+    qml/showdevant/LoadingMask.qml \
+    qml/showdevant/NotifyZone.qml \
+    qml/showdevant/NotifyBox.qml
 
 HEADERS += \
     downloadmanager.h \
@@ -82,4 +83,5 @@ HEADERS += \
     cachewatcher.h \
     settings.h \
     authenticator.h \
-    myshowsmodel.h
+    myshowsmodel.h \
+    cacheqmlproxy.h

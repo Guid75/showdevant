@@ -155,49 +155,43 @@ ShadowRectangle {
 		}
 	}
 
-	//	Rectangle {
-	//		id: searchButton
-	//		color: "#FFFF88"
-	//		border.color: "#888888"
-	//		border.width: 1
-	//		antialiasing: true
-	//		smooth: true
-	//		radius: 4
-	//		width: 70
-	//		height: 30
-	//		clip: true
-	//		anchors {
-	//			leftMargin: 5
-	//			left: searchRectangle.right
-	//			verticalCenter: parent.verticalCenter
-	//		}
-	//		Image {
-	//			source: "search.png"
-	//			smooth: true
-	//			anchors {
-	//				horizontalCenter: parent.horizontalCenter
-	//				verticalCenter: parent.verticalCenter
-	//			}
-	//			width: 16
-	//			height: 16
-	//		}
-
-	//		/*		Text {
-	//			id: searchButtonText
-	//			color: "white"
-	//			horizontalAlignment: Text.AlignHCenter
-	//			text: "<b>search</b>"
-	//			clip: true
-	//			anchors.fill: parent
-	//			anchors.leftMargin: 8
-	//			anchors.rightMargin: 8
-	//			anchors.topMargin: 8
-	//		}*/
-	//		MouseArea {
-	//			anchors.fill: parent
-	//			onClicked: searchButton.focus = true
-	//		}
-	//	}
+		Rectangle {
+			id: searchButton
+			color: "#FFFF88"
+			border.color: "#888888"
+			border.width: 1
+			antialiasing: true
+			smooth: true
+			radius: 4
+			width: 70
+			height: 30
+			clip: true
+			anchors {
+				leftMargin: 5
+				left: searchRectangle.right
+				verticalCenter: parent.verticalCenter
+			}
+			Image {
+				source: "search.png"
+				smooth: true
+				anchors {
+					horizontalCenter: parent.horizontalCenter
+					verticalCenter: parent.verticalCenter
+				}
+				width: 16
+				height: 16
+			}
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+				onClicked: {
+					console.log("pouet");
+					notifyZone.notify("zselmfkjzemlfkdzjmlekje", 2000);
+					searchButton.focus = true
+				}
+			}
+		}
 
 	Component {
 		id: loggedComponent

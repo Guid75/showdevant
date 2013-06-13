@@ -17,7 +17,7 @@
 #include "jsonparser.h"
 
 JsonParser::JsonParser(const QByteArray &content)
-    : valid(false)
+	: valid(false)
 {
 	if (content.isEmpty())
 		return;
@@ -49,6 +49,7 @@ bool JsonParser::parse(const QByteArray &content)
 	}
 
 	_root = val.toObject();
+	_code = (int) _root.value("code").toDouble();
 	valid = true;
 	return true;
 }

@@ -5,8 +5,8 @@
 MyShowsModel::MyShowsModel(QObject *parent) :
 	SqlQueryModel(parent)
 {
-	QVariantMap id;
-	cacheWatcher.watchFor(Cache::Data_MemberInfos, id);
+	cacheWatcher.watchFor(Cache::Data_MemberInfos, QVariantMap());
+	cacheWatcher.watchFor(Cache::Data_AddShow, QVariantMap());
 	select();
 }
 

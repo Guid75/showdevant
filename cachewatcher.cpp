@@ -1,7 +1,8 @@
 #include "cachewatcher.h"
 
 CacheWatcher::CacheWatcher(QObject *parent) :
-    QObject(parent)
+	QObject(parent),
+	_synchronizeState(Unsynchronized)
 {
 
 	connect(&Cache::instance(), &Cache::synchronizing,
@@ -25,7 +26,21 @@ void CacheWatcher::setSynchronizeState(CacheWatcher::SynchronizeState state)
 
 bool CacheWatcher::watchable(Cache::CacheDataType dataType, const QVariantMap &id)
 {
-	return watching.values(dataType).indexOf(id) >= 0;
+	foreach (const QVariantMap &watchingId, watching.values(dataType)) {
+		bool ok = true;
+		// all watching keys values must be included into the challenged id
+		foreach (const QString &key, watchingId.keys()) {
+			if (watchingId[key] != id[key]) {
+				ok = false;
+				break;
+			}
+		}
+		if (ok)
+			return true;
+	}
+
+	return false;
+//	return watching.values(dataType).indexOf(id) >= 0;
 }
 
 void CacheWatcher::synchronizing(Cache::CacheDataType dataType, const QVariantMap &id)

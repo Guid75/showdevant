@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include <QNetworkReply>
+#include <QUrlQuery>
 
 class QNetworkAccessManager;
 class Command;
@@ -22,6 +23,7 @@ public:
 	Command *showsSearch(const QString &expression);
 	Command *showsDisplay(const QString &showId);
 	Command *showsEpisodes(const QString &showId, int season = -1, int episode = -1, bool summary = true, bool hide_notes = true);
+	Command *showsAdd(const QString &showId);
 
 	// subtitles commands
 	Command *subtitlesShow(const QString &showId, int season = -1, int episode = -1, const QString &language = QString());
@@ -38,7 +40,10 @@ private:
 	QString authToken;
 
 	explicit CommandManager(QObject *parent = 0);
-	Command *pushCommand(const QString &url);
+
+	Command *pushCommand(const QString &path, const QString &command, const QVariantMap &arguments = QVariantMap());
+
+	static QUrlQuery forgeQuery(const QString &path, const QString &postfix = "");
 
 private slots:
 	void httpFinished();

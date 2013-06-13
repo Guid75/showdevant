@@ -28,14 +28,17 @@ public:
 
 	bool parse(const QByteArray &content);
 
-    const QJsonObject &root() const { return _root; }
+	const QJsonObject &root() const { return _root; }
 
-    bool isValid() const { return valid; }
+	int code() const { return _code; }
+
+	bool isValid() const { return valid; }
 
 private:
-    bool valid;
-    QJsonDocument doc;
-    QJsonObject _root;
+	bool valid;
+	QJsonDocument doc;
+	QJsonObject _root;
+	int _code;
 };
 
 #endif // JSONPARSER_H
