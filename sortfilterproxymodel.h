@@ -32,6 +32,8 @@ public:
 	const QString &getFilter() const { return _filter; }
 	void setFilter(const QString &filter);
 
+	Q_INVOKABLE QVariant get(int row);
+
 signals:
 	void countChanged();
 

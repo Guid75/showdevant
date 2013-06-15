@@ -7,4 +7,6 @@ CacheQmlProxy::CacheQmlProxy(QObject *parent) :
 {
 	connect(&Cache::instance(), &Cache::showAdded,
 			this, &CacheQmlProxy::showAdded);
+	connect(&Cache::instance(), &Cache::showRemoved,
+			this, &CacheQmlProxy::showRemoved);
 }

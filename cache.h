@@ -33,7 +33,8 @@ public:
 		Data_ShowInfos,
 		Data_Episodes,
 		Data_MemberInfos,
-		Data_AddShow
+		Data_AddShow,
+		Data_RemoveShow
 	};
 
 	static Cache &instance();
@@ -49,11 +50,14 @@ public:
 
 	Q_INVOKABLE int addShow(const QString &showId, const QString &title);
 
+	Q_INVOKABLE int removeShow(const QString &showId);
+
 signals:
 	void synchronizing(CacheDataType dataType, const QVariantMap &id);
 	void synchronized(CacheDataType dataType, const QVariantMap &id);
 	void synchronizeFailed(CacheDataType dataType, const QVariantMap &id);
 	void showAdded(const QString &title);
+	void showRemoved(const QString &title);
 
 private:
 	QThread *thread;
@@ -86,13 +90,15 @@ private slots:
 	void parseSeasons(const QString &showId, const QByteArray &response, bool allEpisodes);
 	void parseShowInfos(const QString &showId, const QByteArray &response);
 	void parseMemberInfos(const QByteArray &response);
-	void parseAddShow(const QString &showId, const QString &title, const QByteArray &response);
+	bool parseAddShow(const QString &showId, const QString &title, const QByteArray &response);
+	bool parseRemoveShow(const QString &showId, const QByteArray &response);
 
 	// action callbacks
 	void showInfosCallback(const QVariantMap &id, const QByteArray &response);
 	void episodesCallback(const QVariantMap &id, const QByteArray &response);
 	void memberInfosCallback(const QVariantMap &id, const QByteArray &response);
 	void addShowCallback(const QVariantMap &id, const QByteArray &response);
+	void removeShowCallback(const QVariantMap &id, const QByteArray &response);
 };
 
 #endif // CACHE_H

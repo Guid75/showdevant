@@ -74,3 +74,9 @@ void SortFilterProxyModel::setFilter(const QString &filter)
 		this->setFilterFixedString(filter);
 	/*}*/
 }
+
+QVariant SortFilterProxyModel::get(int row)
+{
+	QModelIndex sourceIdx = mapToSource(index(row, 0));
+	return sourceModel()->get(sourceIdx.row());
+}

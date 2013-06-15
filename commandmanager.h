@@ -24,6 +24,7 @@ public:
 	Command *showsDisplay(const QString &showId);
 	Command *showsEpisodes(const QString &showId, int season = -1, int episode = -1, bool summary = true, bool hide_notes = true);
 	Command *showsAdd(const QString &showId);
+	Command *showsRemove(const QString &showId);
 
 	// subtitles commands
 	Command *subtitlesShow(const QString &showId, int season = -1, int episode = -1, const QString &language = QString());
@@ -42,6 +43,7 @@ private:
 	explicit CommandManager(QObject *parent = 0);
 
 	Command *pushCommand(const QString &path, const QString &command, const QVariantMap &arguments = QVariantMap());
+	Command *pushCommandAuth(const QString &path, const QString &command, const QVariantMap &arguments = QVariantMap());
 
 	static QUrlQuery forgeQuery(const QString &path, const QString &postfix = "");
 

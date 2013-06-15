@@ -48,7 +48,10 @@ Rectangle {
 	Connections {
 		target: cacheQmlProxy
 		onShowAdded: {
-			notifyZone.notify('"%1" as been added to your followed tv shows'.arg(title), 4000);
+			notifyZone.notify('"%1" as been <b>added</b> to your followed tv shows'.arg(title), 4000);
+		}
+		onShowRemoved: {
+			notifyZone.notify('"%1" as been <b>removed</b> from your followed tv shows'.arg(title), 4000);
 		}
 	}
 
@@ -286,6 +289,36 @@ Rectangle {
 			bottom: parent.bottom
 		}
 		width: parent.width
+	}
+
+	BubbleMenu {
+		id: bubbleMenu
+		visible: false
+		bubbleX: showList.width - 10
+		Behavior on bubbleY {
+			NumberAnimation { duration: 100 }
+		}
+		model: ListModel {
+			ListElement {
+				text: "Remove"
+				name: "remove"
+			}
+			ListElement {
+				text: "Archive"
+				name: "archive"
+			}
+			ListElement {
+				text: "Refresh"
+				name: "refresh"
+			}
+		}
+		onItemClicked: {
+			if (name === "remove") {
+				console.log("remove");
+				var showId = showProxyModel.get(showList.currentShowIndex).show_id;
+				cache.removeShow(showId);
+			}
+		}
 	}
 
 	Loader {

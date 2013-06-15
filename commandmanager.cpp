@@ -78,6 +78,13 @@ Command *CommandManager::pushCommand(const QString &path, const QString &cmd, co
 	return command;
 }
 
+Command *CommandManager::pushCommandAuth(const QString &path, const QString &command, const QVariantMap &arguments)
+{
+	Q_ASSERT(!authToken.isEmpty());
+
+	pushCommand(path, command, arguments);
+}
+
 
 QUrlQuery CommandManager::forgeQuery(const QString &path, const QString &postfix)
 {
@@ -123,9 +130,14 @@ Command *CommandManager::showsEpisodes(const QString &showId, int season, int ep
 
 Command *CommandManager::showsAdd(const QString &showId)
 {
+	return pushCommandAuth("shows/add", showId);
+}
+
+Command *CommandManager::showsRemove(const QString &showId)
+{
 	Q_ASSERT(!authToken.isEmpty());
 
-	return pushCommand("shows/add", showId);
+	return pushCommandAuth("shows/remove", showId);
 }
 
 Command *CommandManager::subtitlesShow(const QString &showId, int season, int episode, const QString &language)

@@ -9,9 +9,9 @@ class CacheQmlProxy : public QObject
 public:
 	explicit CacheQmlProxy(QObject *parent = 0);
 
-
 signals:
 	void showAdded(const QString &title);
+	void showRemoved(const QString &title);
 
 public slots:
 	

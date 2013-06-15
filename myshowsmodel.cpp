@@ -7,6 +7,7 @@ MyShowsModel::MyShowsModel(QObject *parent) :
 {
 	cacheWatcher.watchFor(Cache::Data_MemberInfos, QVariantMap());
 	cacheWatcher.watchFor(Cache::Data_AddShow, QVariantMap());
+	cacheWatcher.watchFor(Cache::Data_RemoveShow, QVariantMap());
 	select();
 }
 

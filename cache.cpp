@@ -278,22 +278,22 @@ void Cache::parseMemberInfos(const QByteArray &response)
 	QSqlDatabase::database().commit();
 }
 
-void Cache::parseAddShow(const QString &showId, const QString &title, const QByteArray &response)
+bool Cache::parseAddShow(const QString &showId, const QString &title, const QByteArray &response)
 {
 	JsonParser parser(response);
 	if (!parser.isValid()) {
 		// TODO manage error
-		return;
+		return false;
 	}
 
 	if (parser.code() == 0) {
 		// TODO manage error code
-		return;
+		return false;
 	}
 
 	if (!QSqlDatabase::database().transaction()) {
 		qCritical("Error while beginning a transaction for SQL insertion");
-		return;
+		return false;
 	}
 
 	QSqlQuery query;
@@ -305,8 +305,35 @@ void Cache::parseAddShow(const QString &showId, const QString &title, const QByt
 	query.exec();
 
 	QSqlDatabase::database().commit();
+	return true;
+}
 
-	emit showAdded(title);
+bool Cache::parseRemoveShow(const QString &showId, const QByteArray &response)
+{
+	JsonParser parser(response);
+	if (!parser.isValid()) {
+		// TODO manage error
+		return false;
+	}
+
+	if (parser.code() == 0) {
+		// TODO manage error code
+		return false;
+	}
+
+	if (!QSqlDatabase::database().transaction()) {
+		qCritical("Error while beginning a transaction for SQL insertion");
+		return false;
+	}
+
+	QSqlQuery query;
+
+	query.prepare("DELETE FROM myshows WHERE show_id=:show_id");
+	query.bindValue(":show_id", showId);
+	query.exec();
+
+	QSqlDatabase::database().commit();
+	return true;
 }
 
 void Cache::showInfosCallback(const QVariantMap &id, const QByteArray &response)
@@ -332,8 +359,25 @@ void Cache::memberInfosCallback(const QVariantMap &id, const QByteArray &respons
 
 void Cache::addShowCallback(const QVariantMap &id, const QByteArray &response)
 {
-	parseAddShow(id["showId"].toString(), id["title"].toString(), response);
+	if (parseAddShow(id["showId"].toString(), id["title"].toString(), response))
+		emit showAdded(id["title"].toString());
 	emit synchronized(Data_AddShow, id);
+}
+
+void Cache::removeShowCallback(const QVariantMap &id, const QByteArray &response)
+{
+	// get the title into the database
+	QSqlQuery query;
+	query.prepare("SELECT title FROM myshows WHERE show_id=:show_id");
+	query.bindValue(":show_id", id["showId"]);
+	query.exec();
+	QString title;
+	if (query.next())
+		title = query.value("title").toString();
+
+	if (parseRemoveShow(id["showId"].toString(), response))
+		emit showRemoved(title);
+	emit synchronized(Data_RemoveShow, id);
 }
 
 int Cache::synchronizeShowInfos(const QString &showId)
@@ -484,6 +528,27 @@ int Cache::addShow(const QString &showId, const QString &title)
 	action->id = id;
 	action->callbackMethodName = "addShowCallback";
 	Command *command = CommandManager::instance().showsAdd(showId);
+	action->commands << command;
+	currentActions << action;
+	commandMapper.setMapping(command, command);
+	connect(command, SIGNAL(finished()), &commandMapper, SLOT(map()));
+	return 1;
+}
+
+int Cache::removeShow(const QString &showId)
+{
+	QVariantMap id;
+	id.insert("showId", showId);
+
+	// expired data, we need to launch the request if not already done
+	emit synchronizing(Data_RemoveShow, id);
+
+	// store the synchronize action
+	SynchronizeAction *action = new SynchronizeAction;
+	action->dataType = Data_RemoveShow;
+	action->id = id;
+	action->callbackMethodName = "removeShowCallback";
+	Command *command = CommandManager::instance().showsRemove(showId);
 	action->commands << command;
 	currentActions << action;
 	commandMapper.setMapping(command, command);
