@@ -295,9 +295,6 @@ Rectangle {
 		id: bubbleMenu
 		visible: false
 		bubbleX: showList.width - 10
-		Behavior on bubbleY {
-			NumberAnimation { duration: 100 }
-		}
 		model: ListModel {
 			ListElement {
 				text: "Remove"

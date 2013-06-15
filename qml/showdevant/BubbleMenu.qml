@@ -24,10 +24,12 @@ Item {
 		id: bubbleItem
 		width: 70
 		height: 48
+		Behavior on y {
+			NumberAnimation { duration: 100 }
+		}
 
 		Canvas {
 			id: canvas
-			//antialiasing: false
 			property string strokeStyle: "#888888"
 			property string fillStyle: "#EEEEEE"
 			property double lineWidth: 1
@@ -36,8 +38,6 @@ Item {
 				top: parent.top
 				bottom: parent.bottom
 			}
-			//		x: 0
-			//		width: 10
 			onPaint: {
 				var ctx = canvas.getContext('2d');
 				ctx.translate(0.5, 0.5); // prevent bluring effect
