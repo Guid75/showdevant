@@ -34,7 +34,8 @@ public:
 		Data_Episodes,
 		Data_MemberInfos,
 		Data_AddShow,
-		Data_RemoveShow
+		Data_RemoveShow,
+		Data_ArchiveShow
 	};
 
 	static Cache &instance();
@@ -51,6 +52,8 @@ public:
 	Q_INVOKABLE int addShow(const QString &showId, const QString &title);
 
 	Q_INVOKABLE int removeShow(const QString &showId);
+
+	Q_INVOKABLE int archiveShow(const QString &showId);
 
 signals:
 	void synchronizing(CacheDataType dataType, const QVariantMap &id);
@@ -99,6 +102,7 @@ private slots:
 	void memberInfosCallback(const QVariantMap &id, const QByteArray &response);
 	void addShowCallback(const QVariantMap &id, const QByteArray &response);
 	void removeShowCallback(const QVariantMap &id, const QByteArray &response);
+	void archiveShowCallback(const QVariantMap &id, const QByteArray &response);
 };
 
 #endif // CACHE_H

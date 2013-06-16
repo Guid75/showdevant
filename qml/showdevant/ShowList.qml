@@ -4,10 +4,26 @@ import com.guid75 1.0
 import "showmanager.js" as ShowManager
 
 Rectangle {
+	id: showList
 	color: "#00000000"
 	property alias model : listView.model
 	property alias currentShowIndex : listView.currentIndex
 	signal showSelected(string showId, string title)
+
+	function overDropDown(x, y) {
+		var a = listView.mapFromItem(null, x, y)
+		var item = listView.itemAt(a.x, a.y);
+
+		if (!item)
+			return false;
+
+		a = item.mapFromItem(null, x, y);
+		var image = item.childAt(a.x, a.y);
+		if (!image)
+			return false;
+
+		return image && image.objectName === 'dropDownImage';
+	}
 
 	Menu {
 		id: showMenu
@@ -28,7 +44,7 @@ Rectangle {
 			id: showItem
 			width: parent.width
 			height: 20
-			color: itemMouseArea.containsMouse ? "white" : (ListView.isCurrentItem ? "#FFEECC" : "#DDDDDD")
+			color: (itemMouseArea.containsMouse || dropDownMouseArea.containsMouse) ? "white" : (ListView.isCurrentItem ? "#FFEECC" : "#DDDDDD")
 			clip: true
 			Text {
 				x: 8
@@ -42,6 +58,12 @@ Rectangle {
 				cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
 				id: itemMouseArea
 				anchors.fill: parent
+/*				onEntered: {
+					dropDownImage.visible = true;
+				}
+				onExited: {
+					dropDownImage.visible = false;
+				}*/
 				hoverEnabled: true
 				onClicked: {
 					listView.currentIndex = index;
@@ -49,7 +71,10 @@ Rectangle {
 				}
 			}
 			Image {
-				visible: itemMouseArea.containsMouse
+				id: dropDownImage
+				objectName: "dropDownImage"
+//				visible: false
+				visible: /*authenticator.isLogged() && */itemMouseArea.containsMouse// || dropDownMouseArea.containsMouse
 				anchors {
 					right: parent.right
 					verticalCenter: parent.verticalCenter
@@ -57,7 +82,9 @@ Rectangle {
 				}
 				source: "dropdown.png"
 				MouseArea {
+					id: dropDownMouseArea
 					anchors.fill: parent
+//					hoverEnabled: true
 					onClicked: {
 						listView.currentIndex = index;
 						var item = showItem;

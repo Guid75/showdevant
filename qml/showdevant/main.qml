@@ -310,10 +310,20 @@ Rectangle {
 			}
 		}
 		onItemClicked: {
-			if (name === "remove") {
-				console.log("remove");
-				var showId = showProxyModel.get(showList.currentShowIndex).show_id;
+			var showId;
+			switch (name) {
+			case "remove":
+				showId = showProxyModel.get(showList.currentShowIndex).show_id;
 				cache.removeShow(showId);
+				break;
+			default:
+				break;
+			}
+		}
+		onPressOutside: {
+			// if we are clicking on another show dropdown, don't hide the bubble menu
+			if (!showList.overDropDown(x, y)) {
+				bubbleMenu.visible = false;
 			}
 		}
 	}

@@ -135,9 +135,12 @@ Command *CommandManager::showsAdd(const QString &showId)
 
 Command *CommandManager::showsRemove(const QString &showId)
 {
-	Q_ASSERT(!authToken.isEmpty());
-
 	return pushCommandAuth("shows/remove", showId);
+}
+
+Command *CommandManager::showsArchive(const QString &showId)
+{
+	return pushCommandAuth("shows/archive", showId);
 }
 
 Command *CommandManager::subtitlesShow(const QString &showId, int season, int episode, const QString &language)

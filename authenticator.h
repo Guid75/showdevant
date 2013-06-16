@@ -40,6 +40,8 @@ public:
 
 	Q_INVOKABLE void forgetMe();
 
+	Q_INVOKABLE bool isLogged() const  { return _logState == Logged; }
+
 	LogState logState() const { return _logState; }
 
 	const QString &user() const { return _user; }

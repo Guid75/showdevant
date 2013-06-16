@@ -25,6 +25,7 @@ public:
 	Command *showsEpisodes(const QString &showId, int season = -1, int episode = -1, bool summary = true, bool hide_notes = true);
 	Command *showsAdd(const QString &showId);
 	Command *showsRemove(const QString &showId);
+	Command *showsArchive(const QString &showId);
 
 	// subtitles commands
 	Command *subtitlesShow(const QString &showId, int season = -1, int episode = -1, const QString &language = QString());

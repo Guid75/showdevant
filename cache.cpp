@@ -380,6 +380,12 @@ void Cache::removeShowCallback(const QVariantMap &id, const QByteArray &response
 	emit synchronized(Data_RemoveShow, id);
 }
 
+void Cache::archiveShowCallback(const QVariantMap &id, const QByteArray &response)
+{
+	// TODO
+	emit synchronized(Data_ArchiveShow, id);
+}
+
 int Cache::synchronizeShowInfos(const QString &showId)
 {
 	qint64 last_sync_epoch = 0;
@@ -549,6 +555,27 @@ int Cache::removeShow(const QString &showId)
 	action->id = id;
 	action->callbackMethodName = "removeShowCallback";
 	Command *command = CommandManager::instance().showsRemove(showId);
+	action->commands << command;
+	currentActions << action;
+	commandMapper.setMapping(command, command);
+	connect(command, SIGNAL(finished()), &commandMapper, SLOT(map()));
+	return 1;
+}
+
+int Cache::archiveShow(const QString &showId)
+{
+	QVariantMap id;
+	id.insert("showId", showId);
+
+	// expired data, we need to launch the request if not already done
+	emit synchronizing(Data_ArchiveShow, id);
+
+	// store the synchronize action
+	SynchronizeAction *action = new SynchronizeAction;
+	action->dataType = Data_ArchiveShow;
+	action->id = id;
+	action->callbackMethodName = "archiveShowCallback";
+	Command *command = CommandManager::instance().showsArchive(showId);
 	action->commands << command;
 	currentActions << action;
 	commandMapper.setMapping(command, command);

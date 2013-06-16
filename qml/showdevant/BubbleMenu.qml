@@ -3,6 +3,7 @@ import QtQuick 2.0
 Item {
 	id: bubbleMenu
 	signal itemClicked(string name);
+	signal pressOutside(int x, int y);
 	property alias model : listView.model
 
 	property alias bubbleX : bubbleItem.x
@@ -15,7 +16,8 @@ Item {
 		anchors.fill: parent
 		propagateComposedEvents: true
 		onPressed: {
-			parent.visible = false;
+			//parent.visible = false;
+			pressOutside(mouse.x, mouse.y);
 			mouse.accepted = false;
 		}
 	}
