@@ -10,6 +10,8 @@ Rectangle {
 	width: 1024
 	height: 768
 
+	property int morphAnimationTime : 500
+
 	ShowModel {
 		id: showModel
 	}
@@ -171,9 +173,6 @@ Rectangle {
 			RangeSelector {
 				id: seasonSelector
 				currentTemplate: "Season %1/%2"
-				Behavior on height {
-					NumberAnimation { from: 20; to: 40; duration: 500 }
-				}
 				anchors {
 					left: parent.left
 					right: parent.right
@@ -182,7 +181,6 @@ Rectangle {
 				}
 				visible: false
 				onCurrentIndexChanged: {
-					//					episodeListModel.season = current;
 					episodeSelector.current = 1;
 					if (playgroundLoader.item.widgetType === "episodes") {
 						playgroundLoader.item.setCurrentSeason(current);
@@ -193,6 +191,7 @@ Rectangle {
 				}
 				onCloseMe: {
 					playgroundLoader.source = "SeasonsViewer.qml";
+
 					seasonSelector.visible = false;
 					episodeSelector.visible = false;
 				}
@@ -238,6 +237,97 @@ Rectangle {
 				}
 			}
 
+			Connections {
+				target: playgroundLoader.item
+				onSeasonClicked: {
+					seasonMorpher.x = x;
+					seasonMorpher.y = y;
+					seasonMorpher.width = w;
+					seasonMorpher.height = h;
+					seasonMorpher.current = season;
+					seasonMorpher.min = 1;
+					seasonMorpher.max = seasonListModel.count;
+					seasonMorpher.visible = true;
+					shadowSeasons.start();
+					seasonMorpherAnimation.initXY();
+					seasonMorpherAnimation.start();
+				}
+			}
+
+			NumberAnimation {
+				id: shadowSeasons
+				target: playgroundLoader.item
+				from: 1.0
+				to: 0.0
+				duration: morphAnimationTime
+				easing.type: Easing.InOutQuad
+				property: "opacity"
+				onStopped: {
+					seasonSelector.current = seasonMorpher.current;
+					seasonSelector.min = 1;
+					seasonSelector.max = seasonListModel.count;
+					seasonSelector.visible = true;
+					seasonMorpher.visible = false;
+					playgroundLoader.setSource("EpisodesViewer.qml", {
+												   currentSeason: seasonMorpher.current,
+												   currentShow: seasonListModel.show
+											   });
+				}
+			}
+
+			ParallelAnimation {
+				id: seasonMorpherAnimation
+				function initXY() {
+					seasonMorpherX.to = seasonSelector.mapToItem(null, 0, 0).x;
+					seasonMorpherY.to = seasonSelector.mapToItem(null, 0, 0).y;
+				}
+				NumberAnimation {
+					id: seasonMorpherX
+					target: seasonMorpher
+					property: "x"
+					//to: 205 //seasonSelector.mapToItem(null, 0, 0).x
+					easing.type: Easing.InOutQuad
+					duration: morphAnimationTime
+				}
+				NumberAnimation {
+					id: seasonMorpherY
+					target: seasonMorpher
+					property: "y"
+//					to: 158 //seasonSelector.mapToItem(null, 0, 0).y
+					easing.type: Easing.InOutQuad
+					duration: morphAnimationTime
+				}
+				NumberAnimation {
+					target: seasonMorpher
+					property: "width"
+					to: seasonSelector.width
+					easing.type: Easing.InOutQuad
+					duration: morphAnimationTime
+				}
+				NumberAnimation {
+					target: seasonMorpher
+					property: "height"
+					to: seasonSelector.height
+					easing.type: Easing.InOutQuad
+					duration: morphAnimationTime
+				}
+/*				NumberAnimation {
+					target: seasonMorpher
+					property: "fontSize"
+					from: 12
+					to: 13
+					easing.type: Easing.InOutQuad
+					duration: morphAnimationTime
+				}
+				NumberAnimation {
+					target: seasonMorpher
+					property: "secondaryTextOpacity"
+					from: 1
+					to: 0
+					easing.type: Easing.InOutQuad
+					duration: morphAnimationTime
+				}*/
+			}
 			Loader {
 				id: loadingWidget
 				anchors.centerIn: playgroundLoader
@@ -281,15 +371,16 @@ Rectangle {
 		duration: 750
 	}
 
-	NotifyZone {
-		id: notifyZone
-		anchors {
-			horizontalCenter: parent.horizontalCenter
-			top: parent.top
-			bottom: parent.bottom
-		}
-		width: parent.width
+	RangeSelector {
+		id: seasonMorpher
+		currentTemplate: "Season %1/%2"
+		visible: false
 	}
+
+/*	SeasonItem {
+		id: seasonMorpher
+		visible: false
+	}*/
 
 	BubbleMenu {
 		id: bubbleMenu
@@ -326,6 +417,16 @@ Rectangle {
 				bubbleMenu.visible = false;
 			}
 		}
+	}
+
+	NotifyZone {
+		id: notifyZone
+		anchors {
+			horizontalCenter: parent.horizontalCenter
+			top: parent.top
+			bottom: parent.bottom
+		}
+		width: parent.width
 	}
 
 	Loader {

@@ -58,12 +58,6 @@ Rectangle {
 				cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
 				id: itemMouseArea
 				anchors.fill: parent
-/*				onEntered: {
-					dropDownImage.visible = true;
-				}
-				onExited: {
-					dropDownImage.visible = false;
-				}*/
 				hoverEnabled: true
 				onClicked: {
 					listView.currentIndex = index;
@@ -73,7 +67,6 @@ Rectangle {
 			Image {
 				id: dropDownImage
 				objectName: "dropDownImage"
-//				visible: false
 				visible: /*authenticator.isLogged() && */itemMouseArea.containsMouse// || dropDownMouseArea.containsMouse
 				anchors {
 					right: parent.right

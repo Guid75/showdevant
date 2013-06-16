@@ -22,7 +22,7 @@ ToolBar {
 	}
 
 	Component.onCompleted: {
-		textBehavior.enabled = true;
+		//textBehavior.enabled = true;
 	}
 
 	RowLayout {

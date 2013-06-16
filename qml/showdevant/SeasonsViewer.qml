@@ -2,6 +2,8 @@ import QtQuick 2.0
 import com.guid75 1.0
 
 Item {
+	signal seasonClicked(int season, int episodeCount, int x, int y, int w, int h)
+
 	Flickable {
 		id: flickable
 		anchors.fill: parent
@@ -34,18 +36,12 @@ Item {
 				id: repeaterEpisode
 				model: seasonListModel
 				SeasonItem {
+					id: seasonItem
+					seasonNumber: number
+					episodeCount: episode_count
 					onItemClicked: {
-/*						episodeListModel.show = show_id;
-						episodeListModel.season = number;*/
-						seasonSelector.current = number;
-						seasonSelector.min = 1;
-						seasonSelector.max = seasonListModel.count;
-						seasonSelector.visible = true;
-						seasonSelector.height = 40;
-						playgroundLoader.setSource("EpisodesViewer.qml", {
-													   currentSeason: number,
-													   currentShow: show_id
-												   });
+						var ar = seasonItem.mapToItem(null, 0, 0);
+						seasonClicked(number, episode_count, ar.x, ar.y, seasonItem.width, seasonItem.height);
 					}
 				}
 			}

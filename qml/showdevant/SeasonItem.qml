@@ -1,6 +1,8 @@
 import QtQuick 2.0
 
 ShadowRectangle {
+	property int seasonNumber : 0
+	property int episodeCount : 0
 	signal itemClicked()
 	height: 50
 	width: 200
@@ -17,12 +19,14 @@ ShadowRectangle {
 			leftMargin: 4
 		}
 		Text {
-			text: "Season <b>" + number + "</b>"
+			id: mainText
+			text: "Season <b>" + seasonNumber + "</b>"
 			renderType: Text.NativeRendering
 			font.pointSize: 12
 		}
 		Text {
-			text: episode_count + " episodes"
+			id: secondaryText
+			text: episodeCount + " episodes"
 			renderType: Text.NativeRendering
 			font.pointSize: 8
 		}
