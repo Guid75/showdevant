@@ -239,6 +239,7 @@ Rectangle {
 
 			Connections {
 				target: playgroundLoader.item
+				ignoreUnknownSignals: true
 				onSeasonClicked: {
 					seasonMorpher.x = x;
 					seasonMorpher.y = y;

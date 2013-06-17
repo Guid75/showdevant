@@ -49,10 +49,8 @@ void SqlQueryModel::slotSynchronizeStateChanged()
 QVariant SqlQueryModel::data(const QModelIndex &index, int role) const
 {
 	QVariant value = QSqlQueryModel::data(index, role);
-	if(role < Qt::UserRole)
-	{
+	if (role < Qt::UserRole)
 		value = QSqlQueryModel::data(index, role);
-	}
 	else
 	{
 		int columnIdx = role - Qt::UserRole - 1;

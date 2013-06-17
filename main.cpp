@@ -20,12 +20,16 @@
 #include "cacheqmlproxy.h"
 #include "authenticator.h"
 #include "myshowsmodel.h"
+#include "jsonparser.h"
 
 #include "qtquick2applicationviewer.h"
 
 int main(int argc, char *argv[])
 {
 	QGuiApplication app(argc, argv);
+
+	// for invokeMethod
+	//qRegisterMetaType<JsonParser>("JsonParser");
 
 	Cache::instance().start();
 

@@ -26,7 +26,6 @@
 
 #include "commandmanager.h"
 #include "command.h"
-#include "jsonparser.h"
 #include "cache.h"
 
 Cache *Cache::_instance = 0;
@@ -91,7 +90,8 @@ void Cache::commandFinished(QObject *commandObj)
 	if (command->error())
 		emit synchronizeFailed(action->dataType, action->id);
 	else
-		QMetaObject::invokeMethod(this, action->callbackMethodName.toLocal8Bit(), Qt::DirectConnection, Q_ARG(QVariantMap, action->id), Q_ARG(QByteArray, command->response()));
+		QMetaObject::invokeMethod(this, action->callbackMethodName.toLocal8Bit(),
+								  Qt::DirectConnection, Q_ARG(QVariantMap, action->id), Q_ARG(JsonParser, command->jsonParser()));
 	command->deleteLater();
 }
 
@@ -109,13 +109,14 @@ void Cache::parseEpisodes(const QString &showId, int season, const QJsonObject &
 		QString number = episodeJson.value("number").toString();
 		int global = episodeJson.value("global").toString().toInt();
 		int date = episodeJson.value("date").toDouble();
+		bool seen = episodeJson.value("has_seen").toString() == "1"; // only valid when are logged
 		int comments = episodeJson.value("comments").toString().toInt();
 
 		QSqlQuery query;
 		query.prepare("REPLACE INTO episode (show_id, season, episode, title, description, number, global, "
-					  "date, comments) "
+					  "date, seen, comments) "
 					  "VALUES (:show_id, :season, :episode, :title, :description, :number, :global, "
-					  ":date, :comments)");
+					  ":date, :seen, :comments)");
 
 		query.bindValue(":show_id", showId);
 		query.bindValue(":season", season);
@@ -125,20 +126,15 @@ void Cache::parseEpisodes(const QString &showId, int season, const QJsonObject &
 		query.bindValue(":number", number);
 		query.bindValue(":global", global);
 		query.bindValue(":date", date);
+		query.bindValue(":seen", seen);
 		query.bindValue(":comments", comments);
 		query.exec();
 	}
 }
 
-void Cache::parseSeasons(const QString &showId, const QByteArray &response, bool allEpisodes)
+void Cache::parseSeasons(const QString &showId, const JsonParser &json, bool allEpisodes)
 {
-	JsonParser parser(response);
-	if (!parser.isValid()) {
-		// TODO manage error
-		return;
-	}
-
-	QJsonObject seasonsJson = parser.root().value("seasons").toObject();
+	QJsonObject seasonsJson = json.root().value("seasons").toObject();
 	if (!QSqlDatabase::database().transaction()) {
 		qCritical("Error while beginning a transaction for SQL insertion");
 		return;
@@ -168,15 +164,9 @@ void Cache::parseSeasons(const QString &showId, const QByteArray &response, bool
 	QSqlDatabase::database().commit();
 }
 
-void Cache::parseShowInfos(const QString &showId, const QByteArray &response)
+void Cache::parseShowInfos(const QString &showId, const JsonParser &json)
 {
-	JsonParser parser(response);
-	if (!parser.isValid()) {
-		// TODO manage error
-		return;
-	}
-
-	QJsonObject showJson = parser.root().value("show").toObject();
+	QJsonObject showJson = json.root().value("show").toObject();
 	if (!QSqlDatabase::database().transaction()) {
 		qCritical("Error while beginning a transaction for SQL insertion");
 		return;
@@ -184,14 +174,14 @@ void Cache::parseShowInfos(const QString &showId, const QByteArray &response)
 
 	// update the show details
 	QSqlQuery query;
-	query.prepare("UPDATE show SET title=:title,description=:description, "
-				  "network=:network,duration=:duration,last_sync=:last_sync WHERE show_id=:show_id");
+	query.prepare("INSERT OR REPLACE INTO show (show_id, title, description, network, duration, last_sync) "
+				  "VALUES (:show_id, :title, :description, :network, :duration, :last_sync)");
+	query.bindValue(":show_id", showId);
 	query.bindValue(":title", showJson.value("title").toString());
 	query.bindValue(":description", showJson.value("description").toString());
 	query.bindValue(":network", showJson.value("network").toString());
 	query.bindValue(":duration", showJson.value("duration").toString().toInt());
 	query.bindValue(":last_sync", QDateTime::currentMSecsSinceEpoch() / 1000);
-	query.bindValue(":show_id", showId);
 	query.exec();
 
 	// init the "to delete" list
@@ -228,20 +218,14 @@ void Cache::parseShowInfos(const QString &showId, const QByteArray &response)
 	QSqlDatabase::database().commit();
 }
 
-void Cache::parseMemberInfos(const QByteArray &response)
+void Cache::parseMemberInfos(const JsonParser &json)
 {
-	JsonParser parser(response);
-	if (!parser.isValid()) {
-		// TODO manage error
-		return;
-	}
-
 	if (!QSqlDatabase::database().transaction()) {
 		qCritical("Error while beginning a transaction for SQL insertion");
 		return;
 	}
 
-	QJsonObject memberJson = parser.root().value("member").toObject();
+	QJsonObject memberJson = json.root().value("member").toObject();
 
 	// TODO parse member inner infos
 
@@ -278,15 +262,9 @@ void Cache::parseMemberInfos(const QByteArray &response)
 	QSqlDatabase::database().commit();
 }
 
-bool Cache::parseAddShow(const QString &showId, const QString &title, const QByteArray &response)
+bool Cache::parseAddShow(const QString &showId, const QString &title, const JsonParser &json)
 {
-	JsonParser parser(response);
-	if (!parser.isValid()) {
-		// TODO manage error
-		return false;
-	}
-
-	if (parser.code() == 0) {
+	if (json.code() == 0) {
 		// TODO manage error code
 		return false;
 	}
@@ -308,15 +286,9 @@ bool Cache::parseAddShow(const QString &showId, const QString &title, const QByt
 	return true;
 }
 
-bool Cache::parseRemoveShow(const QString &showId, const QByteArray &response)
+bool Cache::parseRemoveShow(const QString &showId, const JsonParser &json)
 {
-	JsonParser parser(response);
-	if (!parser.isValid()) {
-		// TODO manage error
-		return false;
-	}
-
-	if (parser.code() == 0) {
+	if (json.code() == 0) {
 		// TODO manage error code
 		return false;
 	}
@@ -336,35 +308,35 @@ bool Cache::parseRemoveShow(const QString &showId, const QByteArray &response)
 	return true;
 }
 
-void Cache::showInfosCallback(const QVariantMap &id, const QByteArray &response)
+void Cache::showInfosCallback(const QVariantMap &id, const JsonParser &json)
 {
 	QString showId = id["showId"].toString();
 	// TODO: parseShowInfos must return a boolean for potential errors
-	parseShowInfos(showId, response);
+	parseShowInfos(showId, json);
 	emit synchronized(Data_ShowInfos, id);
 }
 
-void Cache::episodesCallback(const QVariantMap &id, const QByteArray &response)
+void Cache::episodesCallback(const QVariantMap &id, const JsonParser &json)
 {
 	QString showId = id["showId"].toString();
-	parseSeasons(showId, response, id["episode"].isNull());
+	parseSeasons(showId, json, id["episode"].isNull());
 	emit synchronized(Data_Episodes, id);
 }
 
-void Cache::memberInfosCallback(const QVariantMap &id, const QByteArray &response)
+void Cache::memberInfosCallback(const QVariantMap &id, const JsonParser &json)
 {
-	parseMemberInfos(response);
+	parseMemberInfos(json);
 	emit synchronized(Data_MemberInfos, id);
 }
 
-void Cache::addShowCallback(const QVariantMap &id, const QByteArray &response)
+void Cache::addShowCallback(const QVariantMap &id, const JsonParser &json)
 {
-	if (parseAddShow(id["showId"].toString(), id["title"].toString(), response))
+	if (parseAddShow(id["showId"].toString(), id["title"].toString(), json))
 		emit showAdded(id["title"].toString());
 	emit synchronized(Data_AddShow, id);
 }
 
-void Cache::removeShowCallback(const QVariantMap &id, const QByteArray &response)
+void Cache::removeShowCallback(const QVariantMap &id, const JsonParser &json)
 {
 	// get the title into the database
 	QSqlQuery query;
@@ -375,15 +347,21 @@ void Cache::removeShowCallback(const QVariantMap &id, const QByteArray &response
 	if (query.next())
 		title = query.value("title").toString();
 
-	if (parseRemoveShow(id["showId"].toString(), response))
+	if (parseRemoveShow(id["showId"].toString(), json))
 		emit showRemoved(title);
 	emit synchronized(Data_RemoveShow, id);
 }
 
-void Cache::archiveShowCallback(const QVariantMap &id, const QByteArray &response)
+void Cache::archiveShowCallback(const QVariantMap &id, const JsonParser &json)
 {
 	// TODO
 	emit synchronized(Data_ArchiveShow, id);
+}
+
+void Cache::watchShowCallback(const QVariantMap &id, const JsonParser &json)
+{
+	// TODO
+	emit synchronized(Data_WatchShow, id);
 }
 
 int Cache::synchronizeShowInfos(const QString &showId)
@@ -520,14 +498,6 @@ int Cache::addShow(const QString &showId, const QString &title)
 	// expired data, we need to launch the request if not already done
 	emit synchronizing(Data_AddShow, id);
 
-	// is there a current action about it?
-	// no particular reasons to forbid the same add show command for the same show id here
-/*	SynchronizeAction *action = getAction(Data_AddShow, id);
-	if (action) {
-		// just wait for the end of it
-		return 1;
-	}*/
-
 	// store the synchronize action
 	SynchronizeAction *action = new SynchronizeAction;
 	action->dataType = Data_AddShow;
@@ -576,6 +546,29 @@ int Cache::archiveShow(const QString &showId)
 	action->id = id;
 	action->callbackMethodName = "archiveShowCallback";
 	Command *command = CommandManager::instance().showsArchive(showId);
+	action->commands << command;
+	currentActions << action;
+	commandMapper.setMapping(command, command);
+	connect(command, SIGNAL(finished()), &commandMapper, SLOT(map()));
+	return 1;
+}
+
+int Cache::watchShow(const QString &showId, int season, int episode)
+{
+	QVariantMap id;
+	id.insert("showId", showId);
+	id.insert("season", season);
+	id.insert("episode", episode);
+
+	// expired data, we need to launch the request if not already done
+	emit synchronizing(Data_WatchShow, id);
+
+	// store the synchronize action
+	SynchronizeAction *action = new SynchronizeAction;
+	action->dataType = Data_WatchShow;
+	action->id = id;
+	action->callbackMethodName = "watchShowCallback";
+	Command *command = CommandManager::instance().membersWatched(showId, season, episode);
 	action->commands << command;
 	currentActions << action;
 	commandMapper.setMapping(command, command);

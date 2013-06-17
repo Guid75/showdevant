@@ -23,6 +23,8 @@
 #include <QVariantMap>
 #include <QSignalMapper>
 
+#include "jsonparser.h"
+
 class Command;
 
 class Cache : public QObject
@@ -35,7 +37,8 @@ public:
 		Data_MemberInfos,
 		Data_AddShow,
 		Data_RemoveShow,
-		Data_ArchiveShow
+		Data_ArchiveShow,
+		Data_WatchShow
 	};
 
 	static Cache &instance();
@@ -54,6 +57,8 @@ public:
 	Q_INVOKABLE int removeShow(const QString &showId);
 
 	Q_INVOKABLE int archiveShow(const QString &showId);
+
+	Q_INVOKABLE int watchShow(const QString &showId, int season, int episode);
 
 signals:
 	void synchronizing(CacheDataType dataType, const QVariantMap &id);
@@ -90,19 +95,20 @@ private slots:
 
 	// parsing
 	void parseEpisodes(const QString &showId, int season, const QJsonObject &root, bool detailMode);
-	void parseSeasons(const QString &showId, const QByteArray &response, bool allEpisodes);
-	void parseShowInfos(const QString &showId, const QByteArray &response);
-	void parseMemberInfos(const QByteArray &response);
-	bool parseAddShow(const QString &showId, const QString &title, const QByteArray &response);
-	bool parseRemoveShow(const QString &showId, const QByteArray &response);
+	void parseSeasons(const QString &showId, const JsonParser &json, bool allEpisodes);
+	void parseShowInfos(const QString &showId, const JsonParser &json);
+	void parseMemberInfos(const JsonParser &json);
+	bool parseAddShow(const QString &showId, const QString &title, const JsonParser &json);
+	bool parseRemoveShow(const QString &showId, const JsonParser &json);
 
 	// action callbacks
-	void showInfosCallback(const QVariantMap &id, const QByteArray &response);
-	void episodesCallback(const QVariantMap &id, const QByteArray &response);
-	void memberInfosCallback(const QVariantMap &id, const QByteArray &response);
-	void addShowCallback(const QVariantMap &id, const QByteArray &response);
-	void removeShowCallback(const QVariantMap &id, const QByteArray &response);
-	void archiveShowCallback(const QVariantMap &id, const QByteArray &response);
+	void showInfosCallback(const QVariantMap &id, const JsonParser &json);
+	void episodesCallback(const QVariantMap &id, const JsonParser &json);
+	void memberInfosCallback(const QVariantMap &id, const JsonParser &json);
+	void addShowCallback(const QVariantMap &id, const JsonParser &json);
+	void removeShowCallback(const QVariantMap &id, const JsonParser &json);
+	void archiveShowCallback(const QVariantMap &id, const JsonParser &json);
+	void watchShowCallback(const QVariantMap &id, const JsonParser &json);
 };
 
 #endif // CACHE_H

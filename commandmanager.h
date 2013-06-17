@@ -17,7 +17,9 @@ public:
 
 	void setNetworkAccessManager(QNetworkAccessManager *nam);
 
-	Q_INVOKABLE void recordAuthToken(const QString &token);
+	// all future commands will be passed with this token as a additional parameter which
+	// will be useful to get informations about the authenticated member.
+	void recordAuthToken(const QString &token);
 
 	// show commands
 	Command *showsSearch(const QString &expression);
@@ -34,6 +36,7 @@ public:
 	// members commands
 	Command *membersAuth(const QString &login, const QString &password);
 	Command *membersInfos(const QString &login = "");
+	Command *membersWatched(const QString &showId, int season, int episode, int note = -1);
 
 private:
 	static CommandManager *_instance;

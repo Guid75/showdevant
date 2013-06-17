@@ -90,7 +90,7 @@ int DatabaseManager::openDB()
 	// episodes
 	if (!createTable(query, "episode",
 					 "(show_id text, season integer, episode integer, title text, description text, "
-					 "number text, global integer, date integer, "
+					 "number text, global integer, date integer, seen integer, "
 					 "comments integer, last_sync_detail integer, subtitles_last_check_date integer, "
 					 "PRIMARY KEY (show_id, season, episode), "
 					 "FOREIGN KEY (show_id, season) REFERENCES season(show_id, number) ON DELETE CASCADE)"))

@@ -82,9 +82,8 @@ Command *CommandManager::pushCommandAuth(const QString &path, const QString &com
 {
 	Q_ASSERT(!authToken.isEmpty());
 
-	pushCommand(path, command, arguments);
+	return pushCommand(path, command, arguments);
 }
-
 
 QUrlQuery CommandManager::forgeQuery(const QString &path, const QString &postfix)
 {
@@ -179,10 +178,19 @@ Command *CommandManager::membersAuth(const QString &login, const QString &passwo
 
 Command *CommandManager::membersInfos(const QString &login)
 {
-	Q_ASSERT(!authToken.isEmpty());
 	if (login.isEmpty())
-		return pushCommand("members", "infos");
-	return pushCommand("members/infos", login);
+		return pushCommandAuth("members", "infos");
+	return pushCommandAuth("members/infos", login);
+}
+
+Command *CommandManager::membersWatched(const QString &showId, int season, int episode, int note)
+{
+	QVariantMap args;
+	args.insert("season", season);
+	args.insert("episode", episode);
+	if (note >= 1)
+		args.insert("note", note);
+	return pushCommandAuth("members/watched", showId, args);
 }
 
 void CommandManager::httpError(QNetworkReply::NetworkError)
