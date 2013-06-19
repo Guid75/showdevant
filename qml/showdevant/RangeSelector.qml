@@ -9,7 +9,7 @@ ToolBar {
 	property int min: 0
 	property int max: 0
 	property int current: 0
-	property string currentTemplate: "Foobar %1/%2"
+	property string template: "Foobar %1/%2"
 
 	clip: true
 
@@ -19,10 +19,6 @@ ToolBar {
 
 		current = val;
 		currentIndexChanged(val);
-	}
-
-	Component.onCompleted: {
-		//textBehavior.enabled = true;
 	}
 
 	RowLayout {
@@ -73,7 +69,7 @@ ToolBar {
 				anchors.fill: parent
 				horizontalAlignment: Text.AlignHCenter
 				verticalAlignment: Text.AlignVCenter
-				text: currentTemplate.arg(current).arg(max)
+				text: template.arg(current).arg(max)
 				font.pointSize: 13
 			}
 
@@ -85,7 +81,7 @@ ToolBar {
 				verticalAlignment: Text.AlignVCenter
 				property int current: 0
 				clip: true
-				text: currentTemplate.arg(current).arg(max)
+				text: template.arg(current).arg(max)
 				font.pointSize: 13
 				opacity: 0
 			}

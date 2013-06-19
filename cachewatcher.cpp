@@ -40,7 +40,6 @@ bool CacheWatcher::watchable(Cache::CacheDataType dataType, const QVariantMap &i
 	}
 
 	return false;
-//	return watching.values(dataType).indexOf(id) >= 0;
 }
 
 void CacheWatcher::synchronizing(Cache::CacheDataType dataType, const QVariantMap &id)

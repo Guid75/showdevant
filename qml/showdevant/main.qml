@@ -10,7 +10,11 @@ Rectangle {
 	width: 1024
 	height: 768
 
-	property int morphAnimationTime : 500
+	property int morphAnimationTime : 300
+	property int morphInitX
+	property int morphInitY
+	property int morphInitW
+	property int morphInitH
 
 	ShowModel {
 		id: showModel
@@ -30,8 +34,69 @@ Rectangle {
 		filterCaseSensitivity: Qt.CaseInsensitive
 	}
 
-	SeasonListModel {
-		id: seasonListModel
+	// -1 means that no seasons viewer has been showed yet
+	property int currentSeasonsViewerIndex : -1
+
+	function __toggleCurrentSeasonsViewer() {
+		currentSeasonsViewerIndex = (currentSeasonsViewerIndex + 1) % 2;
+	}
+
+	function __getNextSeasonsViewerCompo() {
+		if (currentSeasonsViewerIndex === 0)
+			return altSeasonsViewerCompo;
+		return seasonsViewerCompo;
+	}
+
+	function __getCurrentSeasonsViewer() {
+		return stackView.find(function(item, index) {
+			return item.widgetType === 'seasons';
+		}, true);
+	}
+
+	Component {
+		id: seasonsViewerCompo
+		SeasonsViewer {
+			onSeasonClicked: __seasonClicked(season, episodeCount)
+		}
+	}
+
+	Component {
+		id: altSeasonsViewerCompo
+		SeasonsViewer {
+			onSeasonClicked: __seasonClicked(season, episodeCount)
+		}
+	}
+
+	property int currentEpisodesViewerIndex : -1
+
+	function __toggleCurrentEpisodesViewer() {
+		currentEpisodesViewerIndex = (currentEpisodesViewerIndex + 1) % 2;
+	}
+
+	function __getNextEpisodesViewerCompo() {
+		if (currentEpisodesViewerIndex === 0)
+			return altEpisodesViewerCompo;
+		return episodesViewerCompo;
+	}
+
+	function __getCurrentEpisodesViewer() {
+		return stackView.find(function(item, index) {
+			return item.widgetType === 'episodes';
+		}, true);
+	}
+
+	Component {
+		id: episodesViewerCompo
+		EpisodesViewer {
+			onEpisodeClicked: __episodeClicked(episode)
+		}
+	}
+
+	Component {
+		id: altEpisodesViewerCompo
+		EpisodesViewer {
+			onEpisodeClicked: __episodeClicked(episode)
+		}
 	}
 
 	Connections {
@@ -58,6 +123,7 @@ Rectangle {
 	}
 
 	Component.onCompleted: {
+		showList.showSelected("lost", "Lost");
 		switch (databaseManager.openDBLastError()) {
 		case 0:
 			epicFailMessage.active = true;
@@ -74,6 +140,44 @@ Rectangle {
 		topToolbarAnimation.start();
 
 		authenticator.autoLogin();
+	}
+
+	function __seasonClicked(season, episodeCount) {
+		var seasonsViewer = __getCurrentSeasonsViewer();
+
+		stackView.push({
+						   item: episodesViewerCompo,
+						   properties: {
+							   show: seasonsViewer.show,
+							   season: season
+						   }
+					   });
+
+		currentEpisodesViewerIndex = 0;
+
+		var coord = seasonsViewer.getSeasonItemCoordinates(season);
+
+		seasonMorpher.x = coord.x;
+		seasonMorpher.y = coord.y;
+		seasonMorpher.width = coord.w;
+		seasonMorpher.height = coord.h;
+		seasonMorpher.current = season;
+		seasonMorpher.min = 1;
+		seasonMorpher.max = seasonsViewer.model.count;
+		seasonMorpher.visible = true;
+		seasonSelector.opacity = 0;
+		seasonSelector.visible = true;
+		seasonSelector.current = season;
+		seasonSelector.min = 1;
+		seasonSelector.max = seasonsViewer.model.count;
+		var ar = stackView.mapToItem(null, 0, 0);
+		seasonMorpherAnimation.initTarget(ar.x, ar.y, seasonSelector.width, seasonSelector.height);
+		seasonMorpherAnimation.apparition = true;
+		seasonMorpherAnimation.start();
+	}
+
+	function __episodeClicked(episode) {
+		// TODO
 	}
 
 	SplitView {
@@ -114,30 +218,46 @@ Rectangle {
 				anchors.left: parent.left
 				anchors.right: parent.right
 				anchors.topMargin: 6
-				anchors.bottomMargin: 40
 				onShowSelected: {
-					seasonListModel.show = showId;
-					playgroundLoader.source = "SeasonsViewer.qml";
-					seasonSelector.visible = false;
-					episodeSelector.visible = false;
+					var seasonsViewer = stackView.get(0, null);
+					if (seasonsViewer && seasonsViewer.model.show === showId)
+						return;
+
+					// pop all components until only one remains
+					stackView.pop(null);
+
+					var compoToPush = __getNextSeasonsViewerCompo();
+
+					if (!stackView.currentItem || stackView.currentItem.widgetType === 'seasons') {
+						var item = stackView.push({
+													  item: compoToPush,
+													  replace: true,
+													  properties: {
+														  show: showId
+													  }
+												  });
+						__toggleCurrentSeasonsViewer();
+					}
 
 					bannerImage.source = "http://api.betaseries.com/pictures/show/" + showId + ".jpg?key=9adb4ab628c6";
 					bannerText.text = title;
 				}
 			}
 		}
-		Item {
+		ColumnLayout {
 			Layout.minimumWidth: 0
 			Layout.fillWidth: true
+			spacing: 0
 
 			Rectangle {
 				id: resumeRectangle
-				anchors {
+/*				anchors {
 					left: parent.left
 					right: parent.right
 					top: parent.top
 					margins: 4
-				}
+				}*/
+				Layout.fillWidth: true
 				height: 100
 				color: "white"
 				Image {
@@ -172,121 +292,80 @@ Rectangle {
 
 			RangeSelector {
 				id: seasonSelector
-				currentTemplate: "Season %1/%2"
-				anchors {
-					left: parent.left
-					right: parent.right
-					top: resumeRectangle.bottom
-					margins: 4
-				}
+				template: "Season %1/%2"
+				Layout.fillWidth: true
 				visible: false
 				onCurrentIndexChanged: {
 					episodeSelector.current = 1;
-					if (playgroundLoader.item.widgetType === "episodes") {
-						playgroundLoader.item.setCurrentSeason(current);
-					} else if (playgroundLoader.item.widgetType === "episodedetail") {
-						playgroundLoader.item.season = current;
-						playgroundLoader.item.episode = 1;
+					if (stackView.currentItem.widgetType === 'episodes') {
+						var compoToPush = __getNextEpisodesViewerCompo();
+						var item = stackView.push({
+													  item: compoToPush,
+													  replace: true,
+													  properties: {
+														  show: stackView.currentItem.show,
+														  season: current
+													  }
+												  });
+						__toggleCurrentEpisodesViewer();
 					}
 				}
 				onCloseMe: {
-					playgroundLoader.source = "SeasonsViewer.qml";
+					var seasonsViewer = __getCurrentSeasonsViewer();
 
-					seasonSelector.visible = false;
-					episodeSelector.visible = false;
+					currentEpisodesViewerIndex = 0;
+
+					seasonMorpher.current = current;
+					seasonMorpher.visible = true;
+					seasonSelector.opacity = 0;
+					var coord = seasonsViewer.getSeasonItemCoordinates(current);
+					seasonMorpherAnimation.initTarget(coord.x, coord.y - seasonSelector.height, coord.w, coord.h);
+					seasonMorpherAnimation.apparition = false;
+					seasonMorpherAnimation.start();
+					stackView.pop(null);
 				}
 			}
 
 			RangeSelector {
 				id: episodeSelector
-				currentTemplate: "Episode %1/%2"
-				Behavior on height {
-					NumberAnimation { from: 20; to: 40; duration: 500 }
-				}
-				anchors {
-					left: parent.left
-					right: parent.right
-					top: seasonSelector.bottom
-					margins: 4
-				}
+				template: "Episode %1/%2"
+				Layout.fillWidth: true
 				visible: false
 				onCurrentIndexChanged: {
-					// TODO refresh current episode details
-					//playgroundLoader.item.season = episodeListModel.season
-					playgroundLoader.item.season = seasonSelector.current;
-					playgroundLoader.item.episode = current;
 				}
 				onCloseMe: {
-					playgroundLoader.setSource("EpisodesViewer.qml", {
-												   currentSeason: seasonSelector.current,
-												   currentShow: seasonListModel.show
-											   });
-
-					episodeSelector.visible = false;
 				}
 			}
 
-			Loader {
-				id: playgroundLoader
-				anchors {
-					top: episodeSelector.visible ? episodeSelector.bottom : (seasonSelector.visible ? seasonSelector.bottom : resumeRectangle.bottom)
-					left: parent.left
-					right: parent.right
-					bottom: parent.bottom
-					margins: 4
-				}
-			}
-
-			Connections {
-				target: playgroundLoader.item
-				ignoreUnknownSignals: true
-				onSeasonClicked: {
-					seasonMorpher.x = x;
-					seasonMorpher.y = y;
-					seasonMorpher.width = w;
-					seasonMorpher.height = h;
-					seasonMorpher.current = season;
-					seasonMorpher.min = 1;
-					seasonMorpher.max = seasonListModel.count;
-					seasonMorpher.visible = true;
-					shadowSeasons.start();
-					seasonMorpherAnimation.initXY();
-					seasonMorpherAnimation.start();
-				}
-			}
-
-			NumberAnimation {
-				id: shadowSeasons
-				target: playgroundLoader.item
-				from: 1.0
-				to: 0.0
-				duration: morphAnimationTime
-				easing.type: Easing.InOutQuad
-				property: "opacity"
-				onStopped: {
-					seasonSelector.current = seasonMorpher.current;
-					seasonSelector.min = 1;
-					seasonSelector.max = seasonListModel.count;
-					seasonSelector.visible = true;
-					seasonMorpher.visible = false;
-					playgroundLoader.setSource("EpisodesViewer.qml", {
-												   currentSeason: seasonMorpher.current,
-												   currentShow: seasonListModel.show
-											   });
-				}
+			StackView {
+				id: stackView
+				clip: true
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				delegate: MainStackViewDelegate {}
 			}
 
 			ParallelAnimation {
+				property bool apparition : true
 				id: seasonMorpherAnimation
-				function initXY() {
-					seasonMorpherX.to = seasonSelector.mapToItem(null, 0, 0).x;
-					seasonMorpherY.to = seasonSelector.mapToItem(null, 0, 0).y;
+				function initTarget(x, y, w, h) {
+					seasonMorpherX.to = x;
+					seasonMorpherY.to = y;
+					seasonMorpherW.to = w;
+					seasonMorpherH.to = h;
+				}
+				onStopped: {
+					seasonMorpher.visible = false;
+					if (apparition) {
+						seasonSelector.opacity = 1;
+					} else {
+						seasonSelector.visible = false;
+					}
 				}
 				NumberAnimation {
 					id: seasonMorpherX
 					target: seasonMorpher
 					property: "x"
-					//to: 205 //seasonSelector.mapToItem(null, 0, 0).x
 					easing.type: Easing.InOutQuad
 					duration: morphAnimationTime
 				}
@@ -294,44 +373,28 @@ Rectangle {
 					id: seasonMorpherY
 					target: seasonMorpher
 					property: "y"
-//					to: 158 //seasonSelector.mapToItem(null, 0, 0).y
 					easing.type: Easing.InOutQuad
 					duration: morphAnimationTime
 				}
 				NumberAnimation {
+					id: seasonMorpherW
 					target: seasonMorpher
 					property: "width"
-					to: seasonSelector.width
 					easing.type: Easing.InOutQuad
 					duration: morphAnimationTime
 				}
 				NumberAnimation {
+					id: seasonMorpherH
 					target: seasonMorpher
 					property: "height"
-					to: seasonSelector.height
 					easing.type: Easing.InOutQuad
 					duration: morphAnimationTime
 				}
-/*				NumberAnimation {
-					target: seasonMorpher
-					property: "fontSize"
-					from: 12
-					to: 13
-					easing.type: Easing.InOutQuad
-					duration: morphAnimationTime
-				}
-				NumberAnimation {
-					target: seasonMorpher
-					property: "secondaryTextOpacity"
-					from: 1
-					to: 0
-					easing.type: Easing.InOutQuad
-					duration: morphAnimationTime
-				}*/
 			}
 			Loader {
 				id: loadingWidget
-				anchors.centerIn: playgroundLoader
+				//anchors.centerIn: playgroundLoader
+				anchors.centerIn: stackView
 				sourceComponent: LoadingWidget {
 					anchors.centerIn: parent
 					color: "#888888"
@@ -374,14 +437,9 @@ Rectangle {
 
 	RangeSelector {
 		id: seasonMorpher
-		currentTemplate: "Season %1/%2"
+		template: "Season %1/%2"
 		visible: false
 	}
-
-/*	SeasonItem {
-		id: seasonMorpher
-		visible: false
-	}*/
 
 	BubbleMenu {
 		id: bubbleMenu

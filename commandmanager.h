@@ -17,8 +17,8 @@ public:
 
 	void setNetworkAccessManager(QNetworkAccessManager *nam);
 
-	// all future commands will be passed with this token as a additional parameter which
-	// will be useful to get informations about the authenticated member.
+	// after this function call, all future commands will be passed with this token as
+	// an additional parameter which will be useful to get informations about the authenticated member.
 	void recordAuthToken(const QString &token);
 
 	// show commands

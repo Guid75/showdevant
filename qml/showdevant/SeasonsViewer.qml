@@ -2,57 +2,64 @@ import QtQuick 2.0
 import com.guid75 1.0
 
 Item {
-	signal seasonClicked(int season, int episodeCount, int x, int y, int w, int h)
+	signal seasonClicked(int season, int episodeCount); //, int x, int y, int w, int h)
+	readonly property string widgetType : "seasons"
+	property alias model : seasonModel
+	property alias show : seasonModel.show
+	property int flowMargins : 6
+
+	function getSeasonItemCoordinates(season) {
+		var i, len, item, coord;
+		for (i = 0, len = repeaterSeasons.count; i < len; i++) {
+			item = repeaterSeasons.itemAt(i);
+			if (item.seasonNumber === season) {
+				coord = item.mapToItem(null, 0, 0);
+				return {
+					x: coord.x,
+					y: coord.y,
+					w: item.width,
+					h: item.height
+				}
+			}
+		}
+		return null;
+	}
+
+	SeasonListModel {
+		id: seasonModel
+	}
 
 	Flickable {
 		id: flickable
 		anchors.fill: parent
 		signal seasonSelected(int season)
-		readonly property string widgetType : "seasons"
 
-		contentWidth: Math.max(width, 208)
-		contentHeight: flowEpisode.childrenRect.height + 8
+		contentWidth: Math.max(width, 200 + flowMargins * 2)
+		contentHeight: flowSeasons.childrenRect.height + flowMargins * 2
 		clip: true
 
-		Component.onCompleted: {
-			flowAnimation.start();
-		}
-
-		Connections {
-			target: seasonListModel
-			onShowChanged: flowAnimation.start()
-		}
-
 		Flow {
-			id: flowEpisode
-			x: 4
+			id: flowSeasons
+			y: flowMargins
 			anchors {
 				left: parent.left
 				right: parent.right
+				leftMargin: flowMargins
+				rightMargin: flowMargins
 			}
-			anchors.margins: 4
 			spacing: 10
 			Repeater {
-				id: repeaterEpisode
-				model: seasonListModel
+				id: repeaterSeasons
+				model: seasonModel
 				SeasonItem {
 					id: seasonItem
 					seasonNumber: number
 					episodeCount: episode_count
 					onItemClicked: {
-						var ar = seasonItem.mapToItem(null, 0, 0);
-						seasonClicked(number, episode_count, ar.x, ar.y, seasonItem.width, seasonItem.height);
+						seasonClicked(number, episode_count);
 					}
 				}
 			}
-		}
-		PropertyAnimation {
-			id: flowAnimation
-			target: flowEpisode
-			property: 'y'
-			from: parent ? parent.height : 0
-			to: 4
-			duration: 300
 		}
 	}
 	Loader {
@@ -66,7 +73,7 @@ Item {
 			width: 200
 			height: 200
 		}
-		active: seasonListModel.synchronizeState === CacheWatcher.Synchronizing
+		active: seasonModel.synchronizeState === CacheWatcher.Synchronizing
 		asynchronous: true
 	}
 }

@@ -132,6 +132,25 @@ void Cache::parseEpisodes(const QString &showId, int season, const QJsonObject &
 	}
 }
 
+void Cache::tagSeen(const QString &showId, int maxSeason, int maxEpisode)
+{
+	if (!QSqlDatabase::database().transaction()) {
+		qCritical("Error while beginning a transaction for SQL insertion");
+		return;
+	}
+
+	QSqlQuery query;
+
+	// command successful, we must tag all previous episodes
+	query.prepare("UPDATE episode SET seen=1 WHERE show_id=:showid AND (season < :season OR (season = :season AND episode <= :episode))");
+	query.bindValue(":showid", showId);
+	query.bindValue(":season", maxSeason);
+	query.bindValue(":episode", maxEpisode);
+	query.exec();
+
+	QSqlDatabase::database().commit();
+}
+
 void Cache::parseSeasons(const QString &showId, const JsonParser &json, bool allEpisodes)
 {
 	QJsonObject seasonsJson = json.root().value("seasons").toObject();
@@ -360,7 +379,14 @@ void Cache::archiveShowCallback(const QVariantMap &id, const JsonParser &json)
 
 void Cache::watchShowCallback(const QVariantMap &id, const JsonParser &json)
 {
-	// TODO
+	if (json.code() == 0) {
+		// TODO treat errors
+		emit synchronized(Data_WatchShow, id);
+		return;
+	}
+
+	tagSeen(id["showId"].toString(), id["season"].toInt(), id["episode"].toInt());
+
 	emit synchronized(Data_WatchShow, id);
 }
 

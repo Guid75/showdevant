@@ -89,12 +89,14 @@ private:
 
 	SynchronizeAction *getAction(Command *command) const;
 
+	void parseEpisodes(const QString &showId, int season, const QJsonObject &root, bool detailMode);
+	void tagSeen(const QString &showId, int maxSeason, int maxEpisode);
+
 private slots:
 	// thread callbacks
 	void commandFinished(QObject *commandObj);
 
 	// parsing
-	void parseEpisodes(const QString &showId, int season, const QJsonObject &root, bool detailMode);
 	void parseSeasons(const QString &showId, const JsonParser &json, bool allEpisodes);
 	void parseShowInfos(const QString &showId, const JsonParser &json);
 	void parseMemberInfos(const JsonParser &json);

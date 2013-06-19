@@ -64,7 +64,9 @@ OTHER_FILES += \
     qml/showdevant/LoadingMask.qml \
     qml/showdevant/NotifyZone.qml \
     qml/showdevant/NotifyBox.qml \
-    qml/showdevant/BubbleMenu.qml
+    qml/showdevant/BubbleMenu.qml \
+    qml/showdevant/SeasonViewer.qml \
+    qml/showdevant/MainStackViewDelegate.qml
 
 HEADERS += \
     downloadmanager.h \
