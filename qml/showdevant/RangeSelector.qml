@@ -22,7 +22,10 @@ ToolBar {
 	}
 
 	RowLayout {
-		anchors.fill: parent
+		anchors {
+			left: parent.left
+			right: parent.right
+		}
 
 		ToolButton {
 			iconSource: "first.png"
