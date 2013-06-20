@@ -13,7 +13,7 @@ Rectangle {
 	Image {
 		id: episodeImage
 		width: 250
-		source: showId && season && episode ? "http://api.betaseries.com/pictures/episode/%1.jpg?season=%2&episode=%3&key=9adb4ab628c6".arg(showId).arg(season).arg(episode) : ""
+		source: show && season && episode ? "http://api.betaseries.com/pictures/episode/%1.jpg?season=%2&episode=%3&key=9adb4ab628c6".arg(show).arg(season).arg(episode) : ""
 		fillMode: Image.PreserveAspectFit
 	}
 	Rectangle {

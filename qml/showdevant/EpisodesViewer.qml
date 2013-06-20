@@ -12,6 +12,24 @@ Item {
 	property alias season : episodeModel.season
 	property int flowMargins : 6
 
+	function getEpisodeItemCoordinates(episode) {
+		var i, len, item, coord, modelData;
+		for (i = 0, len = episodeModel.count; i < len; i ++) {
+			modelData = episodeModel.get(i);
+			if (modelData.episode === episode) {
+				item = repeaterEpisodes.itemAt(i);
+				coord = item.mapToItem(null, 0, 0);
+				return {
+					x: coord.x,
+					y: coord.y,
+					w: item.width,
+					h: item.height
+				}
+			}
+		}
+		return null;
+	}
+
 	EpisodeListModel {
 		id: episodeModel
 	}
@@ -35,10 +53,10 @@ Item {
 	Flickable {
 		anchors.fill: parent
 		contentWidth: Math.max(width, 200 + 2 * flowMargins)
-		contentHeight: currentFlow.childrenRect.height + flowMargins * 2
+		contentHeight: flowEpisodes.childrenRect.height + flowMargins * 2
 		clip: true
 		Flow {
-			id: currentFlow
+			id: flowEpisodes
 			y: flowMargins
 			anchors {
 				left: parent.left
@@ -49,7 +67,7 @@ Item {
 			height: parent.height
 			spacing: 10
 			Repeater {
-				id: repeater
+				id: repeaterEpisodes
 				model: episodeModel
 				EpisodeItem {
 					onItemClicked: {

@@ -5,7 +5,7 @@ import com.guid75 1.0
 
 Rectangle {
 	id: episodeDetail
-	property alias showId: episodeDetailModel.show
+	property alias show: episodeDetailModel.show
 	property alias season: episodeDetailModel.season
 	property alias episode: episodeDetailModel.episode
 	readonly property string widgetType : "episodedetail"
@@ -15,7 +15,7 @@ Rectangle {
 	}
 
 	Component.onCompleted: {
-		//		bannerImage.source = "http://api.betaseries.com/pictures/episode/%1.jpg?season=%2&episode=%3&key=9adb4ab628c6".arg(showId).arg(season).arg(episode);
+		//		bannerImage.source = "http://api.betaseries.com/pictures/episode/%1.jpg?season=%2&episode=%3&key=9adb4ab628c6".arg(show).arg(season).arg(episode);
 	}
 
 	//color: "#DDDDDD"

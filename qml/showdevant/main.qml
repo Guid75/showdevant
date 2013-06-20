@@ -34,6 +34,8 @@ Rectangle {
 		filterCaseSensitivity: Qt.CaseInsensitive
 	}
 
+	////////////////////////// SEASONS
+
 	// -1 means that no seasons viewer has been showed yet
 	property int currentSeasonsViewerIndex : -1
 
@@ -67,6 +69,8 @@ Rectangle {
 		}
 	}
 
+	////////////////////////// EPISODES
+
 	property int currentEpisodesViewerIndex : -1
 
 	function __toggleCurrentEpisodesViewer() {
@@ -98,6 +102,40 @@ Rectangle {
 			onEpisodeClicked: __episodeClicked(episode)
 		}
 	}
+
+	////////////////////////// EPISODE DETAILS
+
+	property int currentEpisodeDetailIndex : -1
+
+	function __toggleCurrentEpisodeDetail() {
+		currentEpisodeDetailIndex = (currentEpisodeDetailIndex + 1) % 2;
+	}
+
+	function __getNextEpisodeDetailCompo() {
+		if (currentEpisodeDetailIndex === 0)
+			return altEpisodeDetailCompo;
+		return episodeDetailCompo;
+	}
+
+	function __getCurrentEpisodeDetail() {
+		return stackView.find(function(item, index) {
+			return item.widgetType === 'episodedetail';
+		}, true);
+	}
+
+	Component {
+		id: episodeDetailCompo
+		EpisodeDetail {
+		}
+	}
+
+	Component {
+		id: altEpisodeDetailCompo
+		EpisodeDetail {
+		}
+	}
+
+	/////////////////////////////////////////
 
 	Connections {
 		target: authenticator
@@ -153,31 +191,71 @@ Rectangle {
 						   }
 					   });
 
+		__precacheEpisodes(seasonsViewer.show, season, seasonsViewer.model.count);
+
 		currentEpisodesViewerIndex = 0;
 
 		var coord = seasonsViewer.getSeasonItemCoordinates(season);
 
-		seasonMorpher.x = coord.x;
-		seasonMorpher.y = coord.y;
-		seasonMorpher.width = coord.w;
-		seasonMorpher.height = coord.h;
-		seasonMorpher.current = season;
-		seasonMorpher.min = 1;
-		seasonMorpher.max = seasonsViewer.model.count;
-		seasonMorpher.visible = true;
+		selectorMorpher.template = 'Season %1/%2'
+		selectorMorpher.x = coord.x;
+		selectorMorpher.y = coord.y;
+		selectorMorpher.width = coord.w;
+		selectorMorpher.height = coord.h;
+		selectorMorpher.current = season;
+		selectorMorpher.min = 1;
+		selectorMorpher.max = seasonsViewer.model.count;
+		selectorMorpher.visible = true;
 		seasonSelector.opacity = 0;
 		seasonSelector.visible = true;
 		seasonSelector.current = season;
 		seasonSelector.min = 1;
 		seasonSelector.max = seasonsViewer.model.count;
 		var ar = stackView.mapToItem(null, 0, 0);
-		seasonMorpherAnimation.initTarget(ar.x, ar.y, seasonSelector.width, seasonSelector.height);
-		seasonMorpherAnimation.apparition = true;
-		seasonMorpherAnimation.start();
+		selectorMorpherAnimation.initTarget(ar.x, ar.y, seasonSelector.width, seasonSelector.height);
+		selectorMorpherAnimation.start();
 	}
 
 	function __episodeClicked(episode) {
-		// TODO
+		var episodesViewer = __getCurrentEpisodesViewer();
+
+		stackView.push({
+						   item: episodeDetailCompo,
+						   properties: {
+							   show: episodesViewer.show,
+							   season: episodesViewer.season,
+							   episode: episode
+						   }
+					   });
+
+		currentEpisodeDetailIndex = 0;
+
+		var coord = episodesViewer.getEpisodeItemCoordinates(episode);
+
+		selectorMorpher.template = 'Episode %1/%2'
+		selectorMorpher.x = coord.x;
+		selectorMorpher.y = coord.y;
+		selectorMorpher.width = coord.w;
+		selectorMorpher.height = coord.h;
+		selectorMorpher.current = episode;
+		selectorMorpher.min = 1;
+		selectorMorpher.max = episodesViewer.model.count;
+		selectorMorpher.visible = true;
+		episodeSelector.opacity = 0;
+		episodeSelector.visible = true;
+		episodeSelector.current = episode;
+		episodeSelector.min = 1;
+		episodeSelector.max = episodesViewer.model.count;
+		var ar = stackView.mapToItem(null, 0, 0);
+		selectorMorpherAnimation.initTarget(ar.x, ar.y, episodeSelector.width, episodeSelector.height);
+		selectorMorpherAnimation.start();
+	}
+
+	function __precacheEpisodes(show, season, seasonMax) {
+		if (season > 1)
+			cache.synchronizeEpisodes(show, season - 1);
+		if (season < seasonMax)
+			cache.synchronizeEpisodes(show, season + 1);
 	}
 
 	SplitView {
@@ -226,6 +304,9 @@ Rectangle {
 					// pop all components until only one remains
 					stackView.pop(null);
 
+					seasonSelector.visible = false;
+					episodeSelector.visible = false;
+
 					var compoToPush = __getNextSeasonsViewerCompo();
 
 					if (!stackView.currentItem || stackView.currentItem.widgetType === 'seasons') {
@@ -251,12 +332,6 @@ Rectangle {
 
 			Rectangle {
 				id: resumeRectangle
-/*				anchors {
-					left: parent.left
-					right: parent.right
-					top: parent.top
-					margins: 4
-				}*/
 				Layout.fillWidth: true
 				height: 100
 				color: "white"
@@ -297,13 +372,19 @@ Rectangle {
 				visible: false
 				onCurrentIndexChanged: {
 					episodeSelector.current = 1;
+
+					var episodesViewer = __getCurrentEpisodesViewer();
+
+					// preload surrounding episodes
+					__precacheEpisodes(episodesViewer.show, current, max);
+
 					if (stackView.currentItem.widgetType === 'episodes') {
 						var compoToPush = __getNextEpisodesViewerCompo();
 						var item = stackView.push({
 													  item: compoToPush,
 													  replace: true,
 													  properties: {
-														  show: stackView.currentItem.show,
+														  show: episodesViewer.show,
 														  season: current
 													  }
 												  });
@@ -312,17 +393,26 @@ Rectangle {
 				}
 				onCloseMe: {
 					var seasonsViewer = __getCurrentSeasonsViewer();
+					var noMorph;
 
 					currentEpisodesViewerIndex = 0;
 
-					seasonMorpher.current = current;
-					seasonMorpher.visible = true;
-					seasonSelector.opacity = 0;
-					var coord = seasonsViewer.getSeasonItemCoordinates(current);
-					seasonMorpherAnimation.initTarget(coord.x, coord.y - seasonSelector.height, coord.w, coord.h);
-					seasonMorpherAnimation.apparition = false;
-					seasonMorpherAnimation.start();
+					if (stackView.currentItem.widgetType === 'episodedetail')
+						noMorph = true;
+
 					stackView.pop(null);
+
+					if (noMorph)
+						return;
+
+					selectorMorpher.current = current;
+					selectorMorpher.visible = true;
+					selectorMorpher.initReturnStart(seasonSelector);
+					seasonSelector.opacity = 0;
+
+					var coord = seasonsViewer.getSeasonItemCoordinates(current);
+					selectorMorpherAnimation.initTarget(coord.x, coord.y - seasonSelector.height, coord.w, coord.h);
+					selectorMorpherAnimation.start();
 				}
 			}
 
@@ -332,8 +422,37 @@ Rectangle {
 				Layout.fillWidth: true
 				visible: false
 				onCurrentIndexChanged: {
+					var episodeDetail = __getCurrentEpisodeDetail();
+
+					if (stackView.currentItem.widgetType === 'episodedetail') {
+						var compoToPush = __getNextEpisodeDetailCompo();
+						var item = stackView.push({
+													  item: compoToPush,
+													  replace: true,
+													  properties: {
+														  show: episodeDetail.show,
+														  season: episodeDetail.season,
+														  episode: current
+													  }
+												  });
+						__toggleCurrentEpisodeDetail();
+					}
+
 				}
-				onCloseMe: {
+				onCloseMe: {					
+					var episodesViewer = __getCurrentEpisodesViewer();
+
+					currentEpisodeDetailIndex = 0;
+
+					selectorMorpher.current = current;
+					selectorMorpher.visible = true;
+					selectorMorpher.initReturnStart(episodeSelector);
+					episodeSelector.opacity = 0;
+
+					var coord = episodesViewer.getEpisodeItemCoordinates(current);
+					selectorMorpherAnimation.initTarget(coord.x, coord.y - episodeSelector.height, coord.w, coord.h);
+					selectorMorpherAnimation.start();
+					stackView.pop();
 				}
 			}
 
@@ -346,46 +465,40 @@ Rectangle {
 			}
 
 			ParallelAnimation {
-				property bool apparition : true
-				id: seasonMorpherAnimation
+				id: selectorMorpherAnimation
 				function initTarget(x, y, w, h) {
-					seasonMorpherX.to = x;
-					seasonMorpherY.to = y;
-					seasonMorpherW.to = w;
-					seasonMorpherH.to = h;
+					selectorMorpherX.to = x;
+					selectorMorpherY.to = y;
+					selectorMorpherW.to = w;
+					selectorMorpherH.to = h;
 				}
 				onStopped: {
-					seasonMorpher.visible = false;
-					if (apparition) {
-						seasonSelector.opacity = 1;
-					} else {
-						seasonSelector.visible = false;
-					}
+					selectorMorpher.visible = false;
 				}
 				NumberAnimation {
-					id: seasonMorpherX
-					target: seasonMorpher
+					id: selectorMorpherX
+					target: selectorMorpher
 					property: "x"
 					easing.type: Easing.InOutQuad
 					duration: morphAnimationTime
 				}
 				NumberAnimation {
-					id: seasonMorpherY
-					target: seasonMorpher
+					id: selectorMorpherY
+					target: selectorMorpher
 					property: "y"
 					easing.type: Easing.InOutQuad
 					duration: morphAnimationTime
 				}
 				NumberAnimation {
-					id: seasonMorpherW
-					target: seasonMorpher
+					id: selectorMorpherW
+					target: selectorMorpher
 					property: "width"
 					easing.type: Easing.InOutQuad
 					duration: morphAnimationTime
 				}
 				NumberAnimation {
-					id: seasonMorpherH
-					target: seasonMorpher
+					id: selectorMorpherH
+					target: selectorMorpher
 					property: "height"
 					easing.type: Easing.InOutQuad
 					duration: morphAnimationTime
@@ -436,8 +549,17 @@ Rectangle {
 	}
 
 	RangeSelector {
-		id: seasonMorpher
-		template: "Season %1/%2"
+		id: selectorMorpher
+
+		function initReturnStart(selector) {
+			var ar = selector.mapToItem(null, 0, 0);
+			x = ar.x;
+			y = ar.y;
+			width = selector.width;
+			height = selector.height;
+			template = selector.template;
+		}
+
 		visible: false
 	}
 
