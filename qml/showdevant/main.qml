@@ -273,55 +273,58 @@ Rectangle {
 			width: 200
 			Layout.minimumWidth: 100
 			color: "#DDDDDD"
-			TextField {
-				placeholderText: "Filter wildcard"
-				id: showFilterField
-				anchors.top: parent.top
-				anchors.left: parent.left
-				anchors.right: parent.right
-				anchors.topMargin: 10
-				anchors.leftMargin: 2
-				anchors.rightMargin: 2
-				onTextChanged: {
-					showProxyModel.filter = text;
+
+			ColumnLayout {
+				spacing: 2
+				anchors {
+					fill: parent
+					topMargin: 6 // top toolbar shadow needs a large top margin
+					leftMargin: 4
+					rightMargin: 4
+					bottomMargin: 2
 				}
-			}
-
-			ShowList {
-				id: showList
-				model: showProxyModel
-				clip: true
-				anchors.top: showFilterField.bottom
-				anchors.bottom: parent.bottom
-				anchors.left: parent.left
-				anchors.right: parent.right
-				anchors.topMargin: 6
-				onShowSelected: {
-					var seasonsViewer = stackView.get(0, null);
-					if (seasonsViewer && seasonsViewer.model.show === showId)
-						return;
-
-					// pop all components until only one remains
-					stackView.pop(null);
-
-					seasonSelector.visible = false;
-					episodeSelector.visible = false;
-
-					var compoToPush = __getNextSeasonsViewerCompo();
-
-					if (!stackView.currentItem || stackView.currentItem.widgetType === 'seasons') {
-						var item = stackView.push({
-													  item: compoToPush,
-													  replace: true,
-													  properties: {
-														  show: showId
-													  }
-												  });
-						__toggleCurrentSeasonsViewer();
+				TextField {
+					Layout.fillWidth: true
+					id: showFilterField
+					placeholderText: "Filter wildcard"
+					onTextChanged: {
+						showProxyModel.filter = text;
 					}
+				}
 
-					bannerImage.source = "http://api.betaseries.com/pictures/show/" + showId + ".jpg?key=9adb4ab628c6";
-					bannerText.text = title;
+				ShowList {
+					id: showList
+					model: showProxyModel
+					clip: true
+					Layout.fillWidth: true
+					Layout.fillHeight: true
+					onShowSelected: {
+						var seasonsViewer = stackView.get(0, null);
+						if (seasonsViewer && seasonsViewer.model.show === showId)
+							return;
+
+						// pop all components until only one remains
+						stackView.pop(null);
+
+						seasonSelector.visible = false;
+						episodeSelector.visible = false;
+
+						var compoToPush = __getNextSeasonsViewerCompo();
+
+						if (!stackView.currentItem || stackView.currentItem.widgetType === 'seasons') {
+							var item = stackView.push({
+														  item: compoToPush,
+														  replace: true,
+														  properties: {
+															  show: showId
+														  }
+													  });
+							__toggleCurrentSeasonsViewer();
+						}
+
+						bannerImage.source = "http://api.betaseries.com/pictures/show/" + showId + ".jpg?key=9adb4ab628c6";
+						bannerText.text = title;
+					}
 				}
 			}
 		}
@@ -393,17 +396,13 @@ Rectangle {
 				}
 				onCloseMe: {
 					var seasonsViewer = __getCurrentSeasonsViewer();
-					var noMorph;
 
 					currentEpisodesViewerIndex = 0;
 
-					if (stackView.currentItem.widgetType === 'episodedetail')
-						noMorph = true;
-
-					stackView.pop(null);
-
-					if (noMorph)
+					if (stackView.currentItem.widgetType === 'episodedetail') {
+						stackView.pop(null);
 						return;
+					}
 
 					selectorMorpher.current = current;
 					selectorMorpher.visible = true;
@@ -413,6 +412,7 @@ Rectangle {
 					var coord = seasonsViewer.getSeasonItemCoordinates(current);
 					selectorMorpherAnimation.initTarget(coord.x, coord.y - seasonSelector.height, coord.w, coord.h);
 					selectorMorpherAnimation.start();
+					stackView.pop(null);
 				}
 			}
 
@@ -439,7 +439,7 @@ Rectangle {
 					}
 
 				}
-				onCloseMe: {					
+				onCloseMe: {
 					var episodesViewer = __getCurrentEpisodesViewer();
 
 					currentEpisodeDetailIndex = 0;

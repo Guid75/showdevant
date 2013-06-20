@@ -124,8 +124,6 @@ Rectangle {
 		}
 		anchors {
 			fill: parent
-			leftMargin: 4
-			rightMargin: 4
 		}
 		section.property: "title"
 		section.criteria: ViewSection.FirstCharacter
