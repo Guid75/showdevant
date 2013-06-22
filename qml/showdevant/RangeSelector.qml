@@ -4,21 +4,16 @@ import QtQuick.Layouts 1.0
 
 ToolBar {
 	id: toolBar
-	signal currentIndexChanged(int current)
 	signal closeMe()
 	property int min: 0
 	property int max: 0
 	property int current: 0
 	property string template: "Foobar %1/%2"
-
 	clip: true
 
-	function __changeCurrent(val) {
-		if (current === val)
-			return;
-
-		current = val;
-		currentIndexChanged(val);
+	// force the signal of the current changed to be sent again
+	function refreshCurrent() {
+		currentChanged(current);
 	}
 
 	RowLayout {
@@ -30,9 +25,7 @@ ToolBar {
 		ToolButton {
 			iconSource: "first.png"
 			onClicked: {
-				if (current === min)
-					return;
-				__changeCurrent(min);
+				current = min;
 			}
 		}
 
@@ -40,7 +33,7 @@ ToolBar {
 			iconSource: "previous.png"
 			onClicked: {
 				if (current > min) {
-					__changeCurrent(current - 1);
+					current -= 1;
 				}
 			}
 		}
@@ -58,6 +51,14 @@ ToolBar {
 					id: textBehavior
 					enabled: toolBar.visible
 					ParallelAnimation {
+						onStopped: {
+							console.log("stop");
+						}
+
+						onStarted: {
+							console.log("start");
+						}
+
 						SequentialAnimation {
 							NumberAnimation { target: myText; property: "opacity"; to: 0; duration: 500 }
 							PropertyAction {}
@@ -100,7 +101,7 @@ ToolBar {
 			iconSource: "next.png"
 			onClicked: {
 				if (current < max) {
-					__changeCurrent(current + 1);
+					current += 1;
 				}
 			}
 		}
@@ -108,9 +109,7 @@ ToolBar {
 		ToolButton {
 			iconSource: "last.png"
 			onClicked: {
-				if (current === max)
-					return;
-				__changeCurrent(max);
+				current = max;
 			}
 		}
 

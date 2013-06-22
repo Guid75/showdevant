@@ -2,6 +2,8 @@ import QtQuick 2.0
 import QtQuick.Controls 1.0
 
 StackViewDelegate {
+	property int transitionDuration : 300
+
 	function __getTransitionName(exitType, enterType) {
 		return exitType + '2' + enterType;
 	}
@@ -9,6 +11,7 @@ StackViewDelegate {
 	function getTransition(properties)
 	{
 		switch (__getTransitionName(properties.exitItem.widgetType, properties.enterItem.widgetType)) {
+		case 'seasons2seasons':
 		case 'seasons2episodes':
 		case 'episodes2seasons':
 		case 'episodes2episodedetail':
@@ -23,7 +26,9 @@ StackViewDelegate {
 			if (properties.enterItem.episode < properties.exitItem.episode)
 				return toRightTransition;
 			return toLeftTransition;
-		default: break;
+		default:
+			console.log(__getTransitionName(properties.exitItem.widgetType, properties.enterItem.widgetType));
+			break;
 		}
 		return showToShowTransition;
 	}
@@ -62,14 +67,14 @@ StackViewDelegate {
 			property: "y"
 			from: target.height
 			to: 0
-			duration: 300
+			duration: transitionDuration
 		}
 		PropertyAnimation {
 			target: exitItem
 			property: "y"
 			from: 0
 			to: -target.height
-			duration: 300
+			duration: transitionDuration
 		}
 	}
 	property Component showToShowTransition: StackViewTransition {
@@ -92,14 +97,14 @@ StackViewDelegate {
 			property: "y"
 			from: target.height
 			to: 0
-			duration: 300
+			duration: transitionDuration
 		}
 		PropertyAnimation {
 			target: exitItem
 			property: "y"
 			from: 0
 			to: target.height
-			duration: 300
+			duration: transitionDuration
 		}
 	}
 	property Component toLeftTransition: StackViewTransition {
@@ -108,14 +113,14 @@ StackViewDelegate {
 			property: "x"
 			from: target.width
 			to: 0
-			duration: 300
+			duration: transitionDuration
 		}
 		PropertyAnimation {
 			target: exitItem
 			property: "x"
 			from: 0
 			to: -target.width
-			duration: 300
+			duration: transitionDuration
 		}
 	}
 
@@ -125,14 +130,14 @@ StackViewDelegate {
 			property: "x"
 			from: -target.width
 			to: 0
-			duration: 300
+			duration: transitionDuration
 		}
 		PropertyAnimation {
 			target: exitItem
 			property: "x"
 			from: 0
 			to: target.width
-			duration: 300
+			duration: transitionDuration
 		}
 	}
 }

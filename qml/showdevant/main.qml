@@ -11,10 +11,6 @@ Rectangle {
 	height: 768
 
 	property int morphAnimationTime : 300
-	property int morphInitX
-	property int morphInitY
-	property int morphInitW
-	property int morphInitH
 
 	ShowModel {
 		id: showModel
@@ -34,59 +30,11 @@ Rectangle {
 		filterCaseSensitivity: Qt.CaseInsensitive
 	}
 
-	////////////////////////// SEASONS
-
-	// -1 means that no seasons viewer has been showed yet
-	property int currentSeasonsViewerIndex : -1
-
-	function __toggleCurrentSeasonsViewer() {
-		currentSeasonsViewerIndex = (currentSeasonsViewerIndex + 1) % 2;
-	}
-
-	function __getNextSeasonsViewerCompo() {
-		if (currentSeasonsViewerIndex === 0)
-			return altSeasonsViewerCompo;
-		return seasonsViewerCompo;
-	}
-
-	function __getCurrentSeasonsViewer() {
-		return stackView.find(function(item, index) {
-			return item.widgetType === 'seasons';
-		}, true);
-	}
-
 	Component {
 		id: seasonsViewerCompo
 		SeasonsViewer {
 			onSeasonClicked: __seasonClicked(season, episodeCount)
 		}
-	}
-
-	Component {
-		id: altSeasonsViewerCompo
-		SeasonsViewer {
-			onSeasonClicked: __seasonClicked(season, episodeCount)
-		}
-	}
-
-	////////////////////////// EPISODES
-
-	property int currentEpisodesViewerIndex : -1
-
-	function __toggleCurrentEpisodesViewer() {
-		currentEpisodesViewerIndex = (currentEpisodesViewerIndex + 1) % 2;
-	}
-
-	function __getNextEpisodesViewerCompo() {
-		if (currentEpisodesViewerIndex === 0)
-			return altEpisodesViewerCompo;
-		return episodesViewerCompo;
-	}
-
-	function __getCurrentEpisodesViewer() {
-		return stackView.find(function(item, index) {
-			return item.widgetType === 'episodes';
-		}, true);
 	}
 
 	Component {
@@ -97,45 +45,10 @@ Rectangle {
 	}
 
 	Component {
-		id: altEpisodesViewerCompo
-		EpisodesViewer {
-			onEpisodeClicked: __episodeClicked(episode)
-		}
-	}
-
-	////////////////////////// EPISODE DETAILS
-
-	property int currentEpisodeDetailIndex : -1
-
-	function __toggleCurrentEpisodeDetail() {
-		currentEpisodeDetailIndex = (currentEpisodeDetailIndex + 1) % 2;
-	}
-
-	function __getNextEpisodeDetailCompo() {
-		if (currentEpisodeDetailIndex === 0)
-			return altEpisodeDetailCompo;
-		return episodeDetailCompo;
-	}
-
-	function __getCurrentEpisodeDetail() {
-		return stackView.find(function(item, index) {
-			return item.widgetType === 'episodedetail';
-		}, true);
-	}
-
-	Component {
 		id: episodeDetailCompo
 		EpisodeDetail {
 		}
 	}
-
-	Component {
-		id: altEpisodeDetailCompo
-		EpisodeDetail {
-		}
-	}
-
-	/////////////////////////////////////////
 
 	Connections {
 		target: authenticator
@@ -161,7 +74,7 @@ Rectangle {
 	}
 
 	Component.onCompleted: {
-		showList.showSelected("lost", "Lost");
+		//	showList.showSelected("lost", "Lost");
 		switch (databaseManager.openDBLastError()) {
 		case 0:
 			epicFailMessage.active = true;
@@ -181,7 +94,7 @@ Rectangle {
 	}
 
 	function __seasonClicked(season, episodeCount) {
-		var seasonsViewer = __getCurrentSeasonsViewer();
+		var seasonsViewer = stackView.findWidget("seasons");
 
 		stackView.push({
 						   item: episodesViewerCompo,
@@ -193,7 +106,7 @@ Rectangle {
 
 		__precacheEpisodes(seasonsViewer.show, season, seasonsViewer.model.count);
 
-		currentEpisodesViewerIndex = 0;
+		// prepare the season morpher
 
 		var coord = seasonsViewer.getSeasonItemCoordinates(season);
 
@@ -217,7 +130,7 @@ Rectangle {
 	}
 
 	function __episodeClicked(episode) {
-		var episodesViewer = __getCurrentEpisodesViewer();
+		var episodesViewer = stackView.findWidget("episodes");
 
 		stackView.push({
 						   item: episodeDetailCompo,
@@ -227,8 +140,6 @@ Rectangle {
 							   episode: episode
 						   }
 					   });
-
-		currentEpisodeDetailIndex = 0;
 
 		var coord = episodesViewer.getEpisodeItemCoordinates(episode);
 
@@ -299,8 +210,8 @@ Rectangle {
 					Layout.fillWidth: true
 					Layout.fillHeight: true
 					onShowSelected: {
-						var seasonsViewer = stackView.get(0, null);
-						if (seasonsViewer && seasonsViewer.model.show === showId)
+						var seasonsViewer = stackView.findWidget('seasons');
+						if (seasonsViewer && seasonsViewer.show === showId)
 							return;
 
 						// pop all components until only one remains
@@ -309,18 +220,13 @@ Rectangle {
 						seasonSelector.visible = false;
 						episodeSelector.visible = false;
 
-						var compoToPush = __getNextSeasonsViewerCompo();
-
-						if (!stackView.currentItem || stackView.currentItem.widgetType === 'seasons') {
-							var item = stackView.push({
-														  item: compoToPush,
-														  replace: true,
-														  properties: {
-															  show: showId
-														  }
-													  });
-							__toggleCurrentSeasonsViewer();
-						}
+						stackView.push({
+										   item: seasonsViewerCompo,
+										   replace: true,
+										   properties: {
+											   show: showId
+										   }
+									   });
 
 						bannerImage.source = "http://api.betaseries.com/pictures/show/" + showId + ".jpg?key=9adb4ab628c6";
 						bannerText.text = title;
@@ -373,33 +279,39 @@ Rectangle {
 				template: "Season %1/%2"
 				Layout.fillWidth: true
 				visible: false
-				onCurrentIndexChanged: {
-					episodeSelector.current = 1;
+				onCurrentChanged: {
+					var episodesViewer = stackView.findWidget("episodes");
 
-					var episodesViewer = __getCurrentEpisodesViewer();
+					console.assert(!episodesViewer, "Cannot find an episode viewer in the stack. It should not happend here.");
 
 					// preload surrounding episodes
 					__precacheEpisodes(episodesViewer.show, current, max);
 
-					if (stackView.currentItem.widgetType === 'episodes') {
-						var compoToPush = __getNextEpisodesViewerCompo();
-						var item = stackView.push({
-													  item: compoToPush,
-													  replace: true,
-													  properties: {
-														  show: episodesViewer.show,
-														  season: current
-													  }
-												  });
-						__toggleCurrentEpisodesViewer();
+					if (stackView.currentItem === episodesViewer) {
+						// replaces an episodes viewer by another episodes viewer
+						stackView.push({
+										   item: episodesViewerCompo,
+										   replace: true,
+										   properties: {
+											   show: episodesViewer.show,
+											   season: current
+										   }
+									   });
+					} else {
+						// the episodes item is not visible but we update its model
+						episodesViewer.season = current;
+
+						var episodeDetail = stackView.findWidget("episodedetail");
+						episodeDetail.season = current;
+
+						episodeSelector.current = 1;
+						episodeSelector.refreshCurrent();
 					}
 				}
 				onCloseMe: {
-					var seasonsViewer = __getCurrentSeasonsViewer();
+					var seasonsViewer = stackView.findWidget("seasons");
 
-					currentEpisodesViewerIndex = 0;
-
-					if (stackView.currentItem.widgetType === 'episodedetail') {
+					if (stackView.currentItem !== stackView.findWidget("episodes")) {
 						stackView.pop(null);
 						return;
 					}
@@ -421,28 +333,24 @@ Rectangle {
 				template: "Episode %1/%2"
 				Layout.fillWidth: true
 				visible: false
-				onCurrentIndexChanged: {
-					var episodeDetail = __getCurrentEpisodeDetail();
+				onCurrentChanged: {
+					var episodeDetail = stackView.findWidget("episodedetail");
 
-					if (stackView.currentItem.widgetType === 'episodedetail') {
-						var compoToPush = __getNextEpisodeDetailCompo();
-						var item = stackView.push({
-													  item: compoToPush,
-													  replace: true,
-													  properties: {
-														  show: episodeDetail.show,
-														  season: episodeDetail.season,
-														  episode: current
-													  }
-												  });
-						__toggleCurrentEpisodeDetail();
+					if (stackView.currentItem === episodeDetail) {
+						stackView.push({
+										   item: episodeDetailCompo,
+										   replace: true,
+										   properties: {
+											   show: episodeDetail.show,
+											   season: episodeDetail.season,
+											   episode: current
+										   }
+									   });
 					}
 
 				}
 				onCloseMe: {
-					var episodesViewer = __getCurrentEpisodesViewer();
-
-					currentEpisodeDetailIndex = 0;
+					var episodesViewer = stackView.findWidget("episodes");
 
 					selectorMorpher.current = current;
 					selectorMorpher.visible = true;
@@ -462,6 +370,14 @@ Rectangle {
 				Layout.fillWidth: true
 				Layout.fillHeight: true
 				delegate: MainStackViewDelegate {}
+				initialItem: Item { // a blank item, used to display the very first transition
+					property string widgetType : "seasons"
+				}
+				function findWidget(widgetType) {
+					return find(function(item, index) {
+						return item.widgetType === widgetType;
+					}, true);
+				}
 			}
 
 			ParallelAnimation {

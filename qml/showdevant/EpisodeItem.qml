@@ -75,7 +75,7 @@ ShadowRectangle {
 		CheckBox {
 			checked: seen
 			onClicked: {
-				cache.watchShow(currentShow, season, episode);
+				cache.watchShow(show, season, episode);
 			}
 		}
 	}
