@@ -23,6 +23,10 @@ ShadowRectangle {
 		return str;
 	}
 
+	function onAir() {
+		return (new Date(1000 * date)) < new Date();
+	}
+
 	gradient: Gradient {
 		GradientStop { position: 0.0; color: mouseArea.containsMouse ? "white" : "#BBBBBB"}
 		GradientStop { position: 1.0; color: mouseArea.containsMouse ? "white" : "#DDDDDD" }
@@ -34,13 +38,13 @@ ShadowRectangle {
 			margins: 4
 		}
 		Text {
-			color: (new Date(1000 * date)) < new Date() ? "black" : "#888888"
+			color: onAir() ? "black" : "#888888"
 			text: "Episode S%1E<b>%2</b>".arg(__getPadded(season, 2)).arg(__getPadded(episode, 2))
 			renderType: Text.NativeRendering
 			font.pointSize: 12
 		}
 		Text {
-			color: (new Date(1000 * date)) < new Date() ? "black" : "#888888"
+			color: onAir() ? "black" : "#888888"
 			text: '"%1"'.arg(title)
 			renderType: Text.NativeRendering
 			width: fatherRectangle.width
@@ -84,7 +88,7 @@ ShadowRectangle {
 	}
 
 	Row {
-		visible: mouseArea.containsMouse
+		visible: authenticator.isLogged() && mouseArea.containsMouse && onAir()
 		spacing: 2
 		anchors {
 			right: parent.right
