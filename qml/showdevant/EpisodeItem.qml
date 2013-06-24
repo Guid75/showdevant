@@ -34,11 +34,13 @@ ShadowRectangle {
 			margins: 4
 		}
 		Text {
+			color: (new Date(1000 * date)) < new Date() ? "black" : "#888888"
 			text: "Episode S%1E<b>%2</b>".arg(__getPadded(season, 2)).arg(__getPadded(episode, 2))
 			renderType: Text.NativeRendering
 			font.pointSize: 12
 		}
 		Text {
+			color: (new Date(1000 * date)) < new Date() ? "black" : "#888888"
 			text: '"%1"'.arg(title)
 			renderType: Text.NativeRendering
 			width: fatherRectangle.width
