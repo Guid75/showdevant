@@ -2,7 +2,7 @@ import QtQuick 2.0
 import com.guid75 1.0
 
 Item {
-	signal seasonClicked(int season, int episodeCount); //, int x, int y, int w, int h)
+	signal seasonClicked(int season)
 	readonly property string widgetType : "seasons"
 	property alias model : seasonModel
 	property alias show : seasonModel.show
@@ -56,7 +56,7 @@ Item {
 					seasonNumber: number
 					episodeCount: episode_count
 					onItemClicked: {
-						seasonClicked(number, episode_count);
+						seasonClicked(number);
 					}
 				}
 			}

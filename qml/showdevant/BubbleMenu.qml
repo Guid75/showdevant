@@ -9,6 +9,7 @@ Item {
 	property alias bubbleX : bubbleItem.x
 	property alias bubbleY : bubbleItem.y
 	property alias bubbleHeight : bubbleItem.height
+	property alias bubbleWidth : bubbleItem.width
 
 	anchors.fill: parent
 
@@ -27,6 +28,7 @@ Item {
 		width: 70
 		height: 48
 		Behavior on y {
+			enabled: bubbleMenu.visible
 			NumberAnimation { duration: 100 }
 		}
 

@@ -25,19 +25,6 @@ Rectangle {
 		return image && image.objectName === 'dropDownImage';
 	}
 
-	Menu {
-		id: showMenu
-		MenuItem {
-			text: "Remove"
-			onTriggered: {
-				console.log("remove it");
-			}
-		}
-		MenuItem {
-			text: "Archive"
-		}
-	}
-
 	Component {
 		id: showDelegate
 		Rectangle {
@@ -77,15 +64,17 @@ Rectangle {
 				MouseArea {
 					id: dropDownMouseArea
 					anchors.fill: parent
-//					hoverEnabled: true
+					//					hoverEnabled: true
 					onClicked: {
 						listView.currentIndex = index;
 						var item = showItem;
 						var ar = item.mapToItem(null, 0, 0);
 						var bubbleCenter = ar.y + item.height / 2;
 						bubbleMenu.bubbleY = bubbleCenter - bubbleMenu.bubbleHeight / 2;
-						if (!bubbleMenu.visible)
+						if (!bubbleMenu.visible) {
 							bubbleMenu.visible = true;
+						}
+
 					}
 				}
 			}

@@ -5,7 +5,7 @@ import com.guid75 1.0
 ShadowRectangle {
 	id: fatherRectangle
 	signal itemClicked()
-	height: 50
+	height: 55
 	width: 200
 
 	function __getPadded(num, pad) {
@@ -30,10 +30,8 @@ ShadowRectangle {
 	color: mouseArea.containsMouse ? "#EEEEEE" : "#CCCCCC"
 	Column {
 		anchors {
-			top: parent.top
-			left: parent.left
-			topMargin: 4
-			leftMargin: 4
+			fill: parent
+			margins: 4
 		}
 		Text {
 			text: "Episode S%1E<b>%2</b>".arg(__getPadded(season, 2)).arg(__getPadded(episode, 2))
@@ -46,6 +44,31 @@ ShadowRectangle {
 			width: fatherRectangle.width
 			font.pointSize: 8
 			elide: Text.ElideMiddle
+		}
+		Text {
+			font.pointSize: 8
+			horizontalAlignment: Text.AlignRight
+		}
+	}
+
+	Rectangle {
+		gradient: Gradient {
+			GradientStop { position: 0.0; color: "#888888" }
+			GradientStop { position: 1.0; color: "#AAAAAA" }
+		}
+//		color: "blue"
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
+		height: dateText.contentHeight
+		width: dateText.contentWidth + 4
+
+		Text {
+			id: dateText
+			color: "white"
+			renderType: Text.NativeRendering
+			font.pointSize: 8
+			text: '%1'.arg(Qt.formatDate(new Date(date * 1000)))
+			anchors.centerIn: parent
 		}
 	}
 

@@ -65,7 +65,8 @@ OTHER_FILES += \
     qml/showdevant/NotifyZone.qml \
     qml/showdevant/NotifyBox.qml \
     qml/showdevant/BubbleMenu.qml \
-    qml/showdevant/MainStackViewDelegate.qml
+    qml/showdevant/MainStackViewDelegate.qml \
+    qml/showdevant/ScrollText.qml
 
 HEADERS += \
     downloadmanager.h \

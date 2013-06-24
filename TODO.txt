@@ -1,12 +1,9 @@
 - On doit pouvoir consulter une série et ses sous-titres meme sans la suivre et pouvoir la mettre quand meme dans le cache avec date de peremption des données
-  Il faut donc un nouveau parametre boolean "follow" dans la table "show" qui permet de dire si cette série doit ou non apparaitre dans la liste des séries suivies
 
 - supprimer régulièrement et automatiquement les données obsolètes de la base pour ne pas la faire trop grossir au fil du temps
 - Pas d'animation quand on affiche les barres de sélection
 - Problème avec chargement rapide des bannières, au bout d'un moment, ça ne charge plus rien, mais pas de message d'erreur
-- Corriger le padding (S01E15)
 
 - Lorsque la gestion de compte sera avancée, je pourrais me contenter d'écraser les paramètres spécifique utilisateur nouvellement lus comme si l'épisode a été visionné ou non
 - Prendre en charge les images inexistantes et les remplacer par une image bidon
 - Attention, le texte des descriptions contient des balises html, les échapper
-- Attention au double parsing json (dans command.cpp et dans cache.cpp)

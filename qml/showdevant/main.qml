@@ -33,7 +33,7 @@ Rectangle {
 	Component {
 		id: seasonsViewerCompo
 		SeasonsViewer {
-			onSeasonClicked: __seasonClicked(season, episodeCount)
+			onSeasonClicked: __seasonClicked(season)
 		}
 	}
 
@@ -74,7 +74,6 @@ Rectangle {
 	}
 
 	Component.onCompleted: {
-		//	showList.showSelected("lost", "Lost");
 		switch (databaseManager.openDBLastError()) {
 		case 0:
 			epicFailMessage.active = true;
@@ -93,7 +92,7 @@ Rectangle {
 		authenticator.autoLogin();
 	}
 
-	function __seasonClicked(season, episodeCount) {
+	function __seasonClicked(season) {
 		var seasonsViewer = stackView.findWidget("seasons");
 
 		stackView.push({
@@ -181,6 +180,7 @@ Rectangle {
 
 		Rectangle {
 			id: leftRectangle
+			z: 1
 			width: 200
 			Layout.minimumWidth: 100
 			color: "#DDDDDD"
@@ -282,7 +282,10 @@ Rectangle {
 				onCurrentChanged: {
 					var episodesViewer = stackView.findWidget("episodes");
 
-					console.assert(!episodesViewer, "Cannot find an episode viewer in the stack. It should not happend here.");
+					if (!episodesViewer) {
+						// not yet initialized
+						return;
+					}
 
 					// preload surrounding episodes
 					__precacheEpisodes(episodesViewer.show, current, max);
@@ -422,7 +425,6 @@ Rectangle {
 			}
 			Loader {
 				id: loadingWidget
-				//anchors.centerIn: playgroundLoader
 				anchors.centerIn: stackView
 				sourceComponent: LoadingWidget {
 					anchors.centerIn: parent
