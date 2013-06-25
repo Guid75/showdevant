@@ -14,7 +14,8 @@ Rectangle {
 	height: episodeImage.paintedHeight
 	color: "#DDDDDD"
 
-	Item {
+	Rectangle {
+		color: "#CCCCCC"
 		id: imageAndResume
 		clip: true
 		height: 150
@@ -92,6 +93,54 @@ Rectangle {
 				rightMargin: 8
 			}
 			text: episodeDetailModel.get(0).description
+		}
+
+		Row {
+			spacing: 2
+			anchors {
+				right: parent.right
+				rightMargin: 4
+				verticalCenter: titleText.verticalCenter
+			}
+
+			Text {
+				visible: authenticator.isLogged()
+				text: "seen"
+				renderType: Text.NativeRendering
+			}
+
+			CheckBox {
+				visible: authenticator.isLogged()
+				checked: episodeDetailModel.get(0).seen
+				onClicked: {
+					cache.watchShow(show, season, episode);
+				}
+			}
+
+			Text {
+				visible: authenticator.isLogged()
+				text: "on air"
+				renderType: Text.NativeRendering
+			}
+
+			Rectangle {
+				gradient: Gradient {
+					GradientStop { position: 0.0; color: "#888888" }
+					GradientStop { position: 1.0; color: "#AAAAAA" }
+				}
+				anchors.verticalCenter: parent.verticalCenter
+				height: dateText.contentHeight
+				width: dateText.contentWidth + 4
+
+				Text {
+					id: dateText
+					color: "white"
+					renderType: Text.NativeRendering
+					font.pointSize: 8
+					text: '%1'.arg(Qt.formatDate(new Date(episodeDetailModel.get(0).date * 1000)))
+					anchors.centerIn: parent
+				}
+			}
 		}
 
 		Loader {

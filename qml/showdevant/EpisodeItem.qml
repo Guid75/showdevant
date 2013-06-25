@@ -62,7 +62,6 @@ ShadowRectangle {
 			GradientStop { position: 0.0; color: "#888888" }
 			GradientStop { position: 1.0; color: "#AAAAAA" }
 		}
-//		color: "blue"
 		anchors.right: parent.right
 		anchors.bottom: parent.bottom
 		height: dateText.contentHeight
