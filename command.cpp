@@ -2,12 +2,13 @@
 
 Command::Command(QObject *parent) :
 	QObject(parent),
-	_error(false)
+	_httpError(false)
 {
 }
 
 void Command::finalize()
 {
-	_jsonParser.parse(_response);
+	if (!_httpError)
+		_jsonParser.parse(_response);
 	emit finished();
 }

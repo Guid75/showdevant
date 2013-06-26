@@ -13,7 +13,8 @@ public:
 	explicit Command(QObject *parent = 0);
 
 	const QByteArray &response() const { return _response; }
-	bool error() const { return _error; }
+	// true if an error occured at the http level
+	bool httpError() const { return _httpError; }
 
 	const JsonParser &jsonParser() const { return _jsonParser; }
 	
@@ -21,7 +22,7 @@ signals:
 	void finished();
 
 private:
-	bool _error;
+	bool _httpError;
 	QByteArray _response;
 	JsonParser _jsonParser;
 

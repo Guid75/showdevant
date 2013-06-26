@@ -53,8 +53,13 @@ void Authenticator::commandFinished()
 	Command *command = qobject_cast<Command*>(sender());
 	Q_ASSERT(command);
 
+	if (command->httpError()) {
+		setLogState(NotLogged);
+		return;
+	}
+
 	if (!command->jsonParser().isValid()) {
-		qCritical("Invalid response format");
+		qCritical("Invalid response format for login");
 		return;
 	}
 

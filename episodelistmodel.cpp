@@ -4,8 +4,7 @@
 
 EpisodeListModel::EpisodeListModel(QObject *parent) :
 	SqlQueryModel(parent),
-	_season(-1),
-	_episode(-1)
+	_season(-1)
 {
 }
 
@@ -29,27 +28,12 @@ void EpisodeListModel::setSeason(int season)
 	emit seasonChanged();
 }
 
-void EpisodeListModel::setEpisode(int episode)
-{
-	if (_episode == episode)
-		return;
-
-	_episode = episode;
-	load();
-	emit episodeChanged();
-}
-
 void EpisodeListModel::select()
 {
 	QSqlQuery query;
-	QString prepareStr = "select * from episode where show_id=:show_id AND season=:season";
-	if (_episode >= 0)
-		prepareStr.append(" AND episode=:episode");
-	query.prepare(prepareStr);
+	query.prepare("SELECT * FROM episode WHERE show_id=:show_id AND season=:season");
 	query.bindValue(":show_id", _show);
 	query.bindValue(":season", _season);
-	if (_episode >= 0)
-		query.bindValue(":episode", _episode);
 	query.exec();
 	setQuery(query);
 }
@@ -64,11 +48,7 @@ void EpisodeListModel::load()
 	id.insert("showId", _show);
 	id.insert("season", _season);
 	cacheWatcher.watchFor(Cache::Data_Episodes, id);
-	if (_episode >= 0) {
-		id.insert("episode", _episode);
-		cacheWatcher.watchFor(Cache::Data_Episodes, id);
-	}
 
-	Cache::instance().synchronizeEpisodes(_show, _season, _episode, _episode >= 0);
+	Cache::instance().synchronizeEpisodes(_show, _season);
 	select();
 }

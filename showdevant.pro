@@ -33,7 +33,8 @@ SOURCES += main.cpp \
     settings.cpp \
     authenticator.cpp \
     myshowsmodel.cpp \
-    cacheqmlproxy.cpp
+    cacheqmlproxy.cpp \
+    episodemodel.cpp
 
 # Installation path
 # target.path =
@@ -87,4 +88,5 @@ HEADERS += \
     settings.h \
     authenticator.h \
     myshowsmodel.h \
-    cacheqmlproxy.h
+    cacheqmlproxy.h \
+    episodemodel.h

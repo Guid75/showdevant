@@ -67,7 +67,10 @@ Command *CommandManager::pushCommand(const QString &path, const QString &cmd, co
 	QUrl url(QString("%1%2%3.json").arg(websiteUrl).arg(normPath).arg(cmd));
 	url.setQuery(query);
 
-	QNetworkReply *reply = nam->get(QNetworkRequest(url));
+	QNetworkRequest request(url);
+	request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysNetwork);
+
+	QNetworkReply *reply = nam->get(request);
 	Command *command = new Command(this);
 	commands.insert(reply, command);
 
@@ -197,8 +200,7 @@ void CommandManager::httpError(QNetworkReply::NetworkError)
 {
 	QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
 	Command *command = commands[reply];
-	command->_error = true;
-	qCritical("CommandManager error: %s", qPrintable(reply->errorString()));
+	command->_httpError = true;
 }
 
 void CommandManager::httpReadyRead()

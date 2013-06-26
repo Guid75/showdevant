@@ -10,7 +10,7 @@ Rectangle {
 	property alias episode: episodeDetailModel.episode
 	readonly property string widgetType : "episodedetail"
 
-	EpisodeListModel {
+	EpisodeModel {
 		id: episodeDetailModel
 	}
 

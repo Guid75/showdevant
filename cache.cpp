@@ -1,18 +1,18 @@
 //  Copyright 2013 Guillaume Denry (guillaume.denry@gmail.com)
-//  This file is part of BetaSeeker.
+//  This file is part of ShowDevant.
 //
-//  BetaSeeker is free software: you can redistribute it and/or modify
+//  ShowDevant is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
-//  BetaSeeker is distributed in the hope that it will be useful,
+//  ShowDevant is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with BetaSeeker.  If not, see <http://www.gnu.org/licenses/>.
+//  along with ShowDevant.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QStringList>
 #include <QSqlDatabase>
@@ -27,6 +27,8 @@
 #include "commandmanager.h"
 #include "command.h"
 #include "cache.h"
+
+//#define OFFLINE 1
 
 Cache *Cache::_instance = 0;
 
@@ -87,11 +89,13 @@ void Cache::commandFinished(QObject *commandObj)
 	SynchronizeAction *action = getAction(command);
 	Q_ASSERT(action != 0); // an action MUST exists for the command
 
-	if (command->error())
+	if (command->httpError())
 		emit synchronizeFailed(action->dataType, action->id);
 	else
 		QMetaObject::invokeMethod(this, action->callbackMethodName.toLocal8Bit(),
 								  Qt::DirectConnection, Q_ARG(QVariantMap, action->id), Q_ARG(JsonParser, command->jsonParser()));
+
+	currentActions.removeOne(action);
 	command->deleteLater();
 }
 
@@ -337,6 +341,7 @@ void Cache::showInfosCallback(const QVariantMap &id, const JsonParser &json)
 
 void Cache::episodesCallback(const QVariantMap &id, const JsonParser &json)
 {
+	qDebug("episodesCallback");
 	QString showId = id["showId"].toString();
 	parseSeasons(showId, json, id["episode"].isNull());
 	emit synchronized(Data_Episodes, id);
@@ -403,6 +408,12 @@ int Cache::synchronizeShowInfos(const QString &showId)
 	if (query.next() && !query.value(0).isNull()) {
 		last_sync_epoch = query.value(0).toLongLong() * 1000;
 	}
+
+#ifdef OFFLINE
+	emit synchronized(Data_ShowInfos, id);
+	return 0;
+#endif
+
 	if (QDateTime::currentDateTime().toMSecsSinceEpoch() - last_sync_epoch <= expiration) {
 		// data are already synchronized, we can use them
 		emit synchronized(Data_ShowInfos, id);
@@ -459,6 +470,12 @@ int Cache::synchronizeEpisodes(const QString &showId, int season, int episode, b
 	query.exec();
 	if (query.next() && !query.value(0).isNull())
 		last_sync_epoch = query.value(0).toLongLong() * 1000;
+
+#ifdef OFFLINE
+	emit synchronized(Data_Episodes, id);
+	return 0;
+#endif
+
 	if (QDateTime::currentDateTime().toMSecsSinceEpoch() - last_sync_epoch <= expiration) {
 		// data are already synchronized, we can use them
 		emit synchronized(Data_Episodes, id);
