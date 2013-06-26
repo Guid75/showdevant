@@ -341,7 +341,6 @@ void Cache::showInfosCallback(const QVariantMap &id, const JsonParser &json)
 
 void Cache::episodesCallback(const QVariantMap &id, const JsonParser &json)
 {
-	qDebug("episodesCallback");
 	QString showId = id["showId"].toString();
 	parseSeasons(showId, json, id["episode"].isNull());
 	emit synchronized(Data_Episodes, id);
