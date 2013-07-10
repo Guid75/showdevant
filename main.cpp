@@ -31,6 +31,7 @@
 #include "seasonlistmodel.h"
 #include "episodelistmodel.h"
 #include "episodemodel.h"
+#include "subtitlelistmodel.h"
 #include "sortfilterproxymodel.h"
 #include "cache.h"
 #include "cachewatcher.h"
@@ -61,6 +62,7 @@ int main(int argc, char *argv[])
 	qmlRegisterType<SeasonListModel>("com.guid75", 1, 0, "SeasonListModel");
 	qmlRegisterType<EpisodeListModel>("com.guid75", 1, 0, "EpisodeListModel");
 	qmlRegisterType<EpisodeModel>("com.guid75", 1, 0, "EpisodeModel");
+	qmlRegisterType<SubtitleListModel>("com.guid75", 1, 0, "SubtitleListModel");
 	qmlRegisterType<ShowModel>("com.guid75", 1, 0, "ShowModel");
 	qmlRegisterType<SortFilterProxyModel>("com.guid75", 1, 0, "SortFilterProxyModel");
 	qmlRegisterType<MyShowsModel>("com.guid75", 1, 0, "MyShowsModel");

@@ -28,6 +28,7 @@ JsonParser::JsonParser(const QByteArray &content)
 bool JsonParser::parse(const QByteArray &content)
 {
 	valid = false;
+	_json = content;
 	QJsonParseError error;
 	doc = QJsonDocument::fromJson(content, &error);
 	if (doc.isNull()) {

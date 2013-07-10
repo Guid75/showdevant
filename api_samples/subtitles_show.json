@@ -1,0 +1,96 @@
+{
+	"root": {
+		"key": "9adb4ab628c6",
+		"subtitles": {
+			"0": {
+				"title": "Supernatural",
+				"season": "1",
+				"episode": "0",
+				"language": "VF",
+				"source": "soustitres",
+				"file": "Supernatural.S01.DVDRip.FR.zip",
+				"content": {
+					"0": "Supernatural.Saison1.E01-E22/",
+					"1": "Supernatural.Saison1.E01-E22/Supernatural.S01E01.srt",
+					"2": "Supernatural.Saison1.E01-E22/Supernatural.S01E02.srt",
+					"3": "Supernatural.Saison1.E01-E22/Supernatural.S01E03.srt",
+					"4": "Supernatural.Saison1.E01-E22/Supernatural.S01E04.srt",
+					"5": "Supernatural.Saison1.E01-E22/Supernatural.S01E05.srt",
+					"6": "Supernatural.Saison1.E01-E22/Supernatural.S01E06.srt",
+					"7": "Supernatural.Saison1.E01-E22/Supernatural.S01E07.srt",
+					"8": "Supernatural.Saison1.E01-E22/Supernatural.S01E08.srt",
+					"9": "Supernatural.Saison1.E01-E22/Supernatural.S01E09.srt",
+					"10": "Supernatural.Saison1.E01-E22/Supernatural.S01E10.srt",
+					"11": "Supernatural.Saison1.E01-E22/Supernatural.S01E11.srt",
+					"12": "Supernatural.Saison1.E01-E22/Supernatural.S01E12.srt",
+					"13": "Supernatural.Saison1.E01-E22/Supernatural.S01E13.srt",
+					"14": "Supernatural.Saison1.E01-E22/Supernatural.S01E14.srt",
+					"15": "Supernatural.Saison1.E01-E22/Supernatural.S01E15.srt",
+					"16": "Supernatural.Saison1.E01-E22/Supernatural.S01E16.srt",
+					"17": "Supernatural.Saison1.E01-E22/Supernatural.S01E17.srt",
+					"18": "Supernatural.Saison1.E01-E22/Supernatural.S01E18.srt",
+					"19": "Supernatural.Saison1.E01-E22/Supernatural.S01E19.srt",
+					"20": "Supernatural.Saison1.E01-E22/Supernatural.S01E20.srt",
+					"21": "Supernatural.Saison1.E01-E22/Supernatural.S01E21.srt",
+					"22": "Supernatural.Saison1.E01-E22/Supernatural.S01E22.srt"
+				},
+				"url": "https://www.betaseries.com/srt/180574",
+				"quality": 5
+			},
+			"1": {
+				"title": "Supernatural",
+				"season": "1",
+				"episode": "2",
+				"language": "VO",
+				"source": "tvsubtitles",
+				"file": "Supernatural_1x02_en.zip",
+				"content": {
+					"0": "Supernatural - 1x02 - Wendigo.en.srt"
+				},
+				"url": "https://www.betaseries.com/srt/71961",
+				"quality": 1
+			},
+			"2": {
+				"title": "Supernatural",
+				"season": "1",
+				"episode": "2",
+				"language": "VF",
+				"source": "tvsubtitles",
+				"file": "Supernatural_1x02_fr.zip",
+				"content": {
+					"0": "Supernatural - 1x02 - Wendigo.fr.srt"
+				},
+				"url": "https://www.betaseries.com/srt/71968",
+				"quality": 1
+			},
+			"3": {
+				"title": "Supernatural",
+				"season": "1",
+				"episode": "2",
+				"language": "VF",
+				"source": "tvsubtitles",
+				"file": "Supernatural_1x02_WebRip.fr.zip",
+				"content": {
+					"0": "Supernatural - 1x02 - Wendigo.WebRip.fr.srt"
+				},
+				"url": "https://www.betaseries.com/srt/351380",
+				"quality": 1
+			},
+			"4": {
+				"title": "Supernatural",
+				"season": "1",
+				"episode": "2",
+				"language": "VO",
+				"source": "podnapisi",
+				"file": "Supernatural - 1x02 - Wendigo.720p.WEB-DL.Arm.ru.zip",
+				"content": {
+					"0": "Supernatural - 1x02 - Wendigo.720p.WEB-DL.Arm.ru.srt"
+				},
+				"url": "https://www.betaseries.com/srt/372706",
+				"quality": 2
+			}
+		},
+		"code": 1,
+		"errors": {}
+	}
+}

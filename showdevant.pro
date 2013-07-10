@@ -34,7 +34,8 @@ SOURCES += main.cpp \
     authenticator.cpp \
     myshowsmodel.cpp \
     cacheqmlproxy.cpp \
-    episodemodel.cpp
+    episodemodel.cpp \
+    subtitlelistmodel.cpp
 
 # Installation path
 # target.path =
@@ -67,7 +68,9 @@ OTHER_FILES += \
     qml/showdevant/NotifyBox.qml \
     qml/showdevant/BubbleMenu.qml \
     qml/showdevant/MainStackViewDelegate.qml \
-    qml/showdevant/ScrollText.qml
+    qml/showdevant/ScrollText.qml \
+    api_samples/members_info.json \
+    api_samples/subtitles_show.json
 
 HEADERS += \
     downloadmanager.h \
@@ -89,4 +92,5 @@ HEADERS += \
     authenticator.h \
     myshowsmodel.h \
     cacheqmlproxy.h \
-    episodemodel.h
+    episodemodel.h \
+    subtitlelistmodel.h

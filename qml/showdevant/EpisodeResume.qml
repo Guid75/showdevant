@@ -6,12 +6,13 @@ import com.guid75 1.0
 
 Rectangle {
 	id: resumeRectangle
-	anchors {
-		left: parent.left
-		top: parent.top
-	}
-	width: episodeImage.paintedWidth
-	height: episodeImage.paintedHeight
+	height: 150
+//	anchors {
+//		left: parent.left
+//		top: parent.top
+//	}
+//	width: episodeImage.paintedWidth
+//	height: episodeImage.paintedHeight
 	color: "#DDDDDD"
 
 	Rectangle {
@@ -19,15 +20,16 @@ Rectangle {
 		id: imageAndResume
 		clip: true
 		height: 150
-		anchors {
-			left: parent.left
-			right: parent.right
-			top: parent.top
-		}
+		anchors.fill: parent
+//		anchors {
+//			left: parent.left
+//			right: parent.right
+//			top: parent.top
+//		}
 
 		Image {
 			id: episodeImage
-			height: 150
+			height: resumeRectangle.height
 			source: show && season && episode ? "http://api.betaseries.com/pictures/episode/%1.jpg?season=%2&episode=%3&key=9adb4ab628c6".arg(show).arg(season).arg(episode) : ""
 			fillMode: Image.PreserveAspectFit
 		}

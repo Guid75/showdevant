@@ -99,11 +99,12 @@ Rectangle {
 						   item: episodesViewerCompo,
 						   properties: {
 							   show: seasonsViewer.show,
-							   season: season
+							   season: season,
+							   maxSeason: seasonsViewer.model.count
 						   }
 					   });
 
-		__precacheEpisodes(seasonsViewer.show, season, seasonsViewer.model.count);
+		//__precacheEpisodes(seasonsViewer.show, season, seasonsViewer.model.count);
 
 		// prepare the season morpher
 
@@ -159,13 +160,6 @@ Rectangle {
 		var ar = stackView.mapToItem(null, 0, 0);
 		selectorMorpherAnimation.initTarget(ar.x, ar.y, episodeSelector.width, episodeSelector.height);
 		selectorMorpherAnimation.start();
-	}
-
-	function __precacheEpisodes(show, season, seasonMax) {
-		if (season > 1)
-			cache.synchronizeEpisodes(show, season - 1);
-		if (season < seasonMax)
-			cache.synchronizeEpisodes(show, season + 1);
 	}
 
 	SplitView {
@@ -288,7 +282,7 @@ Rectangle {
 					}
 
 					// preload surrounding episodes
-					__precacheEpisodes(episodesViewer.show, current, max);
+					//__precacheEpisodes(episodesViewer.show, current, max);
 
 					if (stackView.currentItem === episodesViewer) {
 						// replaces an episodes viewer by another episodes viewer
@@ -297,7 +291,8 @@ Rectangle {
 										   replace: true,
 										   properties: {
 											   show: episodesViewer.show,
-											   season: current
+											   season: current,
+											   maxSeason: max
 										   }
 									   });
 					} else {

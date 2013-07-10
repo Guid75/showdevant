@@ -10,6 +10,7 @@ Item {
 	property alias model : episodeModel
 	property alias show : episodeModel.show
 	property alias season : episodeModel.season
+	property int maxSeason
 	property int flowMargins : 6
 
 	function getEpisodeItemCoordinates(episode) {
@@ -34,20 +35,12 @@ Item {
 		id: episodeModel
 	}
 
-	function __itemClicked(episode) {
-		//			episodeSelector.current = episode;
-		//			episodeSelector.min = 1;
-		//			episodeSelector.max = currentModel.count;
-		//			episodeSelector.visible = true;
-		//			episodeSelector.height = 40;
-		//			playgroundLoader.setSource("EpisodeDetail.qml", {
-		//										   showId: currentModel.show,
-		//										   season: currentModel.season,
-		//										   episode: episode
-		//									   });
-	}
-
 	Component.onCompleted: {
+		// pre-fetch surrounding seasons
+//		if (season > 1)
+//			cache.synchronizeEpisodes(show, season - 1);
+//		if (season < maxSeason)
+//			cache.synchronizeEpisodes(show, season + 1);
 	}
 
 	Flickable {
@@ -88,7 +81,7 @@ Item {
 			width: 200
 			height: 200
 		}
-		active: model ? model.synchronizeState === CacheWatcher.Synchronizing : false
+		active: model && model.synchronizeState === CacheWatcher.Synchronizing
 		asynchronous: true
 	}
 }

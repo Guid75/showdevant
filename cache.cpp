@@ -331,6 +331,87 @@ bool Cache::parseRemoveShow(const QString &showId, const JsonParser &json)
 	return true;
 }
 
+void Cache::parseSubtitles(const QString &show, int season, int episode, const JsonParser &json)
+{
+	QJsonObject subtitlesJson = json.root().value("subtitles").toObject();
+	if (!QSqlDatabase::database().transaction()) {
+		qCritical("Error while beginning a transaction for SQL insertion");
+		return;
+	}
+
+	// remove all subtitles for an episode
+	QSqlQuery query;
+	query.prepare("DELETE FROM subtitle WHERE show_id=:show_id AND season=:season AND episode=:episode");
+	query.bindValue(":show_id", show);
+	query.bindValue(":season", season);
+	query.bindValue(":episode", episode);
+	query.exec();
+
+	foreach (const QString &key, subtitlesJson.keys()) {
+		QJsonObject subtitleJson = subtitlesJson.value(key).toObject();
+		if (subtitleJson.isEmpty())
+			continue;
+
+		QString language = subtitleJson.value("language").toString();
+		QString source = subtitleJson.value("source").toString();
+		QString file = subtitleJson.value("file").toString();
+		QString url = subtitleJson.value("url").toString();
+		int quality = subtitleJson.value("quality").toDouble();
+
+		// TODO smash data if already exists
+		query.prepare("INSERT INTO subtitle (show_id, season, episode, language, "
+					  "source, file, url, quality) "
+					  "VALUES (:show_id, :season, :episode, "
+					  ":language, :source, :file, :url, :quality)");
+		query.bindValue(":show_id", show);
+		query.bindValue(":season", season);
+		query.bindValue(":episode", episode);
+		query.bindValue(":language", language);
+		query.bindValue(":source", source);
+		query.bindValue(":file", file);
+		query.bindValue(":url", url);
+		query.bindValue(":quality", quality);
+		if (!query.exec()) {
+			qCritical("Insertion failed, the subtitle parsing is stopped");
+			break;
+		}
+
+		// content?
+		int subtitleId = query.lastInsertId().toInt();
+
+		QJsonObject contentJson = subtitleJson.value("content").toObject();
+		if (!contentJson.isEmpty()) {
+			// use a QMap to keep all strings ordered as sent by the webserver
+			QMap<int,QString> files;
+			foreach (const QString &key, contentJson.keys()) {
+				QString v = contentJson.value(key).toString();
+				if (!v.isEmpty())
+					files.insert(key.toInt(), v);
+			}
+
+			QMapIterator<int,QString> i(files);
+			while (i.hasNext()) {
+				i.next();
+				query.prepare("INSERT INTO subtitle_content (subtitle_id, file) "
+							  "VALUES (:subtitle_id, :file)");
+				query.bindValue(":subtitle_id", subtitleId);
+				query.bindValue(":file", i.value());
+				query.exec();
+			}
+		}
+	}
+
+	// update the episodes last check date of the subtitles
+	query.prepare("UPDATE episode SET subtitles_last_check_date=:date WHERE show_id=:show_id AND season=:season AND episode=:episode");
+	query.bindValue(":date", QDateTime::currentMSecsSinceEpoch() / 1000);
+	query.bindValue(":show_id", show);
+	query.bindValue(":season", season);
+	query.bindValue(":episode", episode);
+	query.exec();
+
+	QSqlDatabase::database().commit();
+}
+
 void Cache::showInfosCallback(const QVariantMap &id, const JsonParser &json)
 {
 	QString showId = id["showId"].toString();
@@ -392,6 +473,12 @@ void Cache::watchShowCallback(const QVariantMap &id, const JsonParser &json)
 	tagSeen(id["showId"].toString(), id["season"].toInt(), id["episode"].toInt());
 
 	emit synchronized(Data_WatchShow, id);
+}
+
+void Cache::subtitlesCallback(const QVariantMap &id, const JsonParser &json)
+{
+	parseSubtitles(id["showId"].toString(), id["season"].toInt(), id["episode"].toInt(), json);
+	emit synchronized(Data_Subtitles, id);
 }
 
 int Cache::synchronizeShowInfos(const QString &showId)
@@ -611,6 +698,61 @@ int Cache::watchShow(const QString &showId, int season, int episode)
 	action->id = id;
 	action->callbackMethodName = "watchShowCallback";
 	Command *command = CommandManager::instance().membersWatched(showId, season, episode);
+	action->commands << command;
+	currentActions << action;
+	commandMapper.setMapping(command, command);
+	connect(command, SIGNAL(finished()), &commandMapper, SLOT(map()));
+	return 1;
+}
+
+int Cache::synchronizeSubtitles(const QString &showId, int season, int episode, const QString &language)
+{
+	qint64 last_sync_epoch = 0;
+	qint64 expiration = 24 * 60 * 60 * 1000; // one day => TODO customizable
+
+	QVariantMap id;
+	id.insert("showId", showId);
+	id.insert("season", season);
+	id.insert("episode", episode);
+
+	// have we the season in database?
+	// take the expiration date in account
+	QSqlQuery query;
+	query.prepare("SELECT subtitles_last_check_date FROM episode WHERE show_id=:show_id AND season=:season AND episode=:episode");
+	query.bindValue(":show_id", showId);
+	query.bindValue(":season", season);
+	query.bindValue(":episode", episode);
+	query.exec();
+	if (query.next() && !query.value(0).isNull())
+		last_sync_epoch = query.value(0).toLongLong() * 1000;
+
+#ifdef OFFLINE
+	emit synchronized(Data_Subtitles, id);
+	return 0;
+#endif
+
+	if (QDateTime::currentDateTime().toMSecsSinceEpoch() - last_sync_epoch <= expiration) {
+		// data are already synchronized, we can use them
+		emit synchronized(Data_Subtitles, id);
+		return 0;
+	}
+
+	// expired data, we need to launch the request if not already done
+	emit synchronizing(Data_Subtitles, id);
+
+	// is there a current action about it?
+	SynchronizeAction *action = getAction(Data_Subtitles, id);
+	if (action) {
+		// just wait for the end of it
+		return 1;
+	}
+
+	// store the synchronize action
+	action = new SynchronizeAction;
+	action->dataType = Data_Subtitles;
+	action->id = id;
+	action->callbackMethodName = "subtitlesCallback";
+	Command *command = CommandManager::instance().subtitlesShow(showId, season, episode);
 	action->commands << command;
 	currentActions << action;
 	commandMapper.setMapping(command, command);

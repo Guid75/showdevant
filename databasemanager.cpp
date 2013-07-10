@@ -96,18 +96,19 @@ int DatabaseManager::openDB()
 					 "FOREIGN KEY (show_id, season) REFERENCES season(show_id, number) ON DELETE CASCADE)"))
 		return ret;
 
-	//	// subtitles
-	//	query.exec("CREATE TABLE subtitle "
-	//			   "(id integer primary key, show_id text, season integer, episode integer, "
-	//			   "language text, source text, file text, "
-	//			   "url text, quality integer, "
-	//			   "UNIQUE (show_id, season, episode, url) ON CONFLICT REPLACE)");
+	// subtitles
+	if (!createTable(query, "subtitle",
+					 "(id integer primary key, show_id text, season integer, episode integer, "
+					 "language text, source text, file text, "
+					 "url text, quality integer, "
+					 "UNIQUE (show_id, season, episode, url) ON CONFLICT REPLACE)"))
+		return ret;
 
-	//	// subtitles content
-	//	query.exec("CREATE TABLE subtitle_content "
-	//			   "(subtitle_id integer, file text, "
-	//			   "FOREIGN KEY (subtitle_id) REFERENCES subtitle(id) ON DELETE CASCADE, "
-	//			   "UNIQUE (subtitle_id, file) ON CONFLICT REPLACE)");
+	// subtitles content
+	query.exec("CREATE TABLE subtitle_content "
+			   "(subtitle_id integer, file text, "
+			   "FOREIGN KEY (subtitle_id) REFERENCES subtitle(id) ON DELETE CASCADE, "
+			   "UNIQUE (subtitle_id, file) ON CONFLICT REPLACE)");
 
 	emit opened();
 

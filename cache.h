@@ -38,7 +38,8 @@ public:
 		Data_AddShow,
 		Data_RemoveShow,
 		Data_ArchiveShow,
-		Data_WatchShow
+		Data_WatchShow,
+		Data_Subtitles
 	};
 
 	static Cache &instance();
@@ -59,6 +60,8 @@ public:
 	Q_INVOKABLE int archiveShow(const QString &showId);
 
 	Q_INVOKABLE int watchShow(const QString &showId, int season, int episode);
+
+	Q_INVOKABLE int synchronizeSubtitles(const QString &showId, int season, int episode, const QString &language = QString());
 
 signals:
 	void synchronizing(CacheDataType dataType, const QVariantMap &id);
@@ -102,6 +105,7 @@ private slots:
 	void parseMemberInfos(const JsonParser &json);
 	bool parseAddShow(const QString &showId, const QString &title, const JsonParser &json);
 	bool parseRemoveShow(const QString &showId, const JsonParser &json);
+	void parseSubtitles(const QString &show, int season, int episode, const JsonParser &json);
 
 	// action callbacks
 	void showInfosCallback(const QVariantMap &id, const JsonParser &json);
@@ -111,6 +115,7 @@ private slots:
 	void removeShowCallback(const QVariantMap &id, const JsonParser &json);
 	void archiveShowCallback(const QVariantMap &id, const JsonParser &json);
 	void watchShowCallback(const QVariantMap &id, const JsonParser &json);
+	void subtitlesCallback(const QVariantMap &id, const JsonParser &json);
 };
 
 #endif // CACHE_H

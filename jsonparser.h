@@ -28,6 +28,8 @@ public:
 
 	bool parse(const QByteArray &content);
 
+	const QByteArray &json() const { return _json; }
+
 	const QJsonObject &root() const { return _root; }
 
 	int code() const { return _code; }
@@ -36,6 +38,7 @@ public:
 
 private:
 	bool valid;
+	QByteArray _json;
 	QJsonDocument doc;
 	QJsonObject _root;
 	int _code;
