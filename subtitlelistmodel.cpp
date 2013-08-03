@@ -3,7 +3,8 @@
 #include "subtitlelistmodel.h"
 
 SubtitleListModel::SubtitleListModel(QObject *parent) :
-	SqlQueryModel(parent)
+	SqlQueryModel(parent),
+	_season(-1), _episode(-1)
 {
 }
 

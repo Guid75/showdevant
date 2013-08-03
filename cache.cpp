@@ -117,7 +117,7 @@ void Cache::parseEpisodes(const QString &showId, int season, const QJsonObject &
 		int comments = episodeJson.value("comments").toString().toInt();
 
 		QSqlQuery query;
-		query.prepare("REPLACE INTO episode (show_id, season, episode, title, description, number, global, "
+		query.prepare("INSERT INTO episode (show_id, season, episode, title, description, number, global, "
 					  "date, seen, comments) "
 					  "VALUES (:show_id, :season, :episode, :title, :description, :number, :global, "
 					  ":date, :seen, :comments)");
@@ -132,7 +132,35 @@ void Cache::parseEpisodes(const QString &showId, int season, const QJsonObject &
 		query.bindValue(":date", date);
 		query.bindValue(":seen", seen);
 		query.bindValue(":comments", comments);
+		if (query.exec())
+			continue;
+
+		// insert failed => it seems the episode already exists so let's just update it
+
+		query.prepare("UPDATE episode SET title=:title, description=:description, number=:number, global=:global, "
+					  "date=:date, seen=:seen, comments=:comments WHERE show_id=:show_id AND season=:season AND episode=:episode");
+
+		query.bindValue(":show_id", showId);
+		query.bindValue(":season", season);
+		query.bindValue(":episode", episode);
+		query.bindValue(":title", title);
+		query.bindValue(":description", description);
+		query.bindValue(":number", number);
+		query.bindValue(":global", global);
+		query.bindValue(":date", date);
+		query.bindValue(":seen", seen);
+		query.bindValue(":comments", comments);
 		query.exec();
+
+		if (detailMode) {
+			query.prepare("UPDATE episode SET last_sync_detail=:epoch WHERE show_id=:show_id AND season=:season AND episode=:episode");
+			query.bindValue(":show_id", showId);
+			query.bindValue(":season", season);
+			query.bindValue(":episode", episode);
+			query.bindValue(":epoch", QDateTime::currentMSecsSinceEpoch() / 1000);
+			query.exec();
+
+		}
 	}
 }
 
