@@ -46,69 +46,9 @@ Rectangle {
 			bottom: parent.bottom
 		}
 
-		//		anchors.margins: 4
 		Tab {
 			title: "Subtitles"
-			Rectangle {
-				ColumnLayout {
-					anchors.fill: parent
-					anchors.topMargin: 4
-					spacing: 2
-					RowLayout {
-						Layout.fillWidth: true
-						spacing: 2
-						TextField {
-							Layout.minimumWidth: 200
-							placeholderText: "Enter a search term"
-						}
-						ComboBox {
-							Layout.fillWidth: true
-							model: 10
-						}
-						ComboBox {
-							textRole: 'caption'
-							model: ListModel {
-								ListElement {
-									caption: "EN/FR"
-								}
-								ListElement {
-									caption: "FR"
-								}
-								ListElement {
-									caption: "EN"
-								}
-							}
-						}
-					}
-					Item {
-						Layout.fillHeight: true
-						Layout.fillWidth: true
-						TableView {
-							id: subtitlesTableView
-							anchors.fill: parent
-							model: subtitleListModel
-							headerVisible: false
-							TableViewColumn {
-								role: "file"
-								title: "File"
-							}
-						}
-						Loader {
-							id: loadingWidget
-							anchors.centerIn: parent
-							sourceComponent: LoadingWidget {
-								anchors.centerIn: parent
-								color: "#888888"
-								count: 16
-								size: 8
-								width: 100
-								height: 100
-							}
-							active: subtitleListModel.synchronizeState === CacheWatcher.Synchronizing
-							asynchronous: true
-						}
-					}
-				}
+			SubtitlesArea {
 			}
 		}
 		Tab {

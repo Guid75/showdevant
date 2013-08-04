@@ -70,7 +70,8 @@ OTHER_FILES += \
     qml/showdevant/MainStackViewDelegate.qml \
     qml/showdevant/ScrollText.qml \
     api_samples/members_info.json \
-    api_samples/subtitles_show.json
+    api_samples/subtitles_show.json \
+    qml/showdevant/SubtitlesArea.qml
 
 HEADERS += \
     downloadmanager.h \
